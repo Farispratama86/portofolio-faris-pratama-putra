@@ -1,0 +1,1839 @@
+import React, { useEffect, useState } from 'react';
+import {
+  ArrowLeft,
+  Award,
+  Brain,
+  Briefcase,
+  CheckCircle2,
+  Code2,
+  Crop,
+  Edit3,
+  ExternalLink,
+  Eye,
+  FolderKanban,
+  Image as ImageIcon,
+  LogIn,
+  LogOut,
+  Plus,
+  Printer,
+  Save,
+  Server,
+  ShieldCheck,
+  Sliders,
+  Sparkles,
+  Trash2,
+  User,
+} from 'lucide-react';
+import ImageCropperModal from '../components/ImageCropperModal';
+import CvModal from '../components/CvModal';
+import CertificateModal from '../components/CertificateModal';
+import {
+  CERTIFICATES as FALLBACK_CERTIFICATES,
+  DEFAULT_SKILLS,
+  EXPERIENCE_STATUS_OPTIONS,
+  PROFILE,
+  getBadgeStyle,
+  getSkillRatingLabel,
+} from '../data/portfolioData';
+import {
+  createCertificate,
+  createExperience,
+  createProject,
+  createSkill,
+  deleteCertificate,
+  deleteExperience,
+  deleteProject,
+  deleteSkill,
+  fetchCertificates,
+  fetchExperiences,
+  fetchProfile,
+  fetchProjects,
+  fetchSkills,
+  getApiBaseUrl,
+  loginAdmin,
+  updateCertificate,
+  updateExperience,
+  updateProfile,
+  updateProject,
+  updateSkill,
+  uploadCroppedImage,
+} from '../services/api';
+
+const TOKEN_KEY = 'faris-admin-jwt';
+
+export default function AdminPanel({ onNavigate }) {
+  const [token, setToken] = useState(() => {
+    try {
+      return localStorage.getItem(TOKEN_KEY) || '';
+    } catch {
+      return '';
+    }
+  });
+  const [email, setEmail] = useState('farispakez1209@gmail.com');
+  const [password, setPassword] = useState('');
+  const [loginError, setLoginError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const [activeTab, setActiveTab] = useState('projects');
+  const [projects, setProjects] = useState([]);
+  const [experiences, setExperiences] = useState([]);
+  const [certificates, setCertificates] = useState([]);
+  const [skills, setSkills] = useState([]);
+  const [toast, setToast] = useState('');
+  const [cropperTarget, setCropperTarget] = useState(null); // null | 'project' | 'profile' | 'certificate'
+  const [cvPreviewOpen, setCvPreviewOpen] = useState(false);
+  const [previewCert, setPreviewCert] = useState(null);
+
+  const [profileForm, setProfileForm] = useState({
+    photoUrl: '',
+    photoBlob: null,
+    photoMeta: '',
+    role: PROFILE.role,
+    bio: PROFILE.bio,
+    githubUrl: PROFILE.githubUrl || 'https://github.com/Farispratama86',
+    linkedinUrl: '',
+    instagramUrl: '',
+    tiktokUrl: '',
+  });
+
+  const [editingProjectId, setEditingProjectId] = useState(null);
+  const [projForm, setProjForm] = useState({
+    title: '',
+    category: 'web-ml',
+    categoryLabel: 'Web UI/UX',
+    year: '2026',
+    summary: '',
+    highlightsText: '',
+    tagsText: '',
+    liveUrl: '',
+    repoUrl: 'https://github.com/Farispratama86',
+    featured: false,
+    imageUrl: '',
+    imageBlob: null,
+    imageMeta: '',
+  });
+
+  const [editingExpId, setEditingExpId] = useState(null);
+  const [expForm, setExpForm] = useState({
+    badge: 'Magang · Hybrid',
+    role: '',
+    company: '',
+    period: '',
+    location: 'Surakarta, Indonesia',
+    sectionHeading: 'Tanggung Jawab Utama',
+    bulletsText: '',
+  });
+
+  const [editingCertId, setEditingCertId] = useState(null);
+  const [certForm, setCertForm] = useState({
+    title: '',
+    issuer: '',
+    category: 'Magang',
+    issueDate: '',
+    credentialUrl: '',
+    experienceId: '',
+    description: '',
+    imageUrl: '',
+    imageBlob: null,
+    imageMeta: '',
+  });
+
+  const [editingSkillId, setEditingSkillId] = useState(null);
+  const [skillFilterTab, setSkillFilterTab] = useState('all'); // 'all' | 'hard' | 'soft'
+  const [skillForm, setSkillForm] = useState({
+    name: '',
+    category: 'hard', // 'hard' | 'soft'
+    groupName: 'Web UI/UX & ML',
+    ratePoint: 85,
+    sortOrder: 0,
+  });
+
+  const notify = (msg) => {
+    setToast(msg);
+    setTimeout(() => setToast(''), 3200);
+  };
+
+  const loadAll = async () => {
+    try {
+      const [p, e, c, s, prof] = await Promise.all([
+        fetchProjects(),
+        fetchExperiences(),
+        fetchCertificates().catch(() => []),
+        fetchSkills().catch(() => []),
+        fetchProfile().catch(() => ({})),
+      ]);
+      setProjects(p);
+      setExperiences(e);
+      setCertificates(c.length ? c : FALLBACK_CERTIFICATES);
+      setSkills(s.length ? s : DEFAULT_SKILLS);
+      if (prof) {
+        setProfileForm((prev) => ({
+          ...prev,
+          photoUrl: prof.photoUrl || '',
+          photoMeta: prof.photoUrl ? 'Tersimpan di Cloudinary' : '',
+          role: prof.role || PROFILE.role,
+          bio: prof.bio || PROFILE.bio,
+          githubUrl: prof.githubUrl || PROFILE.githubUrl || '',
+          linkedinUrl: prof.linkedinUrl || '',
+          instagramUrl: prof.instagramUrl || '',
+          tiktokUrl: prof.tiktokUrl || '',
+        }));
+      }
+    } catch (err) {
+      notify(`Gagal memuat data: ${err.message}`);
+    }
+  };
+
+  useEffect(() => {
+    if (token) loadAll();
+  }, [token]);
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setLoginError('');
+    setLoading(true);
+    try {
+      const res = await loginAdmin(email, password);
+      setToken(res.token);
+      try {
+        localStorage.setItem(TOKEN_KEY, res.token);
+      } catch {
+        // ignore
+      }
+      notify('Login JWT berhasil!');
+    } catch (err) {
+      setLoginError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogout = () => {
+    setToken('');
+    try {
+      localStorage.removeItem(TOKEN_KEY);
+    } catch {
+      // ignore
+    }
+  };
+
+  const handleSaveProfile = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      let photoUrl = profileForm.photoUrl;
+      let photoPublicId = undefined;
+
+      if (profileForm.photoBlob) {
+        const up = await uploadCroppedImage(profileForm.photoBlob, token, 'profile');
+        photoUrl = up.url;
+        photoPublicId = up.publicId;
+      }
+
+      const saved = await updateProfile(
+        {
+          photoUrl,
+          photoPublicId,
+          role: profileForm.role,
+          bio: profileForm.bio,
+          githubUrl: profileForm.githubUrl,
+          linkedinUrl: profileForm.linkedinUrl,
+          instagramUrl: profileForm.instagramUrl,
+          tiktokUrl: profileForm.tiktokUrl,
+        },
+        token
+      );
+
+      setProfileForm((prev) => ({
+        ...prev,
+        photoUrl: saved.photoUrl || prev.photoUrl,
+        photoBlob: null,
+        photoMeta: saved.photoUrl ? 'Tersimpan di Cloudinary & TiDB' : '',
+      }));
+      notify('Profil & foto berhasil disimpan ke Cloudinary dan TiDB Cloud!');
+    } catch (err) {
+      notify(`Error: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const resetProjectForm = () => {
+    setEditingProjectId(null);
+    setProjForm({
+      title: '',
+      category: 'web-ml',
+      categoryLabel: 'Web UI/UX',
+      year: '2026',
+      summary: '',
+      highlightsText: '',
+      tagsText: '',
+      liveUrl: '',
+      repoUrl: 'https://github.com/Farispratama86',
+      featured: false,
+      imageUrl: '',
+      imageBlob: null,
+      imageMeta: '',
+    });
+  };
+
+  const resetExpForm = () => {
+    setEditingExpId(null);
+    setExpForm({
+      badge: 'Magang · Hybrid',
+      role: '',
+      company: '',
+      period: '',
+      location: 'Surakarta, Indonesia',
+      sectionHeading: 'Tanggung Jawab Utama',
+      bulletsText: '',
+    });
+  };
+
+  const handleSaveProject = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      let imageUrl = projForm.imageUrl;
+      let imagePublicId = '';
+
+      if (projForm.imageBlob) {
+        const up = await uploadCroppedImage(projForm.imageBlob, token, 'project');
+        imageUrl = up.url;
+        imagePublicId = up.publicId;
+      }
+
+      const payload = {
+        title: projForm.title,
+        category: projForm.category,
+        categoryLabel: projForm.categoryLabel,
+        year: projForm.year,
+        summary: projForm.summary,
+        highlights: projForm.highlightsText.split('\n').map((s) => s.trim()).filter(Boolean),
+        tags: projForm.tagsText.split(',').map((s) => s.trim()).filter(Boolean),
+        imageUrl,
+        imagePublicId: imagePublicId || undefined,
+        liveUrl: projForm.liveUrl,
+        repoUrl: projForm.repoUrl,
+        featured: projForm.featured,
+      };
+
+      if (editingProjectId) {
+        const updated = await updateProject(editingProjectId, payload, token);
+        setProjects((prev) => prev.map((p) => (p.id === editingProjectId ? updated : p)));
+        notify('Proyek diperbarui di TiDB Cloud.');
+      } else {
+        const created = await createProject(payload, token);
+        setProjects((prev) => [created, ...prev]);
+        notify('Proyek baru tersimpan ke TiDB Cloud & Cloudinary!');
+      }
+      resetProjectForm();
+    } catch (err) {
+      notify(`Error: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteProject = async (id) => {
+    try {
+      await deleteProject(id, token);
+      setProjects((prev) => prev.filter((p) => p.id !== id));
+      notify('Proyek dihapus.');
+    } catch (err) {
+      notify(`Error: ${err.message}`);
+    }
+  };
+
+  const handleSaveExperience = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const payload = {
+        badge: expForm.badge,
+        role: expForm.role,
+        company: expForm.company,
+        period: expForm.period,
+        location: expForm.location,
+        sections: [
+          {
+            heading: expForm.sectionHeading || 'Tanggung Jawab Utama',
+            bullets: expForm.bulletsText.split('\n').map((b) => b.trim()).filter(Boolean),
+          },
+        ],
+      };
+
+      if (editingExpId) {
+        const updated = await updateExperience(editingExpId, payload, token);
+        setExperiences((prev) => prev.map((x) => (x.id === editingExpId ? updated : x)));
+        notify('Pengalaman diperbarui.');
+      } else {
+        const created = await createExperience(payload, token);
+        setExperiences((prev) => [created, ...prev]);
+        notify('Program magang / pengalaman baru ditambahkan!');
+      }
+      resetExpForm();
+    } catch (err) {
+      notify(`Error: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteExp = async (id) => {
+    try {
+      await deleteExperience(id, token);
+      setExperiences((prev) => prev.filter((x) => x.id !== id));
+      notify('Pengalaman dihapus.');
+    } catch (err) {
+      notify(`Error: ${err.message}`);
+    }
+  };
+
+  const resetCertForm = () => {
+    setEditingCertId(null);
+    setCertForm({
+      title: '',
+      issuer: '',
+      category: 'Magang',
+      issueDate: '',
+      credentialUrl: '',
+      experienceId: '',
+      description: '',
+      imageUrl: '',
+      imageBlob: null,
+      imageMeta: '',
+    });
+  };
+
+  const handleSaveCertificate = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      let imageUrl = certForm.imageUrl;
+      let imagePublicId = '';
+
+      if (certForm.imageBlob) {
+        const up = await uploadCroppedImage(certForm.imageBlob, token, 'certificate');
+        imageUrl = up.url;
+        imagePublicId = up.publicId;
+      }
+
+      const payload = {
+        title: certForm.title,
+        issuer: certForm.issuer,
+        category: certForm.category,
+        issueDate: certForm.issueDate,
+        credentialUrl: certForm.credentialUrl,
+        experienceId: certForm.experienceId || null,
+        description: certForm.description,
+        imageUrl,
+        imagePublicId: imagePublicId || undefined,
+      };
+
+      if (editingCertId) {
+        const updated = await updateCertificate(editingCertId, payload, token);
+        setCertificates((prev) => prev.map((c) => (c.id === editingCertId ? updated : c)));
+        notify('Sertifikat berhasil diperbarui.');
+      } else {
+        const created = await createCertificate(payload, token);
+        setCertificates((prev) => [created, ...prev]);
+        notify('Sertifikat baru berhasil ditambahkan!');
+      }
+      resetCertForm();
+    } catch (err) {
+      notify(`Error: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteCert = async (id) => {
+    try {
+      await deleteCertificate(id, token);
+      setCertificates((prev) => prev.filter((c) => c.id !== id));
+      notify('Sertifikat dihapus.');
+    } catch (err) {
+      notify(`Error: ${err.message}`);
+    }
+  };
+
+  const resetSkillForm = () => {
+    setEditingSkillId(null);
+    setSkillForm({
+      name: '',
+      category: 'hard',
+      groupName: 'Web UI/UX & ML',
+      ratePoint: 85,
+      sortOrder: 0,
+    });
+  };
+
+  const handleSaveSkill = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const payload = {
+        name: skillForm.name,
+        category: skillForm.category,
+        groupName: skillForm.groupName,
+        ratePoint: Number(skillForm.ratePoint) || 85,
+        sortOrder: Number(skillForm.sortOrder) || 0,
+      };
+
+      if (editingSkillId) {
+        const updated = await updateSkill(editingSkillId, payload, token);
+        setSkills((prev) => prev.map((s) => (s.id === editingSkillId ? updated : s)));
+        notify('Keahlian berhasil diperbarui.');
+      } else {
+        const created = await createSkill(payload, token);
+        setSkills((prev) => [...prev, created]);
+        notify('Keahlian baru berhasil ditambahkan!');
+      }
+      resetSkillForm();
+    } catch (err) {
+      notify(`Error: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteSkill = async (id) => {
+    try {
+      await deleteSkill(id, token);
+      setSkills((prev) => prev.filter((s) => s.id !== id));
+      notify('Keahlian dihapus.');
+    } catch (err) {
+      notify(`Error: ${err.message}`);
+    }
+  };
+
+  if (!token) {
+    return (
+      <div className="min-h-screen bg-[#090f1d] text-slate-100 flex items-center justify-center p-4">
+        <div className="w-full max-w-md bg-[#111a2e] border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl space-y-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 rounded-xl bg-sky-500/15 text-sky-400 flex items-center justify-center">
+                <ShieldCheck className="w-6 h-6" />
+              </div>
+              <div>
+                <h1 className="text-xl font-extrabold">Admin Portofolio</h1>
+                <p className="text-xs text-slate-400">API: {getApiBaseUrl()}</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => onNavigate('/')}
+              className="text-xs text-slate-400 hover:text-sky-400 inline-flex items-center gap-1"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" /> Web
+            </button>
+          </div>
+
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div>
+              <label className="block text-xs font-semibold text-slate-400 mb-1.5">Email Admin</label>
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-400 mb-1.5">Password Admin</label>
+              <input
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Password admin Anda"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-sm"
+              />
+            </div>
+            {loginError && (
+              <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs">
+                {loginError}
+              </div>
+            )}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full inline-flex items-center justify-center gap-2 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-semibold text-sm disabled:opacity-50"
+            >
+              <LogIn className="w-4 h-4" />
+              <span>{loading ? 'Masuk...' : 'Login JWT'}</span>
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-[#090f1d] text-slate-100">
+      <header className="sticky top-0 z-30 bg-[#090f1d]/90 backdrop-blur border-b border-slate-800">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <span className="w-9 h-9 rounded-xl bg-sky-500 text-white flex items-center justify-center font-extrabold text-sm">
+              FP
+            </span>
+            <div className="min-w-0">
+              <h1 className="font-bold text-sm sm:text-base truncate">Admin CMS Portofolio</h1>
+              <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
+                <Server className="w-3 h-3 text-emerald-400" />
+                <span>Terhubung: {getApiBaseUrl()}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setCvPreviewOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-sky-500/15 hover:bg-sky-500/25 border border-sky-500/30 text-sky-300 text-xs font-semibold"
+            >
+              <Printer className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Cetak CV PDF</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => onNavigate('/')}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 text-sky-400" />
+              <span>Lihat Portofolio</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-rose-500/30 text-rose-300 hover:bg-rose-500/10 text-xs font-semibold"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span>Keluar</span>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+        <div className="inline-flex flex-wrap p-1 rounded-xl bg-[#111a2e] border border-slate-800 gap-1">
+          <button
+            type="button"
+            onClick={() => setActiveTab('profile')}
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold ${
+              activeTab === 'profile' ? 'bg-sky-500 text-white' : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <User className="w-4 h-4" />
+            <span>Profil &amp; Foto</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('projects')}
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold ${
+              activeTab === 'projects' ? 'bg-sky-500 text-white' : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <FolderKanban className="w-4 h-4" />
+            <span>Proyek ({projects.length})</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('experiences')}
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold ${
+              activeTab === 'experiences' ? 'bg-sky-500 text-white' : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <Briefcase className="w-4 h-4" />
+            <span>Pengalaman &amp; Magang ({experiences.length})</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('certificates')}
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold ${
+              activeTab === 'certificates' ? 'bg-sky-500 text-white' : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <Award className="w-4 h-4" />
+            <span>Sertifikat ({certificates.length})</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('skills')}
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold ${
+              activeTab === 'skills' ? 'bg-sky-500 text-white' : 'text-slate-400 hover:text-slate-200'
+            }`}
+          >
+            <Brain className="w-4 h-4" />
+            <span>Keahlian &amp; Rate ({skills.length})</span>
+          </button>
+        </div>
+
+        {/* PROFILE TAB */}
+        {activeTab === 'profile' && (
+          <form onSubmit={handleSaveProfile} className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <div className="lg:col-span-5 bg-[#111a2e] border border-slate-800 rounded-2xl p-5 space-y-4">
+              <h2 className="font-bold text-base">Foto Profil (Rasio 4:3 → Cloudinary)</h2>
+              <div className="aspect-[4/3] rounded-xl overflow-hidden bg-slate-950 border border-dashed border-slate-700 flex items-center justify-center">
+                {profileForm.photoUrl ? (
+                  <img src={profileForm.photoUrl} alt="Foto Profil" className="w-full h-full object-cover object-top" />
+                ) : (
+                  <div className="text-center p-4">
+                    <User className="w-10 h-10 text-slate-600 mx-auto mb-1.5" />
+                    <p className="text-xs text-slate-500">Belum ada foto profil tersimpan</p>
+                  </div>
+                )}
+              </div>
+              <div className="flex items-center justify-between gap-2">
+                <button
+                  type="button"
+                  onClick={() => setCropperTarget('profile')}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 text-sky-400 border border-sky-500/30 text-xs font-semibold"
+                >
+                  <Crop className="w-3.5 h-3.5" />
+                  <span>{profileForm.photoUrl ? 'Ganti / Crop Foto Profil' : 'Pilih & Crop Foto Profil'}</span>
+                </button>
+                {profileForm.photoMeta && <span className="text-[11px] text-emerald-400">{profileForm.photoMeta}</span>}
+              </div>
+            </div>
+
+            <div className="lg:col-span-7 bg-[#111a2e] border border-slate-800 rounded-2xl p-5 space-y-4">
+              <h2 className="font-bold text-base">Bio &amp; Tautan Media Sosial</h2>
+              <div>
+                <label className="block text-xs font-semibold text-slate-400 mb-1">Peran / Tagline Hero</label>
+                <input
+                  type="text"
+                  value={profileForm.role}
+                  onChange={(e) => setProfileForm({ ...profileForm, role: e.target.value })}
+                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-400 mb-1">Deskripsi Singkat (Hero)</label>
+                <textarea
+                  rows="3"
+                  value={profileForm.bio}
+                  onChange={(e) => setProfileForm({ ...profileForm, bio: e.target.value })}
+                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm resize-none"
+                />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-400 mb-1">GitHub URL</label>
+                  <input
+                    type="url"
+                    value={profileForm.githubUrl}
+                    onChange={(e) => setProfileForm({ ...profileForm, githubUrl: e.target.value })}
+                    placeholder="https://github.com/..."
+                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-400 mb-1">LinkedIn URL</label>
+                  <input
+                    type="url"
+                    value={profileForm.linkedinUrl}
+                    onChange={(e) => setProfileForm({ ...profileForm, linkedinUrl: e.target.value })}
+                    placeholder="https://linkedin.com/in/..."
+                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-400 mb-1">Instagram URL</label>
+                  <input
+                    type="url"
+                    value={profileForm.instagramUrl}
+                    onChange={(e) => setProfileForm({ ...profileForm, instagramUrl: e.target.value })}
+                    placeholder="https://instagram.com/..."
+                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-400 mb-1">TikTok URL</label>
+                  <input
+                    type="url"
+                    value={profileForm.tiktokUrl}
+                    onChange={(e) => setProfileForm({ ...profileForm, tiktokUrl: e.target.value })}
+                    placeholder="https://tiktok.com/@..."
+                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                  />
+                </div>
+              </div>
+              <button
+                type="submit"
+                disabled={loading}
+                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-semibold text-sm disabled:opacity-50"
+              >
+                <Save className="w-4 h-4" />
+                <span>{loading ? 'Menyimpan...' : 'Simpan Profil & Foto'}</span>
+              </button>
+            </div>
+          </form>
+        )}
+
+        {/* PROJECTS TAB */}
+        {activeTab === 'projects' && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <form onSubmit={handleSaveProject} className="lg:col-span-5 bg-[#111a2e] border border-slate-800 rounded-2xl p-5 space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="font-bold text-base">{editingProjectId ? 'Edit Proyek' : 'Tambah Proyek Baru'}</h2>
+                {editingProjectId && (
+                  <button type="button" onClick={resetProjectForm} className="text-xs text-slate-400 hover:text-sky-400">
+                    Batal Edit
+                  </button>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-xs font-semibold text-slate-400">Foto Proyek (Rasio 16:9 → Cloudinary)</label>
+                <div className="aspect-video rounded-xl overflow-hidden bg-slate-950 border border-dashed border-slate-700 flex items-center justify-center">
+                  {projForm.imageUrl ? (
+                    <img src={projForm.imageUrl} alt="Preview crop" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="text-center p-4">
+                      <ImageIcon className="w-8 h-8 text-slate-600 mx-auto mb-1" />
+                      <p className="text-xs text-slate-500">Belum ada foto</p>
+                    </div>
+                  )}
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setCropperTarget('project')}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 text-sky-400 border border-sky-500/30 text-xs font-semibold"
+                  >
+                    <Crop className="w-3.5 h-3.5" />
+                    <span>{projForm.imageUrl ? 'Ganti / Crop Foto 16:9' : 'Pilih & Crop Foto 16:9'}</span>
+                  </button>
+                  {projForm.imageMeta && <span className="text-[11px] text-emerald-400">{projForm.imageMeta}</span>}
+                </div>
+              </div>
+
+              <input
+                type="text"
+                required
+                value={projForm.title}
+                onChange={(e) => setProjForm({ ...projForm, title: e.target.value })}
+                placeholder="Judul Proyek"
+                className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm"
+              />
+
+              <div className="grid grid-cols-2 gap-3">
+                <select
+                  value={projForm.category}
+                  onChange={(e) => setProjForm({ ...projForm, category: e.target.value })}
+                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm"
+                >
+                  <option value="web-ml">Web &amp; ML</option>
+                  <option value="iot">IoT</option>
+                  <option value="desktop">Desktop</option>
+                </select>
+                <input
+                  type="text"
+                  value={projForm.year}
+                  onChange={(e) => setProjForm({ ...projForm, year: e.target.value })}
+                  placeholder="Tahun"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm"
+                />
+              </div>
+
+              <textarea
+                rows="3"
+                required
+                value={projForm.summary}
+                onChange={(e) => setProjForm({ ...projForm, summary: e.target.value })}
+                placeholder="Ringkasan proyek..."
+                className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm resize-none"
+              />
+
+              <textarea
+                rows="2"
+                value={projForm.highlightsText}
+                onChange={(e) => setProjForm({ ...projForm, highlightsText: e.target.value })}
+                placeholder="Poin utama (1 baris = 1 poin)"
+                className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm resize-none"
+              />
+
+              <input
+                type="text"
+                value={projForm.tagsText}
+                onChange={(e) => setProjForm({ ...projForm, tagsText: e.target.value })}
+                placeholder="Tag teknologi (pisahkan koma)"
+                className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm"
+              />
+
+              <div className="grid grid-cols-2 gap-3">
+                <input
+                  type="url"
+                  value={projForm.liveUrl}
+                  onChange={(e) => setProjForm({ ...projForm, liveUrl: e.target.value })}
+                  placeholder="Live Demo URL (opsional)"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm"
+                />
+                <input
+                  type="url"
+                  value={projForm.repoUrl}
+                  onChange={(e) => setProjForm({ ...projForm, repoUrl: e.target.value })}
+                  placeholder="GitHub Repo URL"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm"
+                />
+              </div>
+
+              <label className="flex items-center gap-2 text-xs text-slate-300 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={projForm.featured}
+                  onChange={(e) => setProjForm({ ...projForm, featured: e.target.checked })}
+                  className="accent-sky-500"
+                />
+                <span>Jadikan Proyek Unggulan (Featured)</span>
+              </label>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full inline-flex items-center justify-center gap-2 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-semibold text-sm disabled:opacity-50"
+              >
+                <Save className="w-4 h-4" />
+                <span>{loading ? 'Menyimpan...' : editingProjectId ? 'Simpan Perubahan' : 'Simpan ke Database'}</span>
+              </button>
+            </form>
+
+            <div className="lg:col-span-7 space-y-3">
+              {projects.map((p) => (
+                <article key={p.id} className="bg-[#111a2e] border border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row gap-4">
+                  <div className="w-full sm:w-44 aspect-video rounded-xl overflow-hidden bg-slate-950 border border-slate-800 shrink-0 flex items-center justify-center">
+                    {p.imageUrl ? (
+                      <img src={p.imageUrl} alt={p.title} className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-[11px] text-slate-500">Belum ada foto</span>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0 space-y-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <h3 className="font-bold text-sm sm:text-base">{p.title}</h3>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditingProjectId(p.id);
+                            setProjForm({
+                              title: p.title,
+                              category: p.category,
+                              categoryLabel: p.categoryLabel,
+                              year: p.year,
+                              summary: p.summary,
+                              highlightsText: (p.highlights || []).join('\n'),
+                              tagsText: (p.tags || []).join(', '),
+                              liveUrl: p.liveUrl || '',
+                              repoUrl: p.repoUrl || '',
+                              featured: Boolean(p.featured),
+                              imageUrl: p.imageUrl || '',
+                              imageBlob: null,
+                              imageMeta: p.imageUrl ? 'Foto dari Cloudinary' : '',
+                            });
+                            setCropperTarget('project');
+                          }}
+                          className="inline-flex items-center gap-1 px-2 py-1.5 rounded-lg bg-sky-500/15 hover:bg-sky-500/25 border border-sky-500/30 text-sky-300 text-[11px] font-semibold"
+                          title="Upload atau ganti foto proyek ini"
+                        >
+                          <Crop className="w-3 h-3" />
+                          <span>{p.imageUrl ? 'Ganti Foto' : 'Upload Foto'}</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setEditingProjectId(p.id);
+                            setProjForm({
+                              title: p.title,
+                              category: p.category,
+                              categoryLabel: p.categoryLabel,
+                              year: p.year,
+                              summary: p.summary,
+                              highlightsText: (p.highlights || []).join('\n'),
+                              tagsText: (p.tags || []).join(', '),
+                              liveUrl: p.liveUrl || '',
+                              repoUrl: p.repoUrl || '',
+                              featured: Boolean(p.featured),
+                              imageUrl: p.imageUrl || '',
+                              imageBlob: null,
+                              imageMeta: p.imageUrl ? 'Foto dari Cloudinary' : '',
+                            });
+                          }}
+                          className="p-1.5 rounded-lg border border-slate-700 hover:border-sky-400 text-slate-300"
+                        >
+                          <Edit3 className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteProject(p.id)}
+                          className="p-1.5 rounded-lg border border-rose-500/30 hover:bg-rose-500/15 text-rose-400"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                    <p className="text-xs text-slate-400 line-clamp-2">{p.summary}</p>
+                    {p.liveUrl && (
+                      <a href={p.liveUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs text-emerald-400 hover:underline">
+                        Live Demo <ExternalLink className="w-3 h-3" />
+                      </a>
+                    )}
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* EXPERIENCES TAB */}
+        {activeTab === 'experiences' && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <form onSubmit={handleSaveExperience} className="lg:col-span-5 bg-[#111a2e] border border-slate-800 rounded-2xl p-5 space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="font-bold text-base">{editingExpId ? 'Edit Pengalaman' : 'Tambah Magang / Pengalaman'}</h2>
+                {editingExpId && (
+                  <button type="button" onClick={resetExpForm} className="text-xs text-slate-400 hover:text-sky-400">
+                    Batal Edit
+                  </button>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-400 mb-1">Peran / Posisi *</label>
+                <input
+                  type="text"
+                  required
+                  value={expForm.role}
+                  onChange={(e) => setExpForm({ ...expForm, role: e.target.value })}
+                  placeholder="Contoh: Web UI/UX Developer / Computer Technician"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                />
+              </div>
+
+              {/* Status / Kategori Pengalaman (Pilihan Interaktif) */}
+              <div className="bg-slate-950/70 border border-slate-800/80 rounded-xl p-3.5 space-y-3">
+                <div className="flex items-center justify-between gap-2">
+                  <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+                    <Briefcase className="w-3.5 h-3.5 text-sky-400" />
+                    <span>Status &amp; Kategori Aktivitas</span>
+                  </label>
+                  {/* Live Preview Badge */}
+                  {expForm.badge && (
+                    <span className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-full ${getBadgeStyle(expForm.badge).chipClass}`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${getBadgeStyle(expForm.badge).dotClass}`} />
+                      {expForm.badge}
+                    </span>
+                  )}
+                </div>
+
+                {/* 4 Tombol Cepat Kategori */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setExpForm({ ...expForm, badge: 'Aktif · On-site' })}
+                    className={`px-2 py-1.5 rounded-lg text-xs font-medium border text-left transition-all ${
+                      getBadgeStyle(expForm.badge).type === 'aktif'
+                        ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300 font-semibold shadow-sm'
+                        : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                    }`}
+                  >
+                    <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 mr-1.5"></span>
+                    Aktif Bekerja
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setExpForm({ ...expForm, badge: 'Resign (Nonaktif)' })}
+                    className={`px-2 py-1.5 rounded-lg text-xs font-medium border text-left transition-all ${
+                      getBadgeStyle(expForm.badge).type === 'resign'
+                        ? 'bg-slate-600/30 border-slate-500/50 text-slate-200 font-semibold shadow-sm'
+                        : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                    }`}
+                  >
+                    <span className="inline-block w-2 h-2 rounded-full bg-slate-400 mr-1.5"></span>
+                    Resign
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setExpForm({ ...expForm, badge: 'Magang · Hybrid' })}
+                    className={`px-2 py-1.5 rounded-lg text-xs font-medium border text-left transition-all ${
+                      getBadgeStyle(expForm.badge).type === 'magang'
+                        ? 'bg-sky-500/20 border-sky-500/50 text-sky-300 font-semibold shadow-sm'
+                        : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                    }`}
+                  >
+                    <span className="inline-block w-2 h-2 rounded-full bg-sky-400 mr-1.5"></span>
+                    Magang
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setExpForm({ ...expForm, badge: 'Pelatihan Skill' })}
+                    className={`px-2 py-1.5 rounded-lg text-xs font-medium border text-left transition-all ${
+                      getBadgeStyle(expForm.badge).type === 'pelatihan'
+                        ? 'bg-purple-500/20 border-purple-500/50 text-purple-300 font-semibold shadow-sm'
+                        : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                    }`}
+                  >
+                    <span className="inline-block w-2 h-2 rounded-full bg-purple-400 mr-1.5"></span>
+                    Pelatihan
+                  </button>
+                </div>
+
+                {/* Dropdown Preset Lengkap */}
+                <div className="space-y-1">
+                  <label className="block text-[11px] text-slate-400">Pilihan Standar (Klik untuk memilih):</label>
+                  <select
+                    value={
+                      EXPERIENCE_STATUS_OPTIONS.flatMap((g) => g.options).includes(expForm.badge)
+                        ? expForm.badge
+                        : '__custom__'
+                    }
+                    onChange={(e) => {
+                      if (e.target.value !== '__custom__') {
+                        setExpForm({ ...expForm, badge: e.target.value });
+                      }
+                    }}
+                    className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-sm text-slate-200 focus:border-sky-500 outline-none"
+                  >
+                    {EXPERIENCE_STATUS_OPTIONS.map((group) => (
+                      <optgroup key={group.category} label={group.groupLabel}>
+                        {group.options.map((opt) => (
+                          <option key={opt} value={opt}>
+                            {opt}
+                          </option>
+                        ))}
+                      </optgroup>
+                    ))}
+                    <option value="__custom__">-- Kustom / Ketik Manual Sendiri --</option>
+                  </select>
+                </div>
+
+                {/* Input Teks Fleksibel (Bisa disesuaikan untuk apapun itu) */}
+                <div className="space-y-1">
+                  <label className="block text-[11px] text-slate-400">Label Badge (Bisa diedit atau kustom bebas):</label>
+                  <input
+                    type="text"
+                    required
+                    value={expForm.badge}
+                    onChange={(e) => setExpForm({ ...expForm, badge: e.target.value })}
+                    placeholder="Contoh: Aktif · On-site, Magang · Hybrid, Pelatihan Skill AI..."
+                    className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-sm font-medium focus:border-sky-500 outline-none"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-400 mb-1">Perusahaan / Instansi / Penyelenggara *</label>
+                <input
+                  type="text"
+                  required
+                  value={expForm.company}
+                  onChange={(e) => setExpForm({ ...expForm, company: e.target.value })}
+                  placeholder="Contoh: PT Vinix Seven Aurum / Speed Computer"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-400 mb-1">Periode *</label>
+                  <input
+                    type="text"
+                    required
+                    value={expForm.period}
+                    onChange={(e) => setExpForm({ ...expForm, period: e.target.value })}
+                    placeholder="Contoh: Juni 2023 – Sekarang"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-400 mb-1">Lokasi</label>
+                  <input
+                    type="text"
+                    value={expForm.location}
+                    onChange={(e) => setExpForm({ ...expForm, location: e.target.value })}
+                    placeholder="Contoh: Surakarta, Indonesia"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-400 mb-1">Subjudul Tugas / Capaian</label>
+                <input
+                  type="text"
+                  value={expForm.sectionHeading}
+                  onChange={(e) => setExpForm({ ...expForm, sectionHeading: e.target.value })}
+                  placeholder="Contoh: Tanggung Jawab Utama / Troubleshooting &amp; Instalasi"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-400 mb-1">Poin Tugas / Materi * (1 baris = 1 poin)</label>
+                <textarea
+                  rows="4"
+                  required
+                  value={expForm.bulletsText}
+                  onChange={(e) => setExpForm({ ...expForm, bulletsText: e.target.value })}
+                  placeholder="Poin tugas (1 baris = 1 poin)"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm resize-none"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full inline-flex items-center justify-center gap-2 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-semibold text-sm disabled:opacity-50"
+              >
+                <Plus className="w-4 h-4" />
+                <span>{loading ? 'Menyimpan...' : editingExpId ? 'Simpan Perubahan' : 'Tambahkan Pengalaman'}</span>
+              </button>
+            </form>
+
+            <div className="lg:col-span-7 space-y-4">
+              {experiences.map((exp) => {
+                const bStyle = getBadgeStyle(exp.badge);
+                return (
+                  <article key={exp.id} className="bg-[#111a2e] border border-slate-800 rounded-2xl p-5 space-y-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <span className={`inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-0.5 rounded-full mb-1 ${bStyle.chipClass}`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${bStyle.dotClass}`} />
+                          {exp.badge}
+                        </span>
+                        <h3 className="font-bold text-base">{exp.role}</h3>
+                        <p className="text-sm text-sky-400">{exp.company}</p>
+                        <p className="text-xs text-slate-400">{exp.period} · {exp.location}</p>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const firstSec = (exp.sections && exp.sections[0]) || { heading: 'Tanggung Jawab Utama', bullets: [] };
+                            setEditingExpId(exp.id);
+                            setExpForm({
+                              badge: exp.badge,
+                              role: exp.role,
+                              company: exp.company,
+                              period: exp.period,
+                              location: exp.location,
+                              sectionHeading: firstSec.heading,
+                              bulletsText: (firstSec.bullets || []).join('\n'),
+                            });
+                          }}
+                          className="p-1.5 rounded-lg border border-slate-700 hover:border-sky-400 text-slate-300"
+                        >
+                          <Edit3 className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteExp(exp.id)}
+                          className="p-1.5 rounded-lg border border-rose-500/30 hover:bg-rose-500/15 text-rose-400"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* CERTIFICATES TAB */}
+        {activeTab === 'certificates' && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <form onSubmit={handleSaveCertificate} className="lg:col-span-5 bg-[#111a2e] border border-slate-800 rounded-2xl p-5 space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="font-bold text-base">{editingCertId ? 'Edit Sertifikat' : 'Tambah Sertifikat Baru'}</h2>
+                {editingCertId && (
+                  <button type="button" onClick={resetCertForm} className="text-xs text-slate-400 hover:text-sky-400">
+                    Batal Edit
+                  </button>
+                )}
+              </div>
+
+              {/* Foto / Scan Sertifikat */}
+              <div className="space-y-2">
+                <label className="block text-xs font-semibold text-slate-400">Foto / Scan Sertifikat (Cloudinary)</label>
+                <div className="aspect-[16/10] rounded-xl overflow-hidden bg-slate-950 border border-dashed border-slate-700 flex items-center justify-center relative">
+                  {certForm.imageUrl ? (
+                    <img src={certForm.imageUrl} alt="Preview Sertifikat" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="text-center p-4">
+                      <Award className="w-8 h-8 text-amber-500/50 mx-auto mb-1" />
+                      <p className="text-xs text-slate-500">Belum ada foto sertifikat</p>
+                    </div>
+                  )}
+                </div>
+                <div className="flex items-center justify-between gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setCropperTarget('certificate')}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 text-xs font-semibold"
+                  >
+                    <Crop className="w-3.5 h-3.5" />
+                    <span>{certForm.imageUrl ? 'Ganti / Crop Foto Sertifikat' : 'Pilih & Crop Foto Sertifikat'}</span>
+                  </button>
+                  {certForm.imageMeta && <span className="text-[11px] text-emerald-400">{certForm.imageMeta}</span>}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-400 mb-1">Judul Sertifikat *</label>
+                <input
+                  type="text"
+                  required
+                  value={certForm.title}
+                  onChange={(e) => setCertForm({ ...certForm, title: e.target.value })}
+                  placeholder="Contoh: Sertifikat Magang Web UI/UX Developer"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-400 mb-1">Penerbit / Instansi / Penyelenggara *</label>
+                <input
+                  type="text"
+                  required
+                  value={certForm.issuer}
+                  onChange={(e) => setCertForm({ ...certForm, issuer: e.target.value })}
+                  placeholder="Contoh: PT Vinix Seven Aurum (VINIX7)"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-400 mb-1">Kategori Sertifikat</label>
+                  <select
+                    value={certForm.category}
+                    onChange={(e) => setCertForm({ ...certForm, category: e.target.value })}
+                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                  >
+                    <option value="Magang">Magang (Internship)</option>
+                    <option value="Sertifikasi Profesi">Sertifikasi Profesi</option>
+                    <option value="Pelatihan Skill">Pelatihan Skill</option>
+                    <option value="Bootcamp">Bootcamp</option>
+                    <option value="Workshop & Kursus">Workshop &amp; Kursus</option>
+                    <option value="Kerja / Teknis">Kerja / Teknis</option>
+                    <option value="Penghargaan">Penghargaan / Lomba</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-400 mb-1">Bulan &amp; Tahun Terbit</label>
+                  <input
+                    type="text"
+                    value={certForm.issueDate}
+                    onChange={(e) => setCertForm({ ...certForm, issueDate: e.target.value })}
+                    placeholder="Contoh: November 2026"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                  />
+                </div>
+              </div>
+
+              {/* Hubungkan ke Pengalaman Kerja / Magang */}
+              <div>
+                <label className="block text-xs font-semibold text-slate-400 mb-1">
+                  Hubungkan ke Pengalaman Kerja / Magang (Opsional)
+                </label>
+                <select
+                  value={certForm.experienceId}
+                  onChange={(e) => setCertForm({ ...certForm, experienceId: e.target.value })}
+                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                >
+                  <option value="">-- Tidak dihubungkan ke pengalaman spesifik --</option>
+                  {experiences.map((exp) => (
+                    <option key={exp.id} value={exp.id}>
+                      {exp.company} — {exp.role} ({exp.period})
+                    </option>
+                  ))}
+                </select>
+                <p className="text-[11px] text-slate-500 mt-1">
+                  Jika dihubungkan, tombol "Lihat Sertifikat" otomatis muncul di kartu Rekam Jejak pengalaman tersebut.
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-400 mb-1">URL Verifikasi Kredensial (Opsional)</label>
+                <input
+                  type="url"
+                  value={certForm.credentialUrl}
+                  onChange={(e) => setCertForm({ ...certForm, credentialUrl: e.target.value })}
+                  placeholder="https://..."
+                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-400 mb-1">Deskripsi / Catatan Capaian (Opsional)</label>
+                <textarea
+                  rows="3"
+                  value={certForm.description}
+                  onChange={(e) => setCertForm({ ...certForm, description: e.target.value })}
+                  placeholder="Penjelasan singkat capaian sertifikat ini..."
+                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm resize-none focus:border-sky-500 outline-none"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full inline-flex items-center justify-center gap-2 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-semibold text-sm disabled:opacity-50"
+              >
+                <Save className="w-4 h-4" />
+                <span>{loading ? 'Menyimpan...' : editingCertId ? 'Simpan Perubahan' : 'Tambahkan Sertifikat'}</span>
+              </button>
+            </form>
+
+            {/* List Sertifikat */}
+            <div className="lg:col-span-7 space-y-4">
+              {certificates.map((cert) => {
+                const linkedExp = experiences.find((x) => String(x.id) === String(cert.experienceId) || x.id === cert.experienceId);
+                return (
+                  <article key={cert.id} className="bg-[#111a2e] border border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row gap-4 items-start">
+                    <div className="w-full sm:w-40 aspect-[16/10] rounded-xl overflow-hidden bg-slate-950 border border-slate-800 shrink-0 flex items-center justify-center">
+                      {cert.imageUrl ? (
+                        <img src={cert.imageUrl} alt={cert.title} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="text-center p-2">
+                          <Award className="w-6 h-6 text-amber-500/50 mx-auto mb-1" />
+                          <span className="text-[10px] text-slate-500 block">Preview Mockup</span>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="flex-1 min-w-0 space-y-2">
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <div className="flex flex-wrap items-center gap-1.5 mb-1">
+                            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                              {cert.category}
+                            </span>
+                            {linkedExp && (
+                              <span className="text-[10px] text-sky-400 bg-sky-500/10 border border-sky-500/20 px-2 py-0.5 rounded-full">
+                                Terkait: {linkedExp.company}
+                              </span>
+                            )}
+                          </div>
+                          <h3 className="font-bold text-base">{cert.title}</h3>
+                          <p className="text-xs text-sky-400">{cert.issuer}</p>
+                          <p className="text-[11px] text-slate-400">{cert.issueDate}</p>
+                        </div>
+
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => setPreviewCert(cert)}
+                            className="p-1.5 rounded-lg border border-slate-700 hover:border-amber-400 text-amber-300"
+                            title="Pratinjau Sertifikat"
+                          >
+                            <Eye className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setEditingCertId(cert.id);
+                              setCertForm({
+                                title: cert.title,
+                                issuer: cert.issuer,
+                                category: cert.category || 'Magang',
+                                issueDate: cert.issueDate || '',
+                                credentialUrl: cert.credentialUrl || '',
+                                experienceId: cert.experienceId || '',
+                                description: cert.description || '',
+                                imageUrl: cert.imageUrl || '',
+                                imageBlob: null,
+                                imageMeta: cert.imageUrl ? 'Tersimpan di Cloudinary' : '',
+                              });
+                            }}
+                            className="p-1.5 rounded-lg border border-slate-700 hover:border-sky-400 text-slate-300"
+                            title="Edit Sertifikat"
+                          >
+                            <Edit3 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteCert(cert.id)}
+                            className="p-1.5 rounded-lg border border-rose-500/30 hover:bg-rose-500/15 text-rose-400"
+                            title="Hapus Sertifikat"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+
+                      {cert.description && (
+                        <p className="text-xs text-slate-400 line-clamp-2">{cert.description}</p>
+                      )}
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* SKILLS TAB */}
+        {activeTab === 'skills' && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <form onSubmit={handleSaveSkill} className="lg:col-span-5 bg-[#111a2e] border border-slate-800 rounded-2xl p-5 space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="font-bold text-base">{editingSkillId ? 'Edit Keahlian' : 'Tambah Keahlian Baru'}</h2>
+                {editingSkillId && (
+                  <button type="button" onClick={resetSkillForm} className="text-xs text-slate-400 hover:text-sky-400">
+                    Batal Edit
+                  </button>
+                )}
+              </div>
+
+              {/* Tipe: Hard Skill vs Soft Skill */}
+              <div>
+                <label className="block text-xs font-semibold text-slate-400 mb-1.5">Kategori Utama *</label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSkillForm({
+                        ...skillForm,
+                        category: 'hard',
+                        groupName: skillForm.category === 'soft' ? 'Web UI/UX & ML' : skillForm.groupName,
+                      });
+                    }}
+                    className={`py-2 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-2 transition-all ${
+                      skillForm.category === 'hard'
+                        ? 'bg-sky-500/20 border-sky-500/60 text-sky-300 shadow-sm'
+                        : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-200'
+                    }`}
+                  >
+                    <Code2 className="w-3.5 h-3.5" />
+                    <span>Hard Skill (Teknis)</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSkillForm({
+                        ...skillForm,
+                        category: 'soft',
+                        groupName: skillForm.category === 'hard' ? 'Problem Solving & Analisis' : skillForm.groupName,
+                      });
+                    }}
+                    className={`py-2 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-2 transition-all ${
+                      skillForm.category === 'soft'
+                        ? 'bg-purple-500/20 border-purple-500/60 text-purple-300 shadow-sm'
+                        : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-200'
+                    }`}
+                  >
+                    <Brain className="w-3.5 h-3.5" />
+                    <span>Soft Skill (Interpersonal)</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Grup / Kelompok Keahlian */}
+              <div className="space-y-1.5">
+                <label className="block text-xs font-semibold text-slate-400">Grup / Kelompok Keahlian *</label>
+                <input
+                  type="text"
+                  required
+                  value={skillForm.groupName}
+                  onChange={(e) => setSkillForm({ ...skillForm, groupName: e.target.value })}
+                  placeholder="Contoh: Web UI/UX & ML, Programming Languages..."
+                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                />
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  <span className="text-[11px] text-slate-500 block w-full">Pilihan Cepat Grup:</span>
+                  {(skillForm.category === 'hard'
+                    ? ['Web UI/UX & ML', 'Programming Languages', 'IoT & Embedded', 'Database, Cloud & IT']
+                    : ['Problem Solving & Analisis', 'Komunikasi & Tim', 'Manajemen & Kerja Profesional']
+                  ).map((grp) => (
+                    <button
+                      key={grp}
+                      type="button"
+                      onClick={() => setSkillForm({ ...skillForm, groupName: grp })}
+                      className={`text-[11px] px-2 py-0.5 rounded-lg border transition-all ${
+                        skillForm.groupName === grp
+                          ? 'bg-sky-500/20 border-sky-500/50 text-sky-300'
+                          : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200'
+                      }`}
+                    >
+                      {grp}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Nama Keahlian */}
+              <div>
+                <label className="block text-xs font-semibold text-slate-400 mb-1">Nama Keahlian / Kemampuan *</label>
+                <input
+                  type="text"
+                  required
+                  value={skillForm.name}
+                  onChange={(e) => setSkillForm({ ...skillForm, name: e.target.value })}
+                  placeholder="Contoh: Python, Web UI/UX, Troubleshooting..."
+                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                />
+              </div>
+
+              {/* Tingkat Kemahiran (Rate Point) */}
+              <div className="p-4 rounded-xl bg-slate-950/70 border border-slate-800/80 space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+                    <Sliders className="w-3.5 h-3.5 text-sky-400" />
+                    <span>Rate Point Kemampuan (1 - 100%)</span>
+                  </label>
+                  <div className="flex items-center gap-1.5">
+                    <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full border ${getSkillRatingLabel(skillForm.ratePoint).badgeClass}`}>
+                      {getSkillRatingLabel(skillForm.ratePoint).label.split('/')[0].trim()}
+                    </span>
+                    <span className="text-sm font-extrabold text-sky-400 min-w-[40px] text-right">
+                      {skillForm.ratePoint}%
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <input
+                    type="range"
+                    min="1"
+                    max="100"
+                    value={skillForm.ratePoint}
+                    onChange={(e) => setSkillForm({ ...skillForm, ratePoint: Number(e.target.value) })}
+                    className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-sky-500"
+                  />
+                  <input
+                    type="number"
+                    min="1"
+                    max="100"
+                    value={skillForm.ratePoint}
+                    onChange={(e) => setSkillForm({ ...skillForm, ratePoint: Math.min(100, Math.max(1, Number(e.target.value))) })}
+                    className="w-16 px-2 py-1 rounded-lg bg-slate-900 border border-slate-700 text-sm font-bold text-center"
+                  />
+                </div>
+
+                {/* Live Preview Bar */}
+                <div className="space-y-1">
+                  <div className="w-full bg-slate-900 rounded-full h-2.5 overflow-hidden border border-slate-800 p-0.5">
+                    <div
+                      className={`h-full rounded-full transition-all duration-300 ${
+                        skillForm.category === 'hard'
+                          ? 'bg-gradient-to-r from-sky-500 via-cyan-400 to-emerald-400'
+                          : 'bg-gradient-to-r from-purple-500 via-fuchsia-400 to-indigo-400'
+                      }`}
+                      style={{ width: `${skillForm.ratePoint}%` }}
+                    />
+                  </div>
+                  <div className="flex justify-between text-[10px] text-slate-500">
+                    <span>Pemula (60%)</span>
+                    <span>Menengah (75%)</span>
+                    <span>Mahir (85%)</span>
+                    <span>Expert (95%+)</span>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full inline-flex items-center justify-center gap-2 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-semibold text-sm disabled:opacity-50"
+              >
+                <Save className="w-4 h-4" />
+                <span>{loading ? 'Menyimpan...' : editingSkillId ? 'Simpan Perubahan' : 'Tambahkan Keahlian'}</span>
+              </button>
+            </form>
+
+            {/* List Keahlian */}
+            <div className="lg:col-span-7 space-y-4">
+              <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-2xl bg-[#111a2e] border border-slate-800">
+                <div className="inline-flex gap-1 p-1 bg-slate-950 rounded-xl border border-slate-800">
+                  <button
+                    type="button"
+                    onClick={() => setSkillFilterTab('all')}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                      skillFilterTab === 'all' ? 'bg-sky-500 text-white' : 'text-slate-400 hover:text-slate-200'
+                    }`}
+                  >
+                    Semua ({skills.length})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSkillFilterTab('hard')}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                      skillFilterTab === 'hard' ? 'bg-sky-500 text-white' : 'text-slate-400 hover:text-slate-200'
+                    }`}
+                  >
+                    Hard Skills ({skills.filter((s) => s.category === 'hard').length})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSkillFilterTab('soft')}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                      skillFilterTab === 'soft' ? 'bg-purple-500 text-white' : 'text-slate-400 hover:text-slate-200'
+                    }`}
+                  >
+                    Soft Skills ({skills.filter((s) => s.category === 'soft').length})
+                  </button>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                {skills
+                  .filter((s) => skillFilterTab === 'all' || s.category === skillFilterTab)
+                  .map((skill) => {
+                    const ratingInfo = getSkillRatingLabel(skill.ratePoint);
+                    return (
+                      <article key={skill.id} className="bg-[#111a2e] border border-slate-800 rounded-2xl p-4 space-y-2.5">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <div className="flex flex-wrap items-center gap-1.5 mb-1">
+                              <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${
+                                skill.category === 'hard'
+                                  ? 'bg-sky-500/15 text-sky-400 border-sky-500/30'
+                                  : 'bg-purple-500/15 text-purple-300 border-purple-500/30'
+                              }`}>
+                                {skill.category === 'hard' ? 'Hard Skill' : 'Soft Skill'}
+                              </span>
+                              <span className="text-[11px] text-slate-400 bg-slate-900 border border-slate-800 px-2 py-0.5 rounded-full">
+                                {skill.groupName}
+                              </span>
+                              <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${ratingInfo.badgeClass}`}>
+                                {ratingInfo.label.split('/')[0].trim()}
+                              </span>
+                            </div>
+                            <h3 className="font-bold text-sm sm:text-base text-slate-100">{skill.name}</h3>
+                          </div>
+
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setEditingSkillId(skill.id);
+                                setSkillForm({
+                                  name: skill.name,
+                                  category: skill.category || 'hard',
+                                  groupName: skill.groupName || 'Umum',
+                                  ratePoint: Number(skill.ratePoint) || 85,
+                                  sortOrder: Number(skill.sortOrder) || 0,
+                                });
+                              }}
+                              className="p-1.5 rounded-lg border border-slate-700 hover:border-sky-400 text-slate-300"
+                              title="Edit Keahlian"
+                            >
+                              <Edit3 className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteSkill(skill.id)}
+                              className="p-1.5 rounded-lg border border-rose-500/30 hover:bg-rose-500/15 text-rose-400"
+                              title="Hapus Keahlian"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Progress Rate Point Bar */}
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-slate-400 text-[11px]">Tingkat Penguasaan</span>
+                            <span className="font-extrabold text-sky-400 text-xs">{skill.ratePoint}%</span>
+                          </div>
+                          <div className="w-full bg-slate-950 rounded-full h-2 overflow-hidden border border-slate-800/80 p-0.5">
+                            <div
+                              className={`h-full rounded-full ${
+                                skill.category === 'hard'
+                                  ? 'bg-gradient-to-r from-sky-500 via-cyan-400 to-emerald-400'
+                                  : 'bg-gradient-to-r from-purple-500 via-fuchsia-400 to-indigo-400'
+                              }`}
+                              style={{ width: `${skill.ratePoint}%` }}
+                            />
+                          </div>
+                        </div>
+                      </article>
+                    );
+                  })}
+              </div>
+            </div>
+          </div>
+        )}
+      </main>
+
+      {cropperTarget && (
+        <ImageCropperModal
+          aspect={cropperTarget === 'profile' ? 4 / 3 : cropperTarget === 'certificate' ? 4 / 3 : 16 / 9}
+          initialLabel={
+            cropperTarget === 'profile'
+              ? '4:3 Profil'
+              : cropperTarget === 'certificate'
+              ? 'Foto / Scan Sertifikat'
+              : '16:9 Proyek'
+          }
+          onApply={({ dataUrl, blob, width, height, approxKb }) => {
+            if (cropperTarget === 'profile') {
+              setProfileForm((prev) => ({
+                ...prev,
+                photoUrl: dataUrl,
+                photoBlob: blob,
+                photoMeta: `${width}×${height} WebP (~${approxKb} KB)`,
+              }));
+            } else if (cropperTarget === 'certificate') {
+              setCertForm((prev) => ({
+                ...prev,
+                imageUrl: dataUrl,
+                imageBlob: blob,
+                imageMeta: `${width}×${height} WebP (~${approxKb} KB)`,
+              }));
+            } else {
+              setProjForm((prev) => ({
+                ...prev,
+                imageUrl: dataUrl,
+                imageBlob: blob,
+                imageMeta: `${width}×${height} WebP (~${approxKb} KB)`,
+              }));
+            }
+            setCropperTarget(null);
+            notify(`Foto siap diunggah (${width}×${height} WebP ~${approxKb} KB).`);
+          }}
+          onClose={() => setCropperTarget(null)}
+        />
+      )}
+
+      <CvModal
+        open={cvPreviewOpen}
+        onClose={() => setCvPreviewOpen(false)}
+        profile={{
+          ...PROFILE,
+          photoUrl: profileForm.photoUrl,
+          role: profileForm.role,
+          bio: profileForm.bio,
+          socials: [
+            { id: 'github', label: 'GitHub', url: PROFILE.githubUrl },
+            { id: 'linkedin', label: 'LinkedIn', url: profileForm.linkedinUrl },
+            { id: 'instagram', label: 'Instagram', url: profileForm.instagramUrl || 'https://instagram.com/fpratamaputra' },
+            { id: 'tiktok', label: 'TikTok', url: profileForm.tiktokUrl },
+          ],
+        }}
+        experiences={experiences}
+        projects={projects}
+      />
+
+      <CertificateModal
+        certificate={previewCert}
+        onClose={() => setPreviewCert(null)}
+      />
+
+      {toast && (
+        <div className="fixed bottom-5 right-5 z-50 flex items-center gap-2 px-4 py-3 rounded-xl bg-slate-900 text-white text-sm font-medium shadow-xl border border-sky-500/40">
+          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+          <span>{toast}</span>
+        </div>
+      )}
+    </div>
+  );
+}
