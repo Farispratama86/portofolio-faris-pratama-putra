@@ -124,7 +124,7 @@ export default function CvModal({ open, onClose, profile, experiences, projects 
               <span className="italic">S1 Teknik Informatika — Semester 6</span>
               <span className="italic text-[9.5pt] text-slate-700 shrink-0">Agustus 2023 – Sekarang</span>
             </div>
-            <p className="text-[9.5pt] text-slate-800 pt-0.5">
+            <p className="text-[9.5pt] text-slate-800 pt-0.5 text-justify">
               Mata kuliah relevan: Jaringan Komputer, Internet of Things (IoT), Pemrograman Web, Pemrograman Python, Sistem Operasi, Pemecahan Masalah Hardware &amp; Software.
             </p>
           </section>
@@ -150,7 +150,7 @@ export default function CvModal({ open, onClose, profile, experiences, projects 
                         <span className="italic text-[9.5pt] text-slate-700 shrink-0">{exp.period}</span>
                       )}
                     </div>
-                    <ul className="list-disc pl-5 space-y-0.5 text-[9.8pt] text-slate-900">
+                    <ul className="list-disc pl-5 space-y-0.5 text-[9.8pt] text-slate-900 text-justify">
                       {(sec.bullets || []).map((b, bIdx) => (
                         <li key={bIdx}>{b}</li>
                       ))}
@@ -172,7 +172,7 @@ export default function CvModal({ open, onClose, profile, experiences, projects 
                   <strong className="font-bold text-black">{proj.title}</strong>
                   <span className="italic text-[9.5pt] text-slate-700 shrink-0">{proj.year}</span>
                 </div>
-                <ul className="list-disc pl-5 space-y-0.5 text-[9.8pt] text-slate-900">
+                <ul className="list-disc pl-5 space-y-0.5 text-[9.8pt] text-slate-900 text-justify">
                   <li>{proj.summary}</li>
                   {proj.tags && proj.tags.length > 0 && (
                     <li>

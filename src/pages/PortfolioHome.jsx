@@ -313,7 +313,7 @@ export default function PortfolioHome({ onNavigate }) {
                   </h1>
                   <p className="text-base sm:text-lg font-semibold text-secondary">{profile.role}</p>
                 </div>
-                <p className="text-sm sm:text-base text-secondary leading-relaxed max-w-2xl">{profile.bio}</p>
+                <p className="text-sm sm:text-base text-secondary leading-relaxed max-w-2xl text-justify">{profile.bio}</p>
 
                 {/* Tombol CTA */}
                 <div className="flex flex-wrap items-center gap-3">
@@ -508,7 +508,7 @@ export default function PortfolioHome({ onNavigate }) {
                   Rekam Jejak Profesional
                 </span>
                 <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">Pengalaman Kerja &amp; Magang</h2>
-                <p className="mt-2 text-sm sm:text-base text-secondary max-w-2xl">
+                <p className="mt-2 text-sm sm:text-base text-secondary max-w-2xl text-justify">
                   Perjalanan karier, kontribusi nyata dalam pengembangan aplikasi web modern, riset Machine Learning, hingga troubleshooting infrastruktur TI &amp; perangkat keras.
                 </p>
               </div>
@@ -583,7 +583,7 @@ export default function PortfolioHome({ onNavigate }) {
                               {(sec.bullets || []).map((b, bIdx) => (
                                 <li key={bIdx} className="flex items-start gap-2.5">
                                   <span className="w-1.5 h-1.5 rounded-full bg-sky-400 mt-2 shrink-0 group-hover:bg-cyan-300 transition-colors shadow-sm shadow-sky-400/50" />
-                                  <span className="flex-1">{b}</span>
+                                  <span className="flex-1 text-justify">{b}</span>
                                 </li>
                               ))}
                             </ul>
@@ -676,7 +676,7 @@ export default function PortfolioHome({ onNavigate }) {
                       Proyek Unggulan · {getProjectCategoryBadge(featuredProject)}
                     </span>
                     <h3 className="text-xl sm:text-2xl font-extrabold">{featuredProject.title}</h3>
-                    <p className="text-sm sm:text-base text-secondary leading-relaxed">{featuredProject.summary}</p>
+                    <p className="text-sm sm:text-base text-secondary leading-relaxed text-justify">{featuredProject.summary}</p>
                     <div className="flex flex-wrap gap-2">
                       {(featuredProject.tags || []).map((t) => (
                         <span key={t} className="chip-tag text-xs font-medium px-2.5 py-1 rounded-lg">
@@ -729,7 +729,7 @@ export default function PortfolioHome({ onNavigate }) {
                         <span className="text-xs text-muted">{project.year}</span>
                       </div>
                       <h3 className="font-bold text-base leading-snug">{project.title}</h3>
-                      <p className="text-xs sm:text-sm text-secondary leading-relaxed">{project.summary}</p>
+                      <p className="text-xs sm:text-sm text-secondary leading-relaxed text-justify">{project.summary}</p>
                     </div>
                   </div>
                   <div className="px-5 pb-5 pt-2 space-y-3">
@@ -773,7 +773,7 @@ export default function PortfolioHome({ onNavigate }) {
               <div>
                 <p className="text-xs font-bold uppercase tracking-widest text-accent mb-2">Pengakuan &amp; Kompetensi</p>
                 <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">Sertifikasi &amp; Lisensi</h2>
-                <p className="text-sm text-secondary mt-1">
+                <p className="text-sm text-secondary mt-1 text-justify">
                   Dokumentasi resmi sertifikat magang industri, lisensi keahlian, dan pelatihan teknologi.
                 </p>
               </div>
@@ -830,7 +830,7 @@ export default function PortfolioHome({ onNavigate }) {
                       </h3>
                       <p className="text-xs text-sky-400 font-semibold">{cert.issuer}</p>
                       {cert.description && (
-                        <p className="text-xs text-secondary line-clamp-2 leading-relaxed">
+                        <p className="text-xs text-secondary line-clamp-2 leading-relaxed text-justify">
                           {cert.description}
                         </p>
                       )}
@@ -857,7 +857,7 @@ export default function PortfolioHome({ onNavigate }) {
               <div>
                 <p className="text-xs font-bold uppercase tracking-widest text-accent mb-2">Kompetensi &amp; Penguasaan</p>
                 <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">Keahlian &amp; Kemampuan</h2>
-                <p className="text-sm text-secondary mt-1 max-w-xl">
+                <p className="text-sm text-secondary mt-1 max-w-xl text-justify">
                   Peta tingkat kemahiran teknis (Hard Skills) dan kecakapan interpersonal (Soft Skills) berdasarkan pengalaman dan implementasi proyek nyata.
                 </p>
               </div>
@@ -964,7 +964,7 @@ export default function PortfolioHome({ onNavigate }) {
                 Terhubung & Berkolaborasi
               </span>
               <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">Mari Berkolaborasi</h2>
-              <p className="mt-2 text-sm sm:text-base text-secondary">
+              <p className="mt-2 text-sm sm:text-base text-secondary text-justify">
                 Tertarik membangun proyek bersama, diskusi teknologi, atau membuka peluang karier & magang? Saya siap berdiskusi!
               </p>
             </div>
@@ -982,7 +982,7 @@ export default function PortfolioHome({ onNavigate }) {
                       Aktif
                     </span>
                   </h3>
-                  <p className="text-xs sm:text-sm text-secondary mt-0.5">
+                  <p className="text-xs sm:text-sm text-secondary mt-0.5 text-justify">
                     Akses satu pintu ke semua akun resmi: LinkedIn, GitHub, Instagram, TikTok, WhatsApp & Email.
                   </p>
                 </div>

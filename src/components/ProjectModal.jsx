@@ -45,12 +45,12 @@ export default function ProjectModal({ project, onClose }) {
           <div className="aspect-video rounded-xl overflow-hidden border border-subtle bg-elevated">
             <ProjectMockup project={project} />
           </div>
-          <p className="text-sm sm:text-base text-secondary leading-relaxed">{project.summary}</p>
+          <p className="text-sm sm:text-base text-secondary leading-relaxed text-justify">{project.summary}</p>
           <div>
             <h4 className="text-xs font-bold uppercase tracking-wider text-accent mb-2">Poin Utama</h4>
             <ul className="space-y-1.5 text-sm text-secondary list-disc list-inside">
               {project.highlights.map((item) => (
-                <li key={item}>{item}</li>
+                <li key={item} className="text-justify">{item}</li>
               ))}
             </ul>
           </div>

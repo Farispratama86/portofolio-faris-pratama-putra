@@ -153,7 +153,7 @@ export default function CertificateModal({ certificate, onClose, onNavigateToSec
           {certificate.description && (
             <div className="space-y-1.5">
               <h4 className="text-xs font-bold uppercase tracking-wider text-accent">Keterangan &amp; Capaian</h4>
-              <p className="text-sm text-secondary leading-relaxed bg-elevated/50 p-4 rounded-xl border border-subtle">
+              <p className="text-sm text-secondary leading-relaxed bg-elevated/50 p-4 rounded-xl border border-subtle text-justify">
                 {certificate.description}
               </p>
             </div>

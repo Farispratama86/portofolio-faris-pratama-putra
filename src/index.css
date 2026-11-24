@@ -88,6 +88,11 @@ html.light-theme .hero-grid-pattern {
 .bg-elevated { background-color: var(--bg-elevated); }
 .border-subtle { border-color: var(--border-subtle); }
 
+.text-justify {
+  text-align: justify;
+  text-justify: inter-word;
+}
+
 @page {
   size: A4 portrait;
   margin: 14mm 16mm;
