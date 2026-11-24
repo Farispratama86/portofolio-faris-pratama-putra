@@ -107,7 +107,7 @@ export default function CvModal({ open, onClose, profile, experiences, projects 
               Karanganyar, Jawa Tengah, Indonesia &nbsp;|&nbsp; {activeProfile.whatsappDisplay} &nbsp;|&nbsp; {activeProfile.email}
             </p>
             <p className="text-[9.5pt] text-slate-600">
-              https://portofoliofarispratama.netlify.app/ &nbsp;|&nbsp; {activeProfile.githubDisplay} &nbsp;|&nbsp; instagram: {instagramHandle}
+              https://portofolio-faris-pratama-putra.vercel.app/ &nbsp;|&nbsp; {activeProfile.githubDisplay} &nbsp;|&nbsp; instagram: {instagramHandle}
             </p>
           </header>
 

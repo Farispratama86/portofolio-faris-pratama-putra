@@ -24,6 +24,7 @@ export const PROFILE = {
   whatsappDisplay: '+62 812-1953-4692',
   githubUrl: 'https://github.com/Farispratama86',
   githubDisplay: 'github.com/Farispratama86',
+  portfolioUrl: 'https://portofolio-faris-pratama-putra.vercel.app/',
   // Isi URL asli LinkedIn / Instagram / TikTok di bawah ini agar otomatis tampil di Kontak & Footer
   socials: [
     { id: 'github', label: 'GitHub', url: 'https://github.com/Farispratama86' },
