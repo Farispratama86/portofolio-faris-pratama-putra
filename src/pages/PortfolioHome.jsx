@@ -236,85 +236,204 @@ export default function PortfolioHome({ onNavigate }) {
       />
 
       <main className="pt-16">
-        <section id="beranda" className="hero-glow py-16 sm:py-24 border-b border-subtle">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-            <div className="lg:col-span-7 space-y-6">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold chip-tag">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                <span>{PROFILE.campusBadge}</span>
-              </div>
-              <div className="space-y-3">
-                <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight">
-                  Faris Pratama <span className="text-accent">Putra</span>
-                </h1>
-                <p className="text-base sm:text-lg font-semibold text-secondary">{profile.role}</p>
-              </div>
-              <p className="text-sm sm:text-base text-secondary leading-relaxed max-w-2xl">{profile.bio}</p>
+        <section id="beranda" className="hero-glow py-16 sm:py-24 border-b border-subtle relative overflow-hidden">
+          {/* Subtle tech dot/grid pattern & ambient lighting */}
+          <div className="absolute inset-0 hero-grid-pattern pointer-events-none opacity-50" />
+          <div className="absolute top-1/4 -left-20 w-80 h-80 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute top-1/3 -right-20 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
 
-              <div className="flex flex-wrap items-center gap-3">
-                <a
-                  href="#proyek"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-semibold text-sm shadow-lg shadow-sky-500/25"
-                >
-                  <span>Lihat Proyek</span>
-                  <ArrowDownRight className="w-4 h-4" />
-                </a>
-                <button
-                  type="button"
-                  onClick={() => setCvOpen(true)}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl surface-card font-semibold text-sm"
-                >
-                  <FileText className="w-4 h-4 text-accent" />
-                  <span>Ringkasan CV</span>
-                </button>
-                <a
-                  href={PROFILE.githubUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl surface-card font-semibold text-sm"
-                >
-                  <Github className="w-4 h-4 text-accent" />
-                  <span>GitHub</span>
-                </a>
+          {/* Kontainer Utama max-w-7xl agar proporsional di monitor lebar */}
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+              {/* Kolom Kiri: Informasi Hero & Statistik Dinamis */}
+              <div className="lg:col-span-7 space-y-6">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold chip-tag">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>{PROFILE.campusBadge}</span>
+                </div>
+                <div className="space-y-3">
+                  <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight">
+                    Faris Pratama <span className="text-accent">Putra</span>
+                  </h1>
+                  <p className="text-base sm:text-lg font-semibold text-secondary">{profile.role}</p>
+                </div>
+                <p className="text-sm sm:text-base text-secondary leading-relaxed max-w-2xl">{profile.bio}</p>
+
+                {/* Tombol CTA */}
+                <div className="flex flex-wrap items-center gap-3">
+                  <a
+                    href="#proyek"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-semibold text-sm shadow-lg shadow-sky-500/25 transition-all hover:scale-[1.02]"
+                  >
+                    <span>Lihat Proyek</span>
+                    <ArrowDownRight className="w-4 h-4" />
+                  </a>
+                  <button
+                    type="button"
+                    onClick={() => setCvOpen(true)}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl surface-card font-semibold text-sm hover:border-sky-500/50 transition-all hover:scale-[1.02]"
+                  >
+                    <FileText className="w-4 h-4 text-accent" />
+                    <span>Ringkasan CV</span>
+                  </button>
+                  <a
+                    href={profile.githubUrl || PROFILE.githubUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl surface-card font-semibold text-sm hover:border-sky-500/50 transition-all hover:scale-[1.02]"
+                  >
+                    <Github className="w-4 h-4 text-accent" />
+                    <span>GitHub</span>
+                  </a>
+                </div>
+
+                {/* 3 Kartu Statistik Dinamis */}
+                <div className="grid grid-cols-3 gap-3 pt-3 sm:pt-4 max-w-xl">
+                  <div className="surface-card rounded-xl p-3 sm:p-3.5 border border-subtle hover:border-sky-500/40 transition-all group">
+                    <div className="text-xl sm:text-2xl font-extrabold text-[var(--text-primary)] group-hover:text-sky-400 transition-colors">
+                      {projects.length}+
+                    </div>
+                    <div className="text-[11px] sm:text-xs text-secondary mt-0.5 leading-snug">
+                      Proyek Utama
+                    </div>
+                  </div>
+
+                  <div className="surface-card rounded-xl p-3 sm:p-3.5 border border-subtle hover:border-sky-500/40 transition-all group">
+                    <div className="text-xl sm:text-2xl font-extrabold text-[var(--text-primary)] group-hover:text-sky-400 transition-colors">
+                      {experiences.length}
+                    </div>
+                    <div className="text-[11px] sm:text-xs text-secondary mt-0.5 leading-snug">
+                      Pengalaman Industri
+                    </div>
+                  </div>
+
+                  <div className="surface-card rounded-xl p-3 sm:p-3.5 border border-subtle hover:border-sky-500/40 transition-all group">
+                    <div className="text-xl sm:text-2xl font-extrabold text-[var(--text-primary)] group-hover:text-sky-400 transition-colors">
+                      3+ Thn
+                    </div>
+                    <div className="text-[11px] sm:text-xs text-secondary mt-0.5 leading-snug">
+                      Teknisi IT &amp; Hardware
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Kolom Kanan: Kartu Profil & Identitas */}
+              <div className="lg:col-span-5 relative">
+                {/* Efek Pendaran Cahaya (Ambient Glow Cyan & Indigo) */}
+                <div className="absolute -inset-2 sm:-inset-4 bg-gradient-to-r from-sky-500/20 via-cyan-500/15 to-indigo-500/20 rounded-3xl blur-2xl -z-10 opacity-75 pointer-events-none" />
+
+                <div className="surface-card rounded-2xl p-6 space-y-5 max-w-md mx-auto lg:ml-auto shadow-xl border border-subtle hover:border-sky-500/40 transition-all">
+                  {/* Foto dengan Floating Status Badge */}
+                  <div className="aspect-[4/3] rounded-xl overflow-hidden bg-elevated border border-subtle flex items-center justify-center relative group">
+                    {profile.photoUrl ? (
+                      <img src={profile.photoUrl} alt={PROFILE.fullName} className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300" />
+                    ) : (
+                      <div className="flex flex-col items-center text-center p-6">
+                        <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-sky-500 to-indigo-600 text-white flex items-center justify-center text-3xl font-extrabold mb-3">
+                          {PROFILE.initials}
+                        </div>
+                        <p className="text-sm font-semibold">{PROFILE.fullName}</p>
+                        <p className="text-xs text-secondary mt-1">{PROFILE.location}</p>
+                      </div>
+                    )}
+
+                    {/* Floating status badge di sudut foto */}
+                    <div className="absolute bottom-3 left-3 z-10 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/90 backdrop-blur-md border border-emerald-500/40 text-emerald-300 text-xs font-semibold shadow-lg">
+                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                      <span>Terbuka untuk Peluang</span>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2.5 text-sm">
+                    <div className="flex items-center justify-between py-1.5 border-b border-subtle">
+                      <span className="text-secondary flex items-center gap-2">
+                        <GraduationCap className="w-4 h-4 text-accent" /> Pendidikan
+                      </span>
+                      <span className="font-medium">S1 Teknik Informatika (UDB)</span>
+                    </div>
+                    <div className="flex items-center justify-between py-1.5 border-b border-subtle">
+                      <span className="text-secondary flex items-center gap-2">
+                        <Briefcase className="w-4 h-4 text-accent" /> Magang Terbaru
+                      </span>
+                      <span className="font-medium">PT Vinix Seven Aurum</span>
+                    </div>
+                    <div className="flex items-center justify-between py-1.5 border-b border-subtle">
+                      <span className="text-secondary flex items-center gap-2">
+                        <MapPin className="w-4 h-4 text-accent" /> Domisili
+                      </span>
+                      <span className="font-medium">{PROFILE.cityShort}</span>
+                    </div>
+
+                    {/* Baris Tombol Ikon Cepat Sosial Media */}
+                    <div className="pt-2.5 flex items-center justify-between gap-2">
+                      <span className="text-xs text-secondary font-medium">Hubungi / Ikuti:</span>
+                      <div className="flex items-center gap-2">
+                        <a
+                          href={profile.githubUrl || PROFILE.githubUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-8 h-8 rounded-lg surface-card border border-subtle hover:border-slate-400 hover:text-white text-secondary flex items-center justify-center transition-all hover:scale-110 shadow-sm"
+                          title="GitHub"
+                        >
+                          <Github className="w-4 h-4" />
+                        </a>
+                        <a
+                          href={profile.instagramUrl || (profile.socials?.find((s) => s.id === 'instagram')?.url) || 'https://instagram.com/fpratamaputra'}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-8 h-8 rounded-lg surface-card border border-subtle hover:border-pink-500 hover:text-pink-400 text-secondary flex items-center justify-center transition-all hover:scale-110 shadow-sm"
+                          title="Instagram"
+                        >
+                          <Instagram className="w-4 h-4" />
+                        </a>
+                        <a
+                          href={`https://wa.me/${profile.whatsappNumber || PROFILE.whatsappNumber}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-8 h-8 rounded-lg surface-card border border-subtle hover:border-emerald-500 hover:text-emerald-400 text-secondary flex items-center justify-center transition-all hover:scale-110 shadow-sm"
+                          title="WhatsApp"
+                        >
+                          <MessageCircle className="w-4 h-4" />
+                        </a>
+                        <a
+                          href={`mailto:${profile.email || PROFILE.email}`}
+                          className="w-8 h-8 rounded-lg surface-card border border-subtle hover:border-sky-500 hover:text-sky-400 text-secondary flex items-center justify-center transition-all hover:scale-110 shadow-sm"
+                          title="Kirim Email"
+                        >
+                          <Mail className="w-4 h-4" />
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div className="lg:col-span-5">
-              <div className="surface-card rounded-2xl p-6 space-y-5 max-w-md mx-auto lg:ml-auto">
-                <div className="aspect-[4/3] rounded-xl overflow-hidden bg-elevated border border-subtle flex items-center justify-center">
-                  {profile.photoUrl ? (
-                    <img src={profile.photoUrl} alt={PROFILE.fullName} className="w-full h-full object-cover object-top" />
-                  ) : (
-                    <div className="flex flex-col items-center text-center p-6">
-                      <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-sky-500 to-indigo-600 text-white flex items-center justify-center text-3xl font-extrabold mb-3">
-                        {PROFILE.initials}
-                      </div>
-                      <p className="text-sm font-semibold">{PROFILE.fullName}</p>
-                      <p className="text-xs text-secondary mt-1">{PROFILE.location}</p>
-                    </div>
-                  )}
-                </div>
-
-                <div className="space-y-2.5 text-sm">
-                  <div className="flex items-center justify-between py-1.5 border-b border-subtle">
-                    <span className="text-secondary flex items-center gap-2">
-                      <GraduationCap className="w-4 h-4 text-accent" /> Pendidikan
-                    </span>
-                    <span className="font-medium">S1 Teknik Informatika (UDB)</span>
-                  </div>
-                  <div className="flex items-center justify-between py-1.5 border-b border-subtle">
-                    <span className="text-secondary flex items-center gap-2">
-                      <Briefcase className="w-4 h-4 text-accent" /> Magang Terbaru
-                    </span>
-                    <span className="font-medium">PT Vinix Seven Aurum</span>
-                  </div>
-                  <div className="flex items-center justify-between py-1.5">
-                    <span className="text-secondary flex items-center gap-2">
-                      <MapPin className="w-4 h-4 text-accent" /> Domisili
-                    </span>
-                    <span className="font-medium">{PROFILE.cityShort}</span>
-                  </div>
-                </div>
+            {/* Baris Tech Stack Strip di Bagian Bawah Hero */}
+            <div className="mt-12 pt-8 border-t border-subtle flex flex-col md:flex-row items-center justify-between gap-4">
+              <span className="text-xs font-semibold text-secondary uppercase tracking-wider shrink-0 flex items-center gap-2">
+                <Code2 className="w-4 h-4 text-accent" />
+                Fokus Teknologi Utama:
+              </span>
+              <div className="flex flex-wrap items-center justify-center md:justify-end gap-2">
+                {[
+                  { name: 'React', hover: 'hover:border-cyan-400 hover:text-cyan-400' },
+                  { name: 'Vite', hover: 'hover:border-purple-400 hover:text-purple-400' },
+                  { name: 'Tailwind CSS', hover: 'hover:border-sky-400 hover:text-sky-400' },
+                  { name: 'Node.js / Express', hover: 'hover:border-emerald-400 hover:text-emerald-400' },
+                  { name: 'MySQL', hover: 'hover:border-blue-400 hover:text-blue-400' },
+                  { name: 'Python', hover: 'hover:border-amber-400 hover:text-amber-400' },
+                  { name: 'XGBoost', hover: 'hover:border-orange-400 hover:text-orange-400' },
+                  { name: 'ESP32 / IoT', hover: 'hover:border-teal-400 hover:text-teal-400' },
+                ].map((tech) => (
+                  <span
+                    key={tech.name}
+                    className={`px-3 py-1 rounded-lg text-xs font-medium surface-card border border-subtle text-secondary transition-all cursor-default shadow-sm ${tech.hover}`}
+                  >
+                    {tech.name}
+                  </span>
+                ))}
               </div>
             </div>
           </div>
