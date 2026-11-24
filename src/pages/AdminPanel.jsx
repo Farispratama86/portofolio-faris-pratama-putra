@@ -266,7 +266,7 @@ export default function AdminPanel({ onNavigate }) {
     setProjForm({
       title: '',
       category: 'web-ml',
-      categoryLabel: 'Web UI/UX',
+      categoryLabel: 'Web & Machine Learning',
       year: '2026',
       summary: '',
       highlightsText: '',
@@ -329,10 +329,17 @@ export default function AdminPanel({ onNavigate }) {
         imagePublicId = up.publicId;
       }
 
+      let finalCategoryLabel = projForm.categoryLabel?.trim();
+      if (!finalCategoryLabel || (projForm.category === 'iot' && /web|ui\/ux/i.test(finalCategoryLabel))) {
+        finalCategoryLabel = projForm.category === 'iot' ? 'IoT & Embedded' : projForm.category === 'desktop' ? 'Desktop App' : 'Web & Machine Learning';
+      } else if (projForm.category === 'desktop' && /web|ui\/ux/i.test(finalCategoryLabel)) {
+        finalCategoryLabel = 'Desktop App';
+      }
+
       const payload = {
         title: projForm.title,
         category: projForm.category,
-        categoryLabel: projForm.categoryLabel,
+        categoryLabel: finalCategoryLabel,
         year: projForm.year,
         summary: projForm.summary,
         highlights: projForm.highlightsText.split('\n').map((s) => s.trim()).filter(Boolean),
@@ -854,23 +861,53 @@ export default function AdminPanel({ onNavigate }) {
                 className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm"
               />
 
-              <div className="grid grid-cols-2 gap-3">
-                <select
-                  value={projForm.category}
-                  onChange={(e) => setProjForm({ ...projForm, category: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm"
-                >
-                  <option value="web-ml">Web &amp; ML</option>
-                  <option value="iot">IoT</option>
-                  <option value="desktop">Desktop</option>
-                </select>
-                <input
-                  type="text"
-                  value={projForm.year}
-                  onChange={(e) => setProjForm({ ...projForm, year: e.target.value })}
-                  placeholder="Tahun"
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm"
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-400 mb-1">Kategori Utama *</label>
+                  <select
+                    value={projForm.category}
+                    onChange={(e) => {
+                      const newCat = e.target.value;
+                      let newLabel = 'Web & Machine Learning';
+                      if (newCat === 'iot') newLabel = 'IoT & Embedded';
+                      else if (newCat === 'desktop') newLabel = 'Desktop App';
+                      setProjForm((prev) => ({
+                        ...prev,
+                        category: newCat,
+                        categoryLabel:
+                          prev.categoryLabel &&
+                          !['Web UI/UX', 'Web & ML', 'IoT', 'Desktop', 'Web & Machine Learning', 'IoT & Embedded', 'Desktop App'].includes(prev.categoryLabel)
+                            ? prev.categoryLabel
+                            : newLabel,
+                      }));
+                    }}
+                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                  >
+                    <option value="web-ml">Web &amp; ML</option>
+                    <option value="iot">IoT &amp; Embedded</option>
+                    <option value="desktop">Desktop App</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-400 mb-1">Label Badge Kategori</label>
+                  <input
+                    type="text"
+                    value={projForm.categoryLabel}
+                    onChange={(e) => setProjForm({ ...projForm, categoryLabel: e.target.value })}
+                    placeholder="Contoh: Web UI/UX · Production"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-400 mb-1">Tahun Proyek</label>
+                  <input
+                    type="text"
+                    value={projForm.year}
+                    onChange={(e) => setProjForm({ ...projForm, year: e.target.value })}
+                    placeholder="2026"
+                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                  />
+                </div>
               </div>
 
               <textarea
@@ -938,16 +975,24 @@ export default function AdminPanel({ onNavigate }) {
             <div className="lg:col-span-7 space-y-3">
               {projects.map((p) => (
                 <article key={p.id} className="bg-[#111a2e] border border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row gap-4">
-                  <div className="w-full sm:w-44 aspect-video rounded-xl overflow-hidden bg-slate-950 border border-slate-800 shrink-0 flex items-center justify-center">
+                  <div className="w-full sm:w-44 aspect-video rounded-xl overflow-hidden bg-slate-950/80 border border-slate-800 shrink-0 flex items-center justify-center p-1.5">
                     {p.imageUrl ? (
-                      <img src={p.imageUrl} alt={p.title} className="w-full h-full object-cover" />
+                      <img src={p.imageUrl} alt={p.title} className="w-full h-full object-contain rounded-lg" />
                     ) : (
                       <span className="text-[11px] text-slate-500">Belum ada foto</span>
                     )}
                   </div>
                   <div className="flex-1 min-w-0 space-y-2">
                     <div className="flex items-start justify-between gap-2">
-                      <h3 className="font-bold text-sm sm:text-base">{p.title}</h3>
+                      <div>
+                        <div className="flex flex-wrap items-center gap-1.5 mb-1">
+                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-sky-500/15 text-sky-400 border border-sky-500/30">
+                            {p.categoryLabel || (p.category === 'iot' ? 'IoT & Embedded' : p.category === 'desktop' ? 'Desktop App' : 'Web & ML')}
+                          </span>
+                          <span className="text-xs text-slate-400">· {p.year}</span>
+                        </div>
+                        <h3 className="font-bold text-sm sm:text-base">{p.title}</h3>
+                      </div>
                       <div className="flex items-center gap-1.5 shrink-0">
                         <button
                           type="button"
@@ -1522,9 +1567,9 @@ export default function AdminPanel({ onNavigate }) {
                 const linkedExp = experiences.find((x) => String(x.id) === String(cert.experienceId) || x.id === cert.experienceId);
                 return (
                   <article key={cert.id} className="bg-[#111a2e] border border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row gap-4 items-start">
-                    <div className="w-full sm:w-40 aspect-[16/10] rounded-xl overflow-hidden bg-slate-950 border border-slate-800 shrink-0 flex items-center justify-center">
+                    <div className="w-full sm:w-40 aspect-[16/10] rounded-xl overflow-hidden bg-slate-950/80 border border-slate-800 shrink-0 flex items-center justify-center p-1.5">
                       {cert.imageUrl ? (
-                        <img src={cert.imageUrl} alt={cert.title} className="w-full h-full object-cover" />
+                        <img src={cert.imageUrl} alt={cert.title} className="w-full h-full object-contain rounded-lg" />
                       ) : (
                         <div className="text-center p-2">
                           <Award className="w-6 h-6 text-amber-500/50 mx-auto mb-1" />

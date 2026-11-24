@@ -6,7 +6,7 @@ export default function ProjectMockup({ project }) {
       <img
         src={project.imageUrl}
         alt={project.title}
-        className="w-full h-full object-contain bg-slate-950"
+        className="w-full h-full object-contain bg-slate-950/80 p-1.5 sm:p-2"
       />
     );
   }

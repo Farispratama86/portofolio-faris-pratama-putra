@@ -52,6 +52,62 @@ const SKILL_ICONS = {
   database: Database,
 };
 
+// Helper sinkronisasi label kategori proyek agar tidak salah terbawa 'Web UI/UX' untuk IoT / Desktop
+function getProjectCategoryBadge(project) {
+  if (!project) return 'Web & Machine Learning';
+  const cat = project.category;
+  const label = project.categoryLabel || '';
+
+  if (cat === 'iot') {
+    if (!label || /web|ui\/ux/i.test(label)) {
+      return 'IoT & Embedded';
+    }
+  } else if (cat === 'desktop') {
+    if (!label || /web|ui\/ux/i.test(label)) {
+      return 'Desktop App';
+    }
+  } else if (cat === 'web-ml') {
+    if (!label) {
+      return 'Web & Machine Learning';
+    }
+  }
+  return label || 'Web & ML';
+}
+
+// Helper penamaan tombol tautan cerdas (Live Demo vs Publikasi / Jurnal)
+function getProjectLinkInfo(project) {
+  if (!project || !project.liveUrl) return null;
+  const url = project.liveUrl.toLowerCase();
+  const isJournal =
+    url.includes('ojs.') ||
+    url.includes('journal') ||
+    url.includes('article') ||
+    url.includes('jurnal') ||
+    url.includes('doi.org');
+  const isIot = project.category === 'iot';
+
+  if (isJournal || isIot) {
+    return {
+      text: 'Publikasi / Jurnal',
+      isJournal: true,
+    };
+  }
+  return {
+    text: 'Live Demo',
+    isJournal: false,
+  };
+}
+
+// Helper merapikan tanda kutip sertifikat
+function formatCertificateTitle(title = '') {
+  let t = (title || '').trim();
+  const quoteCount = (t.match(/"/g) || []).length;
+  if (quoteCount % 2 !== 0) {
+    t = `${t}"`;
+  }
+  return t;
+}
+
 export default function PortfolioHome({ onNavigate }) {
   const [theme, setTheme] = useState(() => {
     try {
@@ -291,7 +347,7 @@ export default function PortfolioHome({ onNavigate }) {
                 <div className="grid grid-cols-3 gap-3 pt-3 sm:pt-4 max-w-xl">
                   <div className="surface-card rounded-xl p-3 sm:p-3.5 border border-subtle hover:border-sky-500/40 transition-all group">
                     <div className="text-xl sm:text-2xl font-extrabold text-[var(--text-primary)] group-hover:text-sky-400 transition-colors">
-                      {projects.length}+
+                      {projects.length}
                     </div>
                     <div className="text-[11px] sm:text-xs text-secondary mt-0.5 leading-snug">
                       Proyek Utama
@@ -617,7 +673,7 @@ export default function PortfolioHome({ onNavigate }) {
                 <div className="lg:col-span-6 p-6 sm:p-8 flex flex-col justify-between space-y-5">
                   <div className="space-y-3">
                     <span className="chip-tag text-xs font-semibold px-3 py-1 rounded-full">
-                      Proyek Unggulan · {featuredProject.categoryLabel}
+                      Proyek Unggulan · {getProjectCategoryBadge(featuredProject)}
                     </span>
                     <h3 className="text-xl sm:text-2xl font-extrabold">{featuredProject.title}</h3>
                     <p className="text-sm sm:text-base text-secondary leading-relaxed">{featuredProject.summary}</p>
@@ -636,9 +692,9 @@ export default function PortfolioHome({ onNavigate }) {
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={(e) => e.stopPropagation()}
-                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-white text-sm font-semibold"
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-white text-sm font-semibold transition-all hover:scale-[1.02]"
                       >
-                        <span>Live Demo</span>
+                        <span>{getProjectLinkInfo(featuredProject)?.text || 'Live Demo'}</span>
                         <ExternalLink className="w-3.5 h-3.5" />
                       </a>
                     )}
@@ -668,7 +724,7 @@ export default function PortfolioHome({ onNavigate }) {
                     <div className="p-5 space-y-3">
                       <div className="flex items-center justify-between gap-2">
                         <span className="chip-tag text-[11px] font-semibold px-2.5 py-0.5 rounded-full">
-                          {project.categoryLabel}
+                          {getProjectCategoryBadge(project)}
                         </span>
                         <span className="text-xs text-muted">{project.year}</span>
                       </div>
@@ -694,9 +750,10 @@ export default function PortfolioHome({ onNavigate }) {
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
-                          className="text-emerald-400 hover:underline"
+                          className="text-emerald-400 hover:underline inline-flex items-center gap-1"
                         >
-                          Live Demo
+                          <span>{getProjectLinkInfo(project)?.text || 'Live Demo'}</span>
+                          <ExternalLink className="w-3 h-3" />
                         </a>
                       ) : (
                         <span className="text-muted">Studi Kasus</span>
@@ -736,13 +793,13 @@ export default function PortfolioHome({ onNavigate }) {
                   className="surface-card rounded-2xl overflow-hidden border border-subtle hover:border-sky-500/50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 cursor-pointer flex flex-col justify-between group"
                 >
                   <div>
-                    {/* Thumbnail / Mockup Preview */}
-                    <div className="aspect-[16/10] bg-slate-950/80 border-b border-subtle overflow-hidden relative flex items-center justify-center p-3">
+                    {/* Thumbnail / Mockup Preview (Utuh & Tidak Terpotong) */}
+                    <div className="aspect-[16/10] bg-slate-950/60 border-b border-subtle overflow-hidden relative flex items-center justify-center p-2 sm:p-2.5">
                       {cert.imageUrl ? (
                         <img
                           src={cert.imageUrl}
                           alt={cert.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 rounded-lg"
+                          className="w-full h-full object-contain group-hover:scale-[1.02] transition-transform duration-300 rounded-lg"
                         />
                       ) : (
                         <div className="w-full h-full border-2 border-dashed border-amber-500/30 rounded-xl bg-gradient-to-br from-slate-950 to-[#0e1626] flex flex-col items-center justify-center p-3 text-center">
@@ -765,8 +822,11 @@ export default function PortfolioHome({ onNavigate }) {
                           {cert.category || 'Sertifikat'}
                         </span>
                       </div>
-                      <h3 className="font-bold text-base leading-snug group-hover:text-sky-400 transition-colors line-clamp-2">
-                        {cert.title}
+                      <h3
+                        className="font-bold text-base leading-snug group-hover:text-sky-400 transition-colors line-clamp-2"
+                        title={formatCertificateTitle(cert.title)}
+                      >
+                        {formatCertificateTitle(cert.title)}
                       </h3>
                       <p className="text-xs text-sky-400 font-semibold">{cert.issuer}</p>
                       {cert.description && (

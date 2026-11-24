@@ -56,7 +56,11 @@ export default function CertificateModal({ certificate, onClose, onNavigateToSec
                 )}
               </div>
               <h2 className="text-base sm:text-xl font-bold leading-snug line-clamp-2">
-                {certificate.title}
+                {certificate.title
+                  ? ((certificate.title.match(/"/g) || []).length % 2 !== 0
+                      ? `${certificate.title}"`
+                      : certificate.title)
+                  : ''}
               </h2>
             </div>
           </div>
