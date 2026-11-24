@@ -34,6 +34,7 @@ import {
   EXPERIENCE_STATUS_OPTIONS,
   PROFILE,
   getBadgeStyle,
+  getCertificateCategoryStyle,
   getSkillRatingLabel,
 } from '../data/portfolioData';
 import {
@@ -1438,10 +1439,13 @@ export default function AdminPanel({ onNavigate }) {
                     className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
                   >
                     <option value="Magang">Magang (Internship)</option>
-                    <option value="Sertifikasi Profesi">Sertifikasi Profesi</option>
+                    <option value="Seminar / Webinar">Seminar / Webinar</option>
+                    <option value="Webinar">Webinar</option>
+                    <option value="Seminar">Seminar</option>
                     <option value="Pelatihan Skill">Pelatihan Skill</option>
                     <option value="Bootcamp">Bootcamp</option>
                     <option value="Workshop & Kursus">Workshop &amp; Kursus</option>
+                    <option value="Sertifikasi Profesi">Sertifikasi Profesi</option>
                     <option value="Kerja / Teknis">Kerja / Teknis</option>
                     <option value="Penghargaan">Penghargaan / Lomba</option>
                   </select>
@@ -1533,7 +1537,7 @@ export default function AdminPanel({ onNavigate }) {
                       <div className="flex items-start justify-between gap-2">
                         <div>
                           <div className="flex flex-wrap items-center gap-1.5 mb-1">
-                            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${getCertificateCategoryStyle(cert.category).badgeClass}`}>
                               {cert.category}
                             </span>
                             {linkedExp && (

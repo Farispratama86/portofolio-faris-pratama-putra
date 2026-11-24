@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { Award, Building2, Calendar, CheckCircle2, ExternalLink, Sparkles, X } from 'lucide-react';
+import { getCertificateCategoryStyle } from '../data/portfolioData';
 
 export default function CertificateModal({ certificate, onClose, onNavigateToSection }) {
   useEffect(() => {
@@ -44,7 +45,7 @@ export default function CertificateModal({ certificate, onClose, onNavigateToSec
             </div>
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2 mb-1">
-                <span className="chip-tag text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-400 border border-amber-500/30">
+                <span className={`chip-tag text-[11px] font-semibold px-2.5 py-0.5 rounded-full ${getCertificateCategoryStyle(certificate.category).badgeClass}`}>
                   {certificate.category || 'Sertifikat'}
                 </span>
                 {certificate.issueDate && (

@@ -398,6 +398,65 @@ export function getBadgeStyle(badge = '') {
   };
 }
 
+// Helper visual badge warna untuk Kategori Sertifikat
+export function getCertificateCategoryStyle(category = '') {
+  const c = (category || '').toLowerCase();
+  if (c.includes('webinar') || c.includes('seminar')) {
+    return {
+      type: 'seminar-webinar',
+      label: category || 'Seminar / Webinar',
+      badgeClass: 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/30',
+      dotClass: 'bg-cyan-400',
+    };
+  }
+  if (c.includes('magang') || c.includes('intern')) {
+    return {
+      type: 'magang',
+      label: category || 'Magang',
+      badgeClass: 'bg-amber-500/15 text-amber-300 border border-amber-500/30',
+      dotClass: 'bg-amber-400',
+    };
+  }
+  if (c.includes('pelatihan') || c.includes('skill') || c.includes('bootcamp') || c.includes('kursus') || c.includes('workshop')) {
+    return {
+      type: 'pelatihan',
+      label: category || 'Pelatihan Skill',
+      badgeClass: 'bg-purple-500/15 text-purple-300 border border-purple-500/30',
+      dotClass: 'bg-purple-400',
+    };
+  }
+  if (c.includes('profesi') || c.includes('sertifikasi')) {
+    return {
+      type: 'profesi',
+      label: category || 'Sertifikasi Profesi',
+      badgeClass: 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30',
+      dotClass: 'bg-emerald-400',
+    };
+  }
+  if (c.includes('penghargaan') || c.includes('lomba') || c.includes('award')) {
+    return {
+      type: 'penghargaan',
+      label: category || 'Penghargaan',
+      badgeClass: 'bg-rose-500/15 text-rose-300 border border-rose-500/30',
+      dotClass: 'bg-rose-400',
+    };
+  }
+  if (c.includes('teknis') || c.includes('kerja')) {
+    return {
+      type: 'teknis',
+      label: category || 'Kerja / Teknis',
+      badgeClass: 'bg-blue-500/15 text-blue-300 border border-blue-500/30',
+      dotClass: 'bg-blue-400',
+    };
+  }
+  return {
+    type: 'default',
+    label: category || 'Sertifikat',
+    badgeClass: 'bg-sky-500/15 text-sky-300 border border-sky-500/30',
+    dotClass: 'bg-sky-400',
+  };
+}
+
 export const CERTIFICATES = [
   {
     id: 'vinix7-intern',

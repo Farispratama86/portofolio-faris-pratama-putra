@@ -40,6 +40,7 @@ import {
   PROJECTS as FALLBACK_PROJECTS,
   SKILLS,
   getBadgeStyle,
+  getCertificateCategoryStyle,
   getSkillRatingLabel,
 } from '../data/portfolioData';
 import { fetchCertificates, fetchExperiences, fetchProfile, fetchProjects, fetchSkills } from '../services/api';
@@ -641,7 +642,7 @@ export default function PortfolioHome({ onNavigate }) {
                     {/* Card Content */}
                     <div className="p-5 space-y-2.5">
                       <div className="flex items-center gap-2">
-                        <span className="chip-tag text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                        <span className={`chip-tag text-[10px] font-semibold px-2.5 py-0.5 rounded-full ${getCertificateCategoryStyle(cert.category).badgeClass}`}>
                           {cert.category || 'Sertifikat'}
                         </span>
                       </div>
