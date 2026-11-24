@@ -10,6 +10,7 @@ import {
   Edit3,
   ExternalLink,
   Eye,
+  FileText,
   FolderKanban,
   Image as ImageIcon,
   LogIn,
@@ -120,8 +121,9 @@ export default function AdminPanel({ onNavigate }) {
     company: '',
     period: '',
     location: 'Surakarta, Indonesia',
-    sectionHeading: 'Tanggung Jawab Utama',
-    bulletsText: '',
+    sections: [
+      { heading: 'Tanggung Jawab Utama', bulletsText: '' },
+    ],
   });
 
   const [editingCertId, setEditingCertId] = useState(null);
@@ -285,8 +287,31 @@ export default function AdminPanel({ onNavigate }) {
       company: '',
       period: '',
       location: 'Surakarta, Indonesia',
-      sectionHeading: 'Tanggung Jawab Utama',
-      bulletsText: '',
+      sections: [
+        { heading: 'Tanggung Jawab Utama', bulletsText: '' },
+      ],
+    });
+  };
+
+  const handleAddExpSection = () => {
+    setExpForm((prev) => ({
+      ...prev,
+      sections: [...prev.sections, { heading: '', bulletsText: '' }],
+    }));
+  };
+
+  const handleRemoveExpSection = (index) => {
+    setExpForm((prev) => ({
+      ...prev,
+      sections: prev.sections.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleExpSectionChange = (index, field, value) => {
+    setExpForm((prev) => {
+      const next = [...prev.sections];
+      next[index] = { ...next[index], [field]: value };
+      return { ...prev, sections: next };
     });
   };
 
@@ -349,28 +374,35 @@ export default function AdminPanel({ onNavigate }) {
     e.preventDefault();
     setLoading(true);
     try {
+      const formattedSections = expForm.sections
+        .map((s) => ({
+          heading: (s.heading || '').trim() || 'Tanggung Jawab Utama',
+          bullets: (s.bulletsText || '')
+            .split('\n')
+            .map((b) => b.trim())
+            .filter(Boolean),
+        }))
+        .filter((s) => s.bullets.length > 0 || s.heading.trim().length > 0);
+
       const payload = {
         badge: expForm.badge,
         role: expForm.role,
         company: expForm.company,
         period: expForm.period,
         location: expForm.location,
-        sections: [
-          {
-            heading: expForm.sectionHeading || 'Tanggung Jawab Utama',
-            bullets: expForm.bulletsText.split('\n').map((b) => b.trim()).filter(Boolean),
-          },
+        sections: formattedSections.length > 0 ? formattedSections : [
+          { heading: 'Tanggung Jawab Utama', bullets: [] }
         ],
       };
 
       if (editingExpId) {
         const updated = await updateExperience(editingExpId, payload, token);
         setExperiences((prev) => prev.map((x) => (x.id === editingExpId ? updated : x)));
-        notify('Pengalaman diperbarui.');
+        notify('Pengalaman & sub-bab berhasil diperbarui.');
       } else {
         const created = await createExperience(payload, token);
         setExperiences((prev) => [created, ...prev]);
-        notify('Program magang / pengalaman baru ditambahkan!');
+        notify('Program magang / pengalaman baru berhasil ditambahkan!');
       }
       resetExpForm();
     } catch (err) {
@@ -1161,27 +1193,87 @@ export default function AdminPanel({ onNavigate }) {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-slate-400 mb-1">Subjudul Tugas / Capaian</label>
-                <input
-                  type="text"
-                  value={expForm.sectionHeading}
-                  onChange={(e) => setExpForm({ ...expForm, sectionHeading: e.target.value })}
-                  placeholder="Contoh: Tanggung Jawab Utama / Troubleshooting &amp; Instalasi"
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm"
-                />
-              </div>
+              {/* Multi-Section Sub-bab & Poin Tugas (Bisa 1, 2, atau Lebih) */}
+              <div className="space-y-3 pt-2 border-t border-slate-800">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+                    <FileText className="w-3.5 h-3.5 text-sky-400" />
+                    <span>Sub-bab Tugas &amp; Capaian ({expForm.sections.length})</span>
+                  </label>
+                  <button
+                    type="button"
+                    onClick={handleAddExpSection}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-sky-500/15 hover:bg-sky-500/25 text-sky-400 border border-sky-500/30 transition-all"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Tambah Sub-bab</span>
+                  </button>
+                </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-slate-400 mb-1">Poin Tugas / Materi * (1 baris = 1 poin)</label>
-                <textarea
-                  rows="4"
-                  required
-                  value={expForm.bulletsText}
-                  onChange={(e) => setExpForm({ ...expForm, bulletsText: e.target.value })}
-                  placeholder="Poin tugas (1 baris = 1 poin)"
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm resize-none"
-                />
+                <div className="space-y-3">
+                  {expForm.sections.map((sec, idx) => (
+                    <div
+                      key={idx}
+                      className="bg-slate-950/80 border border-slate-800 rounded-xl p-3.5 space-y-2.5 relative"
+                    >
+                      <div className="flex items-center justify-between pb-1 border-b border-slate-800/60">
+                        <span className="text-[11px] font-bold text-sky-400 flex items-center gap-1.5">
+                          <span className="w-5 h-5 rounded-md bg-sky-500/20 text-sky-400 flex items-center justify-center text-[10px]">
+                            #{idx + 1}
+                          </span>
+                          Sub-bab {idx + 1}
+                        </span>
+                        {expForm.sections.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveExpSection(idx)}
+                            className="text-xs text-rose-400 hover:text-rose-300 inline-flex items-center gap-1 px-1.5 py-0.5 rounded hover:bg-rose-500/10 transition-colors"
+                            title="Hapus sub-bab ini"
+                          >
+                            <Trash2 className="w-3 h-3" /> Hapus
+                          </button>
+                        )}
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-medium text-slate-400 mb-1">
+                          Judul Sub-bab / Capaian *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={sec.heading}
+                          onChange={(e) => handleExpSectionChange(idx, 'heading', e.target.value)}
+                          placeholder="Contoh: Pengembangan Web & UI/UX / Troubleshooting & Instalasi"
+                          className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-sm font-medium focus:border-sky-500 outline-none text-slate-200"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-medium text-slate-400 mb-1">
+                          Poin Tugas / Materi * (1 baris = 1 poin)
+                        </label>
+                        <textarea
+                          rows="3"
+                          required
+                          value={sec.bulletsText}
+                          onChange={(e) => handleExpSectionChange(idx, 'bulletsText', e.target.value)}
+                          placeholder="Poin tugas (1 baris = 1 poin)"
+                          className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-sm text-slate-200 resize-none focus:border-sky-500 outline-none leading-relaxed"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleAddExpSection}
+                  className="w-full py-2.5 rounded-xl border border-dashed border-slate-700 hover:border-sky-500/60 text-xs font-semibold text-slate-300 hover:text-sky-400 hover:bg-sky-500/5 transition-all flex items-center justify-center gap-1.5"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>+ Tambah Sub-bab / Bagian Tugas Lainnya</span>
+                </button>
               </div>
 
               <button
@@ -1198,7 +1290,7 @@ export default function AdminPanel({ onNavigate }) {
               {experiences.map((exp) => {
                 const bStyle = getBadgeStyle(exp.badge);
                 return (
-                  <article key={exp.id} className="bg-[#111a2e] border border-slate-800 rounded-2xl p-5 space-y-2">
+                  <article key={exp.id} className="bg-[#111a2e] border border-slate-800 rounded-2xl p-5 space-y-3">
                     <div className="flex items-start justify-between gap-2">
                       <div>
                         <span className={`inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-0.5 rounded-full mb-1 ${bStyle.chipClass}`}>
@@ -1213,19 +1305,25 @@ export default function AdminPanel({ onNavigate }) {
                         <button
                           type="button"
                           onClick={() => {
-                            const firstSec = (exp.sections && exp.sections[0]) || { heading: 'Tanggung Jawab Utama', bullets: [] };
+                            const expSections = Array.isArray(exp.sections) && exp.sections.length > 0
+                              ? exp.sections.map((s) => ({
+                                  heading: s.heading || '',
+                                  bulletsText: Array.isArray(s.bullets) ? s.bullets.join('\n') : '',
+                                }))
+                              : [{ heading: 'Tanggung Jawab Utama', bulletsText: '' }];
+
                             setEditingExpId(exp.id);
                             setExpForm({
-                              badge: exp.badge,
-                              role: exp.role,
-                              company: exp.company,
-                              period: exp.period,
-                              location: exp.location,
-                              sectionHeading: firstSec.heading,
-                              bulletsText: (firstSec.bullets || []).join('\n'),
+                              badge: exp.badge || 'Aktif · On-site',
+                              role: exp.role || '',
+                              company: exp.company || '',
+                              period: exp.period || '',
+                              location: exp.location || '',
+                              sections: expSections,
                             });
                           }}
                           className="p-1.5 rounded-lg border border-slate-700 hover:border-sky-400 text-slate-300"
+                          title="Edit Pengalaman & Sub-bab"
                         >
                           <Edit3 className="w-3.5 h-3.5" />
                         </button>
@@ -1233,10 +1331,33 @@ export default function AdminPanel({ onNavigate }) {
                           type="button"
                           onClick={() => handleDeleteExp(exp.id)}
                           className="p-1.5 rounded-lg border border-rose-500/30 hover:bg-rose-500/15 text-rose-400"
+                          title="Hapus Pengalaman"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
+                    </div>
+
+                    {/* Preview Sub-bab di Card Admin */}
+                    <div className="pt-2 border-t border-slate-800/80 space-y-2">
+                      {(exp.sections || []).map((sec, sIdx) => (
+                        <div key={sIdx} className="bg-slate-950/60 rounded-xl p-3 border border-slate-800/60 text-xs space-y-1.5">
+                          <div className="flex items-center justify-between text-sky-400 font-semibold">
+                            <span className="flex items-center gap-1.5">
+                              <span className="w-1.5 h-1.5 rounded-full bg-sky-400" />
+                              {sec.heading || `Sub-bab #${sIdx + 1}`}
+                            </span>
+                            <span className="text-[10px] text-slate-400 font-normal px-2 py-0.5 rounded bg-slate-900 border border-slate-800">
+                              {(sec.bullets || []).length} poin
+                            </span>
+                          </div>
+                          <ul className="list-disc list-inside text-slate-400 space-y-0.5 text-[11px] leading-relaxed">
+                            {(sec.bullets || []).map((b, bIdx) => (
+                              <li key={bIdx}>{b}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
                     </div>
                   </article>
                 );

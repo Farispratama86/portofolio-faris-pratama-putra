@@ -6,6 +6,7 @@ import {
   Award,
   Brain,
   Briefcase,
+  Calendar,
   CheckCircle2,
   Code2,
   Cpu,
@@ -318,46 +319,104 @@ export default function PortfolioHome({ onNavigate }) {
           </div>
         </section>
 
-        <section id="pengalaman" className="py-16 sm:py-20 border-b border-subtle">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="mb-10">
-              <p className="text-xs font-bold uppercase tracking-widest text-accent mb-2">Rekam Jejak</p>
-              <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">Pengalaman Kerja &amp; Magang</h2>
+        <section id="pengalaman" className="py-16 sm:py-24 border-b border-subtle relative overflow-hidden">
+          {/* Subtle ambient lighting */}
+          <div className="absolute top-1/4 left-5 w-72 h-72 bg-sky-500/5 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-10 right-5 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-12">
+              <div>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-sky-500/10 text-sky-400 border border-sky-500/20 mb-3">
+                  <Briefcase className="w-3.5 h-3.5" />
+                  Rekam Jejak Profesional
+                </span>
+                <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">Pengalaman Kerja &amp; Magang</h2>
+                <p className="mt-2 text-sm sm:text-base text-secondary max-w-2xl">
+                  Perjalanan karier, kontribusi nyata dalam pengembangan aplikasi web modern, riset Machine Learning, hingga troubleshooting infrastruktur TI &amp; perangkat keras.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 self-start md:self-end">
+                <span className="text-xs font-semibold px-3.5 py-1.5 rounded-xl surface-card border border-subtle text-secondary flex items-center gap-1.5 shadow-sm">
+                  <Sparkles className="w-3.5 h-3.5 text-accent" />
+                  {experiences.length} Pengalaman Terverifikasi
+                </span>
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
               {experiences.map((exp) => {
                 const bStyle = getBadgeStyle(exp.badge);
+                const isTech = /technician|hardware|speed|jaringan|komputer/i.test(`${exp.role} ${exp.company}`);
+                const ExpIcon = isTech ? Cpu : Code2;
+
                 return (
-                  <article key={exp.id} className="surface-card rounded-2xl p-6 sm:p-7 space-y-5">
-                    <div className="flex flex-wrap items-start justify-between gap-3 pb-4 border-b border-subtle">
-                      <div>
-                        <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full mb-2 ${bStyle.chipClass}`}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${bStyle.dotClass}`} />
-                          {exp.badge}
-                        </span>
-                        <h3 className="text-lg sm:text-xl font-bold">{exp.role}</h3>
-                        <p className="text-sm font-semibold text-accent mt-0.5">{exp.company}</p>
-                      </div>
-                      <div className="text-left sm:text-right text-xs text-secondary">
-                        <div className="font-semibold text-[var(--text-primary)]">{exp.period}</div>
-                        <div className="mt-0.5">{exp.location}</div>
-                      </div>
-                    </div>
-                    <div className="space-y-4">
-                      {(exp.sections || []).map((sec) => (
-                        <div key={sec.heading}>
-                          <h4 className="text-xs font-bold uppercase tracking-wider text-accent mb-2">{sec.heading}</h4>
-                          <ul className="space-y-1.5 text-sm text-secondary list-disc list-inside leading-relaxed">
-                            {(sec.bullets || []).map((b) => (
-                              <li key={b}>{b}</li>
-                            ))}
-                          </ul>
+                  <article
+                    key={exp.id}
+                    className="surface-card rounded-2xl p-6 sm:p-7 flex flex-col justify-between border border-subtle hover:border-sky-500/40 transition-all duration-300 shadow-md hover:shadow-xl hover:shadow-sky-500/5 group"
+                  >
+                    <div className="space-y-6">
+                      {/* Header Pengalaman dengan Icon & Status */}
+                      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-5 border-b border-subtle">
+                        <div className="flex items-start gap-3.5">
+                          <div className="w-12 h-12 rounded-2xl bg-sky-500/10 text-sky-400 border border-sky-500/20 flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:bg-sky-500/20 transition-all shadow-sm">
+                            <ExpIcon className="w-6 h-6" />
+                          </div>
+                          <div>
+                            <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-0.5 rounded-full mb-1.5 ${bStyle.chipClass}`}>
+                              <span className={`w-1.5 h-1.5 rounded-full ${bStyle.dotClass} animate-pulse`} />
+                              {exp.badge}
+                            </span>
+                            <h3 className="text-lg sm:text-xl font-bold group-hover:text-sky-400 transition-colors">
+                              {exp.role}
+                            </h3>
+                            <p className="text-sm font-semibold text-accent mt-0.5">{exp.company}</p>
+                          </div>
                         </div>
-                      ))}
+
+                        <div className="text-left sm:text-right text-xs text-secondary shrink-0 pl-1 sm:pl-0">
+                          <div className="font-semibold text-[var(--text-primary)] flex items-center sm:justify-end gap-1.5">
+                            <Calendar className="w-3.5 h-3.5 text-accent" />
+                            <span>{exp.period}</span>
+                          </div>
+                          <div className="mt-1 flex items-center sm:justify-end gap-1.5 text-muted">
+                            <MapPin className="w-3.5 h-3.5" />
+                            <span>{exp.location}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Sub-bab & Poin-poin Capaian yang Hidup & Berstruktur */}
+                      <div className="space-y-4">
+                        {(exp.sections || []).map((sec, sIdx) => (
+                          <div
+                            key={sIdx}
+                            className="bg-elevated/70 rounded-xl p-4 border border-subtle/80 hover:border-subtle transition-colors space-y-2.5 shadow-sm"
+                          >
+                            <div className="flex items-center gap-2">
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-sky-500/15 text-sky-400 border border-sky-500/25">
+                                0{sIdx + 1}
+                              </span>
+                              <h4 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-accent">
+                                {sec.heading}
+                              </h4>
+                            </div>
+
+                            <ul className="space-y-2 text-xs sm:text-sm text-secondary leading-relaxed pt-1">
+                              {(sec.bullets || []).map((b, bIdx) => (
+                                <li key={bIdx} className="flex items-start gap-2.5">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-sky-400 mt-2 shrink-0 group-hover:bg-cyan-300 transition-colors shadow-sm shadow-sky-400/50" />
+                                  <span className="flex-1">{b}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        ))}
+                      </div>
                     </div>
 
-                    {/* Tombol Popup Sertifikat Terkait */}
+                    {/* Tombol Popup Sertifikat Terkait (Interaktif & Glowing) */}
                     {(() => {
                       const linkedCert = certificates.find((c) =>
                         (c.experienceId && (String(c.experienceId) === String(exp.id) || c.experienceId === exp.id)) ||
@@ -368,19 +427,19 @@ export default function PortfolioHome({ onNavigate }) {
                       );
                       if (!linkedCert) return null;
                       return (
-                        <div className="pt-3 border-t border-subtle flex flex-wrap items-center justify-between gap-2">
+                        <div className="pt-4 mt-5 border-t border-subtle flex flex-wrap items-center justify-between gap-2">
                           <button
                             type="button"
                             onClick={() => setSelectedCertificate(linkedCert)}
-                            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-semibold transition-all shadow-sm hover:scale-[1.02] cursor-pointer group"
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500/15 to-yellow-500/10 hover:from-amber-500/25 hover:to-yellow-500/20 text-amber-300 border border-amber-500/40 text-xs font-semibold transition-all shadow-sm hover:shadow-amber-500/10 hover:scale-[1.02] cursor-pointer group/btn"
                           >
-                            <Award className="w-3.5 h-3.5 text-amber-400 group-hover:scale-110 transition-transform" />
-                            <span>Lihat Sertifikat {linkedCert.category || 'Magang'}</span>
-                            <ExternalLink className="w-3 h-3 opacity-70" />
+                            <Award className="w-4 h-4 text-amber-400 group-hover/btn:scale-110 group-hover/btn:rotate-6 transition-all" />
+                            <span>Lihat Sertifikat Resmi ({linkedCert.category || 'Magang'})</span>
+                            <ExternalLink className="w-3.5 h-3.5 opacity-80 group-hover/btn:translate-x-0.5 transition-transform" />
                           </button>
                           <a
                             href="#sertifikat"
-                            className="text-[11px] text-secondary hover:text-accent transition-colors"
+                            className="text-xs text-secondary hover:text-accent font-medium transition-colors"
                           >
                             Semua Sertifikat &rarr;
                           </a>
