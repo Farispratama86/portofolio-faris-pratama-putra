@@ -44,6 +44,14 @@ import {
   getSkillRatingLabel,
 } from '../data/portfolioData';
 import { fetchCertificates, fetchExperiences, fetchProfile, fetchProjects, fetchSkills } from '../services/api';
+import {
+  BerandaDecor,
+  PengalamanDecor,
+  ProyekDecor,
+  SertifikatDecor,
+  KeahlianDecor,
+  KontakDecor,
+} from '../components/SectionDecorations';
 
 const SKILL_ICONS = {
   layout: LayoutDashboard,
@@ -293,13 +301,14 @@ export default function PortfolioHome({ onNavigate }) {
 
       <main className="pt-16">
         <section id="beranda" className="hero-glow py-16 sm:py-24 border-b border-subtle relative overflow-hidden">
+          <BerandaDecor />
           {/* Subtle tech dot/grid pattern & ambient lighting */}
           <div className="absolute inset-0 hero-grid-pattern pointer-events-none opacity-50" />
           <div className="absolute top-1/4 -left-20 w-80 h-80 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute top-1/3 -right-20 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
 
           {/* Kontainer Utama max-w-7xl agar proporsional di monitor lebar */}
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
               {/* Kolom Kiri: Informasi Hero & Statistik Dinamis */}
               <div className="lg:col-span-7 space-y-6">
@@ -496,11 +505,12 @@ export default function PortfolioHome({ onNavigate }) {
         </section>
 
         <section id="pengalaman" className="py-16 sm:py-24 border-b border-subtle relative overflow-hidden">
+          <PengalamanDecor />
           {/* Subtle ambient lighting */}
           <div className="absolute top-1/4 left-5 w-72 h-72 bg-sky-500/5 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute bottom-10 right-5 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
 
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-12">
               <div>
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold tone-sky border mb-3">
@@ -629,8 +639,9 @@ export default function PortfolioHome({ onNavigate }) {
           </div>
         </section>
 
-        <section id="proyek" className="py-16 sm:py-20 border-b border-subtle">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section id="proyek" className="py-16 sm:py-20 border-b border-subtle relative overflow-hidden">
+          <ProyekDecor />
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
               <div>
                 <p className="text-xs font-bold uppercase tracking-widest text-accent mb-2">Karya &amp; Implementasi</p>
@@ -767,8 +778,9 @@ export default function PortfolioHome({ onNavigate }) {
         </section>
 
         {/* SECTION SERTIFIKAT (Di atas Keahlian Teknis) */}
-        <section id="sertifikat" className="py-16 sm:py-20 border-b border-subtle">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section id="sertifikat" className="py-16 sm:py-20 border-b border-subtle relative overflow-hidden">
+          <SertifikatDecor />
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
               <div>
                 <p className="text-xs font-bold uppercase tracking-widest text-accent mb-2">Pengakuan &amp; Kompetensi</p>
@@ -851,8 +863,9 @@ export default function PortfolioHome({ onNavigate }) {
           </div>
         </section>
 
-        <section id="keahlian" className="py-16 sm:py-20 border-b border-subtle">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section id="keahlian" className="py-16 sm:py-20 border-b border-subtle relative overflow-hidden">
+          <KeahlianDecor />
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
               <div>
                 <p className="text-xs font-bold uppercase tracking-widest text-accent mb-2">Kompetensi &amp; Penguasaan</p>
@@ -953,11 +966,12 @@ export default function PortfolioHome({ onNavigate }) {
         </section>
 
         <section id="kontak" className="py-16 sm:py-24 relative overflow-hidden">
+          <KontakDecor />
           {/* Subtle background glow decoration */}
           <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 bg-sky-500/5 rounded-full blur-3xl pointer-events-none" />
           <div className="absolute bottom-10 right-10 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
 
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="text-center max-w-2xl mx-auto mb-12">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold tone-sky border mb-3">
                 <Sparkles className="w-3.5 h-3.5" />
