@@ -40,12 +40,12 @@ export default function CertificateModal({ certificate, onClose, onNavigateToSec
         {/* Modal Header */}
         <div className="sticky top-0 z-10 flex items-start justify-between gap-4 p-5 sm:p-6 border-b border-subtle surface-card">
           <div className="flex items-start gap-3 min-w-0">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center shrink-0">
+            <div className="w-10 h-10 rounded-xl tone-amber border flex items-center justify-center shrink-0">
               <Award className="w-5 h-5" />
             </div>
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2 mb-1">
-                <span className={`chip-tag text-[11px] font-semibold px-2.5 py-0.5 rounded-full ${getCertificateCategoryStyle(certificate.category).badgeClass}`}>
+                <span className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full ${getCertificateCategoryStyle(certificate.category).badgeClass}`}>
                   {certificate.category || 'Sertifikat'}
                 </span>
                 {certificate.issueDate && (
@@ -58,8 +58,8 @@ export default function CertificateModal({ certificate, onClose, onNavigateToSec
               <h2 className="text-base sm:text-xl font-bold leading-snug line-clamp-2">
                 {certificate.title
                   ? ((certificate.title.match(/"/g) || []).length % 2 !== 0
-                      ? `${certificate.title}"`
-                      : certificate.title)
+                    ? `${certificate.title}"`
+                    : certificate.title)
                   : ''}
               </h2>
             </div>
@@ -165,7 +165,7 @@ export default function CertificateModal({ certificate, onClose, onNavigateToSec
           <button
             type="button"
             onClick={handleScrollToCertificates}
-            className="text-xs text-sky-400 hover:underline font-semibold inline-flex items-center gap-1"
+            className="text-xs text-accent hover:underline font-semibold inline-flex items-center gap-1"
           >
             <span>Buka di Menu Sertifikat &darr;</span>
           </button>

@@ -264,10 +264,10 @@ export const DEFAULT_SKILLS = [
 
 export function getSkillRatingLabel(rate) {
   const r = Number(rate) || 0;
-  if (r >= 92) return { label: 'Expert / Sangat Mahir', color: 'text-emerald-400', badgeClass: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30' };
-  if (r >= 85) return { label: 'Advanced / Mahir', color: 'text-sky-400', badgeClass: 'bg-sky-500/15 text-sky-400 border-sky-500/30' };
-  if (r >= 75) return { label: 'Proficient / Mampu', color: 'text-indigo-400', badgeClass: 'bg-indigo-500/15 text-indigo-400 border-indigo-500/30' };
-  return { label: 'Intermediate / Menengah', color: 'text-amber-400', badgeClass: 'bg-amber-500/15 text-amber-400 border-amber-500/30' };
+  if (r >= 92) return { label: 'Expert / Sangat Mahir', color: 'tone-emerald-text', badgeClass: 'tone-emerald' };
+  if (r >= 85) return { label: 'Advanced / Mahir', color: 'text-accent', badgeClass: 'tone-sky' };
+  if (r >= 75) return { label: 'Proficient / Mampu', color: 'text-indigo-500', badgeClass: 'tone-indigo' };
+  return { label: 'Intermediate / Menengah', color: 'tone-amber-text', badgeClass: 'tone-amber' };
 }
 
 export const SKILLS = [
@@ -355,15 +355,15 @@ export function getBadgeStyle(badge = '') {
     return {
       type: 'aktif',
       label: 'Aktif Bekerja',
-      chipClass: 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30',
-      dotClass: 'bg-emerald-400',
+      chipClass: 'tone-emerald border',
+      dotClass: 'bg-emerald-500',
     };
   }
   if (b.includes('resign') || b.includes('nonaktif') || b.includes('alumni') || b.includes('selesai')) {
     return {
       type: 'resign',
       label: 'Resign / Nonaktif',
-      chipClass: 'bg-slate-500/20 text-slate-300 border border-slate-500/30',
+      chipClass: 'tone-slate border',
       dotClass: 'bg-slate-400',
     };
   }
@@ -371,8 +371,8 @@ export function getBadgeStyle(badge = '') {
     return {
       type: 'magang',
       label: 'Magang / Bootcamp',
-      chipClass: 'bg-sky-500/15 text-sky-400 border border-sky-500/30',
-      dotClass: 'bg-sky-400',
+      chipClass: 'tone-sky border',
+      dotClass: 'bg-sky-500',
     };
   }
   if (
@@ -387,15 +387,15 @@ export function getBadgeStyle(badge = '') {
     return {
       type: 'pelatihan',
       label: 'Pelatihan Skill',
-      chipClass: 'bg-purple-500/15 text-purple-300 border border-purple-500/30',
-      dotClass: 'bg-purple-400',
+      chipClass: 'tone-purple border',
+      dotClass: 'bg-purple-500',
     };
   }
   return {
     type: 'custom',
     label: 'Kustom',
-    chipClass: 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/30',
-    dotClass: 'bg-cyan-400',
+    chipClass: 'tone-cyan border',
+    dotClass: 'bg-cyan-500',
   };
 }
 
@@ -406,55 +406,55 @@ export function getCertificateCategoryStyle(category = '') {
     return {
       type: 'seminar-webinar',
       label: category || 'Seminar / Webinar',
-      badgeClass: 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/30',
-      dotClass: 'bg-cyan-400',
+      badgeClass: 'tone-cyan border',
+      dotClass: 'bg-cyan-500',
     };
   }
   if (c.includes('magang') || c.includes('intern')) {
     return {
       type: 'magang',
       label: category || 'Magang',
-      badgeClass: 'bg-amber-500/15 text-amber-300 border border-amber-500/30',
-      dotClass: 'bg-amber-400',
+      badgeClass: 'tone-amber border',
+      dotClass: 'bg-amber-500',
     };
   }
   if (c.includes('pelatihan') || c.includes('skill') || c.includes('bootcamp') || c.includes('kursus') || c.includes('workshop')) {
     return {
       type: 'pelatihan',
       label: category || 'Pelatihan Skill',
-      badgeClass: 'bg-purple-500/15 text-purple-300 border border-purple-500/30',
-      dotClass: 'bg-purple-400',
+      badgeClass: 'tone-purple border',
+      dotClass: 'bg-purple-500',
     };
   }
   if (c.includes('profesi') || c.includes('sertifikasi')) {
     return {
       type: 'profesi',
       label: category || 'Sertifikasi Profesi',
-      badgeClass: 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30',
-      dotClass: 'bg-emerald-400',
+      badgeClass: 'tone-emerald border',
+      dotClass: 'bg-emerald-500',
     };
   }
   if (c.includes('penghargaan') || c.includes('lomba') || c.includes('award')) {
     return {
       type: 'penghargaan',
       label: category || 'Penghargaan',
-      badgeClass: 'bg-rose-500/15 text-rose-300 border border-rose-500/30',
-      dotClass: 'bg-rose-400',
+      badgeClass: 'tone-rose border',
+      dotClass: 'bg-rose-500',
     };
   }
   if (c.includes('teknis') || c.includes('kerja')) {
     return {
       type: 'teknis',
       label: category || 'Kerja / Teknis',
-      badgeClass: 'bg-blue-500/15 text-blue-300 border border-blue-500/30',
-      dotClass: 'bg-blue-400',
+      badgeClass: 'tone-blue border',
+      dotClass: 'bg-blue-500',
     };
   }
   return {
     type: 'default',
     label: category || 'Sertifikat',
-    badgeClass: 'bg-sky-500/15 text-sky-300 border border-sky-500/30',
-    dotClass: 'bg-sky-400',
+    badgeClass: 'tone-sky border',
+    dotClass: 'bg-sky-500',
   };
 }
 

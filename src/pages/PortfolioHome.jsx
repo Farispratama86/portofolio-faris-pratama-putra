@@ -346,7 +346,7 @@ export default function PortfolioHome({ onNavigate }) {
                 {/* 3 Kartu Statistik Dinamis */}
                 <div className="grid grid-cols-3 gap-3 pt-3 sm:pt-4 max-w-xl">
                   <div className="surface-card rounded-xl p-3 sm:p-3.5 border border-subtle hover:border-sky-500/40 transition-all group">
-                    <div className="text-xl sm:text-2xl font-extrabold text-[var(--text-primary)] group-hover:text-sky-400 transition-colors">
+                    <div className="text-xl sm:text-2xl font-extrabold text-[var(--text-primary)] group-hover:text-accent transition-colors">
                       {projects.length}
                     </div>
                     <div className="text-[11px] sm:text-xs text-secondary mt-0.5 leading-snug">
@@ -355,7 +355,7 @@ export default function PortfolioHome({ onNavigate }) {
                   </div>
 
                   <div className="surface-card rounded-xl p-3 sm:p-3.5 border border-subtle hover:border-sky-500/40 transition-all group">
-                    <div className="text-xl sm:text-2xl font-extrabold text-[var(--text-primary)] group-hover:text-sky-400 transition-colors">
+                    <div className="text-xl sm:text-2xl font-extrabold text-[var(--text-primary)] group-hover:text-accent transition-colors">
                       {experiences.length}
                     </div>
                     <div className="text-[11px] sm:text-xs text-secondary mt-0.5 leading-snug">
@@ -364,7 +364,7 @@ export default function PortfolioHome({ onNavigate }) {
                   </div>
 
                   <div className="surface-card rounded-xl p-3 sm:p-3.5 border border-subtle hover:border-sky-500/40 transition-all group">
-                    <div className="text-xl sm:text-2xl font-extrabold text-[var(--text-primary)] group-hover:text-sky-400 transition-colors">
+                    <div className="text-xl sm:text-2xl font-extrabold text-[var(--text-primary)] group-hover:text-accent transition-colors">
                       3+ Thn
                     </div>
                     <div className="text-[11px] sm:text-xs text-secondary mt-0.5 leading-snug">
@@ -429,7 +429,7 @@ export default function PortfolioHome({ onNavigate }) {
                           href={profile.githubUrl || PROFILE.githubUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="w-8 h-8 rounded-lg surface-card border border-subtle hover:border-slate-400 hover:text-white text-secondary flex items-center justify-center transition-all hover:scale-110 shadow-sm"
+                          className="w-8 h-8 rounded-lg surface-card border border-subtle hover:border-slate-500 hover:text-[var(--text-primary)] text-secondary flex items-center justify-center transition-all hover:scale-110 shadow-sm"
                           title="GitHub"
                         >
                           <Github className="w-4 h-4" />
@@ -438,7 +438,7 @@ export default function PortfolioHome({ onNavigate }) {
                           href={profile.instagramUrl || (profile.socials?.find((s) => s.id === 'instagram')?.url) || 'https://instagram.com/fpratamaputra'}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="w-8 h-8 rounded-lg surface-card border border-subtle hover:border-pink-500 hover:text-pink-400 text-secondary flex items-center justify-center transition-all hover:scale-110 shadow-sm"
+                          className="w-8 h-8 rounded-lg surface-card border border-subtle hover:border-pink-500 hover:text-pink-500 text-secondary flex items-center justify-center transition-all hover:scale-110 shadow-sm"
                           title="Instagram"
                         >
                           <Instagram className="w-4 h-4" />
@@ -447,14 +447,14 @@ export default function PortfolioHome({ onNavigate }) {
                           href={`https://wa.me/${profile.whatsappNumber || PROFILE.whatsappNumber}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="w-8 h-8 rounded-lg surface-card border border-subtle hover:border-emerald-500 hover:text-emerald-400 text-secondary flex items-center justify-center transition-all hover:scale-110 shadow-sm"
+                          className="w-8 h-8 rounded-lg surface-card border border-subtle hover:border-emerald-500 hover:text-emerald-500 text-secondary flex items-center justify-center transition-all hover:scale-110 shadow-sm"
                           title="WhatsApp"
                         >
                           <MessageCircle className="w-4 h-4" />
                         </a>
                         <a
                           href={`mailto:${profile.email || PROFILE.email}`}
-                          className="w-8 h-8 rounded-lg surface-card border border-subtle hover:border-sky-500 hover:text-sky-400 text-secondary flex items-center justify-center transition-all hover:scale-110 shadow-sm"
+                          className="w-8 h-8 rounded-lg surface-card border border-subtle hover:border-sky-500 hover:text-accent text-secondary flex items-center justify-center transition-all hover:scale-110 shadow-sm"
                           title="Kirim Email"
                         >
                           <Mail className="w-4 h-4" />
@@ -474,14 +474,14 @@ export default function PortfolioHome({ onNavigate }) {
               </span>
               <div className="flex flex-wrap items-center justify-center md:justify-end gap-2">
                 {[
-                  { name: 'React', hover: 'hover:border-cyan-400 hover:text-cyan-400' },
-                  { name: 'Vite', hover: 'hover:border-purple-400 hover:text-purple-400' },
-                  { name: 'Tailwind CSS', hover: 'hover:border-sky-400 hover:text-sky-400' },
-                  { name: 'Node.js / Express', hover: 'hover:border-emerald-400 hover:text-emerald-400' },
-                  { name: 'MySQL', hover: 'hover:border-blue-400 hover:text-blue-400' },
-                  { name: 'Python', hover: 'hover:border-amber-400 hover:text-amber-400' },
-                  { name: 'XGBoost', hover: 'hover:border-orange-400 hover:text-orange-400' },
-                  { name: 'ESP32 / IoT', hover: 'hover:border-teal-400 hover:text-teal-400' },
+                  { name: 'React', hover: 'hover:border-cyan-500 hover:text-cyan-500' },
+                  { name: 'Vite', hover: 'hover:border-purple-500 hover:text-purple-500' },
+                  { name: 'Tailwind CSS', hover: 'hover:border-sky-500 hover:text-sky-500' },
+                  { name: 'Node.js / Express', hover: 'hover:border-emerald-500 hover:text-emerald-500' },
+                  { name: 'MySQL', hover: 'hover:border-blue-500 hover:text-blue-500' },
+                  { name: 'Python', hover: 'hover:border-amber-500 hover:text-amber-500' },
+                  { name: 'XGBoost', hover: 'hover:border-orange-500 hover:text-orange-500' },
+                  { name: 'ESP32 / IoT', hover: 'hover:border-teal-500 hover:text-teal-500' },
                 ].map((tech) => (
                   <span
                     key={tech.name}
@@ -503,7 +503,7 @@ export default function PortfolioHome({ onNavigate }) {
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-12">
               <div>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-sky-500/10 text-sky-400 border border-sky-500/20 mb-3">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold tone-sky border mb-3">
                   <Briefcase className="w-3.5 h-3.5" />
                   Rekam Jejak Profesional
                 </span>
@@ -536,7 +536,7 @@ export default function PortfolioHome({ onNavigate }) {
                       {/* Header Pengalaman dengan Icon & Status */}
                       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-5 border-b border-subtle">
                         <div className="flex items-start gap-3.5">
-                          <div className="w-12 h-12 rounded-2xl bg-sky-500/10 text-sky-400 border border-sky-500/20 flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:bg-sky-500/20 transition-all shadow-sm">
+                          <div className="w-12 h-12 rounded-2xl tone-sky border flex items-center justify-center shrink-0 group-hover:scale-105 transition-all shadow-sm">
                             <ExpIcon className="w-6 h-6" />
                           </div>
                           <div>
@@ -544,7 +544,7 @@ export default function PortfolioHome({ onNavigate }) {
                               <span className={`w-1.5 h-1.5 rounded-full ${bStyle.dotClass} animate-pulse`} />
                               {exp.badge}
                             </span>
-                            <h3 className="text-lg sm:text-xl font-bold group-hover:text-sky-400 transition-colors">
+                            <h3 className="text-lg sm:text-xl font-bold group-hover:text-accent transition-colors">
                               {exp.role}
                             </h3>
                             <p className="text-sm font-semibold text-accent mt-0.5">{exp.company}</p>
@@ -571,7 +571,7 @@ export default function PortfolioHome({ onNavigate }) {
                             className="bg-elevated/70 rounded-xl p-4 border border-subtle/80 hover:border-subtle transition-colors space-y-2.5 shadow-sm"
                           >
                             <div className="flex items-center gap-2">
-                              <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-sky-500/15 text-sky-400 border border-sky-500/25">
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded tone-sky border">
                                 0{sIdx + 1}
                               </span>
                               <h4 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-accent">
@@ -607,9 +607,9 @@ export default function PortfolioHome({ onNavigate }) {
                           <button
                             type="button"
                             onClick={() => setSelectedCertificate(linkedCert)}
-                            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500/15 to-yellow-500/10 hover:from-amber-500/25 hover:to-yellow-500/20 text-amber-300 border border-amber-500/40 text-xs font-semibold transition-all shadow-sm hover:shadow-amber-500/10 hover:scale-[1.02] cursor-pointer group/btn"
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl tone-amber border text-xs font-semibold transition-all shadow-sm hover:brightness-105 hover:scale-[1.02] cursor-pointer group/btn"
                           >
-                            <Award className="w-4 h-4 text-amber-400 group-hover/btn:scale-110 group-hover/btn:rotate-6 transition-all" />
+                            <Award className="w-4 h-4 tone-amber-text group-hover/btn:scale-110 group-hover/btn:rotate-6 transition-all" />
                             <span>Lihat Sertifikat Resmi ({linkedCert.category || 'Magang'})</span>
                             <ExternalLink className="w-3.5 h-3.5 opacity-80 group-hover/btn:translate-x-0.5 transition-transform" />
                           </button>
@@ -636,7 +636,7 @@ export default function PortfolioHome({ onNavigate }) {
                 <p className="text-xs font-bold uppercase tracking-widest text-accent mb-2">Karya &amp; Implementasi</p>
                 <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">Proyek Utama</h2>
                 {dataSource === 'api' && (
-                  <p className="text-xs text-emerald-400 mt-1">Tersinkronisasi langsung dengan Database Cloud</p>
+                  <p className="text-xs tone-emerald-text mt-1">Tersinkronisasi langsung dengan Database Cloud</p>
                 )}
               </div>
               <div className="flex flex-wrap gap-2">
@@ -750,7 +750,7 @@ export default function PortfolioHome({ onNavigate }) {
                           target="_blank"
                           rel="noopener noreferrer"
                           onClick={(e) => e.stopPropagation()}
-                          className="text-emerald-400 hover:underline inline-flex items-center gap-1"
+                          className="tone-emerald-text hover:underline inline-flex items-center gap-1"
                         >
                           <span>{getProjectLinkInfo(project)?.text || 'Live Demo'}</span>
                           <ExternalLink className="w-3 h-3" />
@@ -778,8 +778,8 @@ export default function PortfolioHome({ onNavigate }) {
                 </p>
               </div>
               <div className="flex items-center gap-2">
-                <span className="chip-tag text-xs font-semibold px-3 py-1.5 rounded-full flex items-center gap-1.5 bg-amber-500/10 text-amber-300 border border-amber-500/30">
-                  <Award className="w-3.5 h-3.5 text-amber-400" />
+                <span className="text-xs font-semibold px-3 py-1.5 rounded-full flex items-center gap-1.5 tone-amber border">
+                  <Award className="w-3.5 h-3.5 tone-amber-text" />
                   <span>{certificates.length} Sertifikat Terdaftar</span>
                 </span>
               </div>
@@ -810,7 +810,7 @@ export default function PortfolioHome({ onNavigate }) {
                           <span className="text-[10px] text-amber-400 font-semibold mt-0.5">{cert.category}</span>
                         </div>
                       )}
-                      <span className="absolute top-2.5 right-2.5 chip-tag text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-900/90 backdrop-blur border border-subtle">
+                      <span className="absolute top-2.5 right-2.5 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-900/90 text-sky-300 backdrop-blur border border-slate-700/80">
                         {cert.issueDate || 'Sertifikat'}
                       </span>
                     </div>
@@ -818,17 +818,17 @@ export default function PortfolioHome({ onNavigate }) {
                     {/* Card Content */}
                     <div className="p-5 space-y-2.5">
                       <div className="flex items-center gap-2">
-                        <span className={`chip-tag text-[10px] font-semibold px-2.5 py-0.5 rounded-full ${getCertificateCategoryStyle(cert.category).badgeClass}`}>
+                        <span className={`text-[10px] font-semibold px-2.5 py-0.5 rounded-full ${getCertificateCategoryStyle(cert.category).badgeClass}`}>
                           {cert.category || 'Sertifikat'}
                         </span>
                       </div>
                       <h3
-                        className="font-bold text-base leading-snug group-hover:text-sky-400 transition-colors line-clamp-2"
+                        className="font-bold text-base leading-snug group-hover:text-accent transition-colors line-clamp-2"
                         title={formatCertificateTitle(cert.title)}
                       >
                         {formatCertificateTitle(cert.title)}
                       </h3>
-                      <p className="text-xs text-sky-400 font-semibold">{cert.issuer}</p>
+                      <p className="text-xs text-accent font-semibold">{cert.issuer}</p>
                       {cert.description && (
                         <p className="text-xs text-secondary line-clamp-2 leading-relaxed text-justify">
                           {cert.description}
@@ -842,7 +842,7 @@ export default function PortfolioHome({ onNavigate }) {
                       Lihat Sertifikat <ArrowUpRight className="w-3.5 h-3.5" />
                     </span>
                     {cert.credentialUrl && (
-                      <span className="text-emerald-400 text-[11px]">Terverifikasi</span>
+                      <span className="tone-emerald-text text-[11px]">Terverifikasi</span>
                     )}
                   </div>
                 </article>
@@ -875,7 +875,7 @@ export default function PortfolioHome({ onNavigate }) {
                 >
                   <Code2 className="w-4 h-4" />
                   <span>Hard Skills</span>
-                  <span className={`text-[11px] px-2 py-0.5 rounded-full font-bold ${skillTab === 'hard' ? 'bg-white/20 text-white' : 'bg-slate-800 text-slate-400'}`}>
+                  <span className={`text-[11px] px-2 py-0.5 rounded-full font-bold ${skillTab === 'hard' ? 'bg-white/20 text-white' : 'bg-[var(--bg-surface)] border border-subtle text-secondary'}`}>
                     {hardSkills.length}
                   </span>
                 </button>
@@ -890,7 +890,7 @@ export default function PortfolioHome({ onNavigate }) {
                 >
                   <Brain className="w-4 h-4" />
                   <span>Soft Skills</span>
-                  <span className={`text-[11px] px-2 py-0.5 rounded-full font-bold ${skillTab === 'soft' ? 'bg-white/20 text-white' : 'bg-slate-800 text-slate-400'}`}>
+                  <span className={`text-[11px] px-2 py-0.5 rounded-full font-bold ${skillTab === 'soft' ? 'bg-white/20 text-white' : 'bg-[var(--bg-surface)] border border-subtle text-secondary'}`}>
                     {softSkills.length}
                   </span>
                 </button>
@@ -903,8 +903,8 @@ export default function PortfolioHome({ onNavigate }) {
                 <div key={groupTitle} className="surface-card rounded-2xl p-6 sm:p-7 space-y-5 border border-subtle">
                   <div className="flex items-center justify-between pb-3 border-b border-subtle">
                     <div className="flex items-center gap-2.5">
-                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${
-                        skillTab === 'hard' ? 'bg-sky-500/15 text-sky-400 border border-sky-500/30' : 'bg-purple-500/15 text-purple-400 border border-purple-500/30'
+                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center border ${
+                        skillTab === 'hard' ? 'tone-sky' : 'tone-purple'
                       }`}>
                         {skillTab === 'hard' ? <Code2 className="w-4 h-4" /> : <Brain className="w-4 h-4" />}
                       </div>
@@ -932,7 +932,7 @@ export default function PortfolioHome({ onNavigate }) {
                             </div>
                           </div>
                           {/* Progress Rate Point Bar */}
-                          <div className="w-full bg-slate-900/90 rounded-full h-2.5 overflow-hidden border border-slate-800/80 p-0.5">
+                          <div className="w-full bg-elevated rounded-full h-2.5 overflow-hidden border border-subtle p-0.5">
                             <div
                               className={`h-full rounded-full transition-all duration-700 ${
                                 skillTab === 'hard'
@@ -959,7 +959,7 @@ export default function PortfolioHome({ onNavigate }) {
 
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative">
             <div className="text-center max-w-2xl mx-auto mb-12">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-sky-500/10 text-sky-400 border border-sky-500/20 mb-3">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold tone-sky border mb-3">
                 <Sparkles className="w-3.5 h-3.5" />
                 Terhubung & Berkolaborasi
               </span>
@@ -972,13 +972,13 @@ export default function PortfolioHome({ onNavigate }) {
             {/* Quick Social Popup Launcher Banner */}
             <div className="surface-card rounded-2xl p-5 sm:p-6 mb-8 border border-sky-500/30 bg-gradient-to-r from-sky-500/10 via-indigo-500/5 to-cyan-500/10 flex flex-col md:flex-row items-center justify-between gap-5 shadow-lg">
               <div className="flex items-center gap-4 text-center sm:text-left">
-                <div className="w-12 h-12 rounded-2xl bg-sky-500/20 text-sky-400 border border-sky-500/30 flex items-center justify-center shrink-0">
+                <div className="w-12 h-12 rounded-2xl tone-sky border flex items-center justify-center shrink-0">
                   <Share2 className="w-6 h-6" />
                 </div>
                 <div>
                   <h3 className="text-base sm:text-lg font-bold flex items-center gap-2 justify-center sm:justify-start">
                     Hub Media Sosial & Jejaring
-                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full tone-emerald border">
                       Aktif
                     </span>
                   </h3>
@@ -1008,7 +1008,7 @@ export default function PortfolioHome({ onNavigate }) {
                   <button
                     type="button"
                     onClick={() => setSocialModalOpen(true)}
-                    className="text-xs text-sky-400 hover:text-sky-300 font-medium inline-flex items-center gap-1"
+                    className="text-xs text-accent hover:opacity-80 font-medium inline-flex items-center gap-1"
                   >
                     Lihat Modal <ExternalLink className="w-3 h-3" />
                   </button>
@@ -1017,7 +1017,7 @@ export default function PortfolioHome({ onNavigate }) {
                 {/* Email Card with Copy */}
                 <div className="surface-card rounded-xl p-3.5 sm:p-4 flex items-center justify-between gap-3 border border-subtle hover:border-sky-500/40 transition-all group">
                   <a href={`mailto:${profile.email || PROFILE.email}`} className="flex items-center gap-3 min-w-0">
-                    <div className="w-10 h-10 rounded-xl bg-sky-500/15 text-sky-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                    <div className="w-10 h-10 rounded-xl tone-sky border flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
                       <Mail className="w-5 h-5" />
                     </div>
                     <div className="min-w-0">
@@ -1043,7 +1043,7 @@ export default function PortfolioHome({ onNavigate }) {
                   className="surface-card rounded-xl p-3.5 sm:p-4 flex items-center justify-between gap-3 border border-subtle hover:border-emerald-500/40 transition-all group block"
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-10 h-10 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                    <div className="w-10 h-10 rounded-xl tone-emerald border flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
                       <MessageCircle className="w-5 h-5" />
                     </div>
                     <div className="min-w-0">
@@ -1051,7 +1051,7 @@ export default function PortfolioHome({ onNavigate }) {
                       <div className="text-sm font-semibold text-[var(--text-primary)]">{profile.whatsappDisplay || PROFILE.whatsappDisplay}</div>
                     </div>
                   </div>
-                  <ArrowUpRight className="w-4 h-4 text-secondary group-hover:text-emerald-400 transition-colors shrink-0" />
+                  <ArrowUpRight className="w-4 h-4 text-secondary group-hover:text-emerald-500 transition-colors shrink-0" />
                 </a>
 
                 {/* GitHub Card */}
@@ -1062,7 +1062,7 @@ export default function PortfolioHome({ onNavigate }) {
                   className="surface-card rounded-xl p-3.5 sm:p-4 flex items-center justify-between gap-3 border border-subtle hover:border-slate-400/50 transition-all group block"
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-10 h-10 rounded-xl bg-slate-700/30 text-slate-200 border border-slate-600/40 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                    <div className="w-10 h-10 rounded-xl bg-elevated text-[var(--text-primary)] border border-subtle flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
                       <Github className="w-5 h-5" />
                     </div>
                     <div className="min-w-0">
@@ -1072,7 +1072,7 @@ export default function PortfolioHome({ onNavigate }) {
                       </div>
                     </div>
                   </div>
-                  <ArrowUpRight className="w-4 h-4 text-secondary group-hover:text-white transition-colors shrink-0" />
+                  <ArrowUpRight className="w-4 h-4 text-secondary group-hover:text-[var(--text-primary)] transition-colors shrink-0" />
                 </a>
 
                 {/* LinkedIn Card */}
@@ -1083,7 +1083,7 @@ export default function PortfolioHome({ onNavigate }) {
                   className="surface-card rounded-xl p-3.5 sm:p-4 flex items-center justify-between gap-3 border border-subtle hover:border-blue-500/50 transition-all group block"
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-10 h-10 rounded-xl bg-blue-600/15 text-blue-400 border border-blue-500/30 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                    <div className="w-10 h-10 rounded-xl tone-blue border flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
                       <Linkedin className="w-5 h-5" />
                     </div>
                     <div className="min-w-0">
@@ -1093,7 +1093,7 @@ export default function PortfolioHome({ onNavigate }) {
                       </div>
                     </div>
                   </div>
-                  <ArrowUpRight className="w-4 h-4 text-secondary group-hover:text-blue-400 transition-colors shrink-0" />
+                  <ArrowUpRight className="w-4 h-4 text-secondary group-hover:text-blue-500 transition-colors shrink-0" />
                 </a>
 
                 {/* Instagram & TikTok Grid */}
@@ -1105,7 +1105,7 @@ export default function PortfolioHome({ onNavigate }) {
                     className="surface-card rounded-xl p-3.5 flex items-center justify-between gap-2 border border-subtle hover:border-pink-500/50 transition-all group"
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="w-9 h-9 rounded-lg bg-pink-500/15 text-pink-400 border border-pink-500/30 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                      <div className="w-9 h-9 rounded-lg tone-rose border flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
                         <Instagram className="w-4 h-4" />
                       </div>
                       <div className="min-w-0">
@@ -1115,7 +1115,7 @@ export default function PortfolioHome({ onNavigate }) {
                         </div>
                       </div>
                     </div>
-                    <ArrowUpRight className="w-3.5 h-3.5 text-secondary group-hover:text-pink-400 shrink-0" />
+                    <ArrowUpRight className="w-3.5 h-3.5 text-secondary group-hover:text-pink-500 shrink-0" />
                   </a>
 
                   <a
@@ -1125,7 +1125,7 @@ export default function PortfolioHome({ onNavigate }) {
                     className="surface-card rounded-xl p-3.5 flex items-center justify-between gap-2 border border-subtle hover:border-cyan-400/50 transition-all group"
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="w-9 h-9 rounded-lg bg-cyan-500/15 text-cyan-400 border border-cyan-500/30 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                      <div className="w-9 h-9 rounded-lg tone-cyan border flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
                         <TikTokIcon className="w-4 h-4" />
                       </div>
                       <div className="min-w-0">
@@ -1135,7 +1135,7 @@ export default function PortfolioHome({ onNavigate }) {
                         </div>
                       </div>
                     </div>
-                    <ArrowUpRight className="w-3.5 h-3.5 text-secondary group-hover:text-cyan-400 shrink-0" />
+                    <ArrowUpRight className="w-3.5 h-3.5 text-secondary group-hover:text-cyan-500 shrink-0" />
                   </a>
                 </div>
               </div>
@@ -1148,7 +1148,7 @@ export default function PortfolioHome({ onNavigate }) {
                       <h3 className="text-lg font-bold">Kirim Pesan Cepat</h3>
                       <p className="text-xs text-secondary mt-0.5">Pesan akan diteruskan langsung ke WhatsApp atau aplikasi email Anda</p>
                     </div>
-                    <div className="w-8 h-8 rounded-lg bg-sky-500/10 text-sky-400 flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-lg tone-sky border flex items-center justify-center">
                       <Send className="w-4 h-4" />
                     </div>
                   </div>
@@ -1215,7 +1215,7 @@ export default function PortfolioHome({ onNavigate }) {
                     <button
                       type="button"
                       onClick={() => setSocialModalOpen(true)}
-                      className="inline-flex items-center gap-1.5 text-xs text-secondary hover:text-sky-400 font-medium py-1 px-2"
+                      className="inline-flex items-center gap-1.5 text-xs text-secondary hover:text-accent font-medium py-1 px-2"
                     >
                       <Share2 className="w-3.5 h-3.5" />
                       <span>Semua Media Sosial</span>
@@ -1237,7 +1237,7 @@ export default function PortfolioHome({ onNavigate }) {
             <button
               type="button"
               onClick={() => setSocialModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 border border-sky-500/20 text-xs font-semibold transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg tone-sky border hover:brightness-105 text-xs font-semibold transition-all"
             >
               <Share2 className="w-3.5 h-3.5" />
               <span>Media Sosial</span>

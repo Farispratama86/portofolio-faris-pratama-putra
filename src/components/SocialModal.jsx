@@ -38,7 +38,7 @@ export default function SocialModal({ open, onClose, profile }) {
       url: linkedinUrl,
       desc: 'Jejaring profesional, rekam jejak karier & relasi industri',
       icon: Linkedin,
-      color: 'bg-blue-600/15 text-blue-400 border-blue-500/30 group-hover:border-blue-400/60 group-hover:bg-blue-600/25',
+      color: 'tone-blue border group-hover:brightness-110',
       badge: 'Profesional',
       btnText: 'Buka LinkedIn',
     },
@@ -49,7 +49,7 @@ export default function SocialModal({ open, onClose, profile }) {
       url: githubUrl,
       desc: 'Repositori kode, source code web, ML, dan proyek IoT',
       icon: Github,
-      color: 'bg-purple-600/15 text-purple-300 border-purple-500/30 group-hover:border-purple-400/60 group-hover:bg-purple-600/25',
+      color: 'tone-purple border group-hover:brightness-110',
       badge: 'Code & Proyek',
       btnText: 'Buka GitHub',
     },
@@ -60,7 +60,7 @@ export default function SocialModal({ open, onClose, profile }) {
       url: instagramUrl,
       desc: 'Dokumentasi kegiatan kampus, project insight & networking',
       icon: Instagram,
-      color: 'bg-rose-500/15 text-rose-400 border-rose-500/30 group-hover:border-rose-400/60 group-hover:bg-rose-500/25',
+      color: 'tone-rose border group-hover:brightness-110',
       badge: 'Aktivitas & Media',
       btnText: 'Buka Instagram',
     },
@@ -71,7 +71,7 @@ export default function SocialModal({ open, onClose, profile }) {
       url: tiktokUrl,
       desc: 'Short video seputar teknologi, tutorial koding & IT hardware',
       icon: TikTokIcon,
-      color: 'bg-cyan-500/15 text-cyan-400 border-cyan-500/30 group-hover:border-cyan-400/60 group-hover:bg-cyan-500/25',
+      color: 'tone-cyan border group-hover:brightness-110',
       badge: 'Video Edukasi',
       btnText: 'Buka TikTok',
     },
@@ -82,7 +82,7 @@ export default function SocialModal({ open, onClose, profile }) {
       url: whatsappUrl,
       desc: 'Komunikasi langsung, konsultasi cepat & koordinasi proyek',
       icon: MessageCircle,
-      color: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/30 group-hover:border-emerald-400/60 group-hover:bg-emerald-500/25',
+      color: 'tone-emerald border group-hover:brightness-110',
       badge: 'Fast Response',
       btnText: 'Chat WhatsApp',
     },
@@ -93,7 +93,7 @@ export default function SocialModal({ open, onClose, profile }) {
       url: `mailto:${emailAddr}`,
       desc: 'Proposal kerja sama resmi, rekrutmen & korespondensi',
       icon: Mail,
-      color: 'bg-sky-500/15 text-sky-400 border-sky-500/30 group-hover:border-sky-400/60 group-hover:bg-sky-500/25',
+      color: 'tone-sky border group-hover:brightness-110',
       badge: 'Email Kontak',
       btnText: 'Kirim Email',
     },
@@ -132,12 +132,12 @@ export default function SocialModal({ open, onClose, profile }) {
             )}
             <div className="min-w-0">
               <div className="flex items-center gap-1.5">
-                <h3 className="font-bold text-base sm:text-lg text-slate-100 truncate">
+                <h3 className="font-bold text-base sm:text-lg text-[var(--text-primary)] truncate">
                   {profile?.fullName || 'Faris Pratama Putra'}
                 </h3>
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" title="Online" />
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title="Online" />
               </div>
-              <p className="text-xs text-sky-400 truncate">
+              <p className="text-xs text-accent truncate">
                 {profile?.role || 'Web UI/UX Developer · Machine Learning · IoT'}
               </p>
             </div>
@@ -160,7 +160,7 @@ export default function SocialModal({ open, onClose, profile }) {
               Pilih platform media sosial untuk terhubung langsung:
             </p>
             <span className="chip-tag text-[10px] font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">
-              <Sparkles className="w-3 h-3 text-amber-400" />
+              <Sparkles className="w-3 h-3 tone-amber-text" />
               <span>Semua Saluran Resmi</span>
             </span>
           </div>
@@ -183,14 +183,14 @@ export default function SocialModal({ open, onClose, profile }) {
                       </div>
                       <div className="min-w-0">
                         <div className="flex items-center gap-1.5">
-                          <h4 className="font-bold text-sm text-slate-100 group-hover:text-sky-400 transition-colors">
+                          <h4 className="font-bold text-sm text-[var(--text-primary)] group-hover:text-accent transition-colors">
                             {item.name}
                           </h4>
                         </div>
-                        <p className="text-xs text-slate-400 truncate">{item.handle}</p>
+                        <p className="text-xs text-secondary truncate">{item.handle}</p>
                       </div>
                     </div>
-                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-900 border border-slate-800 text-slate-400 shrink-0">
+                    <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-elevated border border-subtle text-secondary shrink-0">
                       {item.badge}
                     </span>
                   </div>
@@ -199,7 +199,7 @@ export default function SocialModal({ open, onClose, profile }) {
                     {item.desc}
                   </p>
 
-                  <div className="pt-2 border-t border-subtle/60 flex items-center justify-between text-xs font-semibold text-sky-400">
+                  <div className="pt-2 border-t border-subtle/60 flex items-center justify-between text-xs font-semibold text-accent">
                     <span className="group-hover:underline">{item.btnText}</span>
                     <ExternalLink className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                   </div>
@@ -216,7 +216,7 @@ export default function SocialModal({ open, onClose, profile }) {
             onClick={handleCopyUrl}
             className="inline-flex items-center gap-1.5 text-xs text-secondary hover:text-[var(--text-primary)] transition-colors"
           >
-            {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+            {copied ? <Check className="w-3.5 h-3.5 tone-emerald-text" /> : <Copy className="w-3.5 h-3.5" />}
             <span>{copied ? 'Tautan Portofolio Disalin!' : 'Salin Tautan Portofolio'}</span>
           </button>
 
