@@ -1245,7 +1245,7 @@ export default function PortfolioHome({ onNavigate }) {
       <footer className="border-t border-subtle py-8 bg-elevated">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4 text-sm">
           <div className="text-secondary text-center md:text-left">
-            © 2026 <strong className="font-semibold text-[var(--text-primary)]">{PROFILE.fullName}</strong> · Universitas Duta Bangsa Surakarta
+            © {new Date().getFullYear()} <strong className="font-semibold text-[var(--text-primary)]">{PROFILE.fullName}</strong> · All rights reserved.
           </div>
           <div className="flex flex-wrap items-center justify-center gap-4 font-medium">
             <button
