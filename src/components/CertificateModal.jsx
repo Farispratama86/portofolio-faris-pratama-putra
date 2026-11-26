@@ -1,8 +1,11 @@
 import React, { useEffect } from 'react';
 import { Award, Building2, Calendar, CheckCircle2, ExternalLink, Sparkles, X } from 'lucide-react';
 import { getCertificateCategoryStyle } from '../data/portfolioData';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function CertificateModal({ certificate, onClose, onNavigateToSection }) {
+  const { t, tr } = useLanguage();
+
   useEffect(() => {
     if (!certificate) return;
     const handleKeyDown = (e) => {
@@ -26,6 +29,13 @@ export default function CertificateModal({ certificate, onClose, onNavigateToSec
     }
   };
 
+  const rawTitle = tr(certificate.title || '');
+  const displayTitle = rawTitle
+    ? ((rawTitle.match(/"/g) || []).length % 2 !== 0 ? `${rawTitle}"` : rawTitle)
+    : '';
+  const displayCategory = tr(certificate.category || t('certificates.fallbackChip'));
+  const displayIssueDate = certificate.issueDate ? tr(certificate.issueDate) : '';
+
   return (
     <div
       role="dialog"
@@ -46,21 +56,17 @@ export default function CertificateModal({ certificate, onClose, onNavigateToSec
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2 mb-1">
                 <span className={`text-[11px] font-semibold px-2.5 py-0.5 rounded-full ${getCertificateCategoryStyle(certificate.category).badgeClass}`}>
-                  {certificate.category || 'Sertifikat'}
+                  {displayCategory}
                 </span>
-                {certificate.issueDate && (
+                {displayIssueDate && (
                   <span className="text-xs text-secondary flex items-center gap-1">
                     <Calendar className="w-3 h-3 text-muted" />
-                    {certificate.issueDate}
+                    {displayIssueDate}
                   </span>
                 )}
               </div>
               <h2 className="text-base sm:text-xl font-bold leading-snug line-clamp-2">
-                {certificate.title
-                  ? ((certificate.title.match(/"/g) || []).length % 2 !== 0
-                    ? `${certificate.title}"`
-                    : certificate.title)
-                  : ''}
+                {displayTitle}
               </h2>
             </div>
           </div>
@@ -68,7 +74,7 @@ export default function CertificateModal({ certificate, onClose, onNavigateToSec
           <button
             type="button"
             onClick={onClose}
-            aria-label="Tutup modal"
+            aria-label={t('certificateModal.closeAria')}
             className="p-2 rounded-xl text-secondary hover:text-[var(--text-primary)] hover:bg-elevated transition-colors shrink-0"
           >
             <X className="w-5 h-5" />
@@ -82,7 +88,7 @@ export default function CertificateModal({ certificate, onClose, onNavigateToSec
             {certificate.imageUrl ? (
               <img
                 src={certificate.imageUrl}
-                alt={certificate.title}
+                alt={displayTitle}
                 className="w-full max-h-[52vh] object-contain rounded-xl"
               />
             ) : (
@@ -99,30 +105,30 @@ export default function CertificateModal({ certificate, onClose, onNavigateToSec
 
                 <p className="text-xs font-bold tracking-widest text-amber-400/90 uppercase mb-1 flex items-center justify-center gap-1.5">
                   <Sparkles className="w-3.5 h-3.5" />
-                  SERTIFIKAT RESMI &amp; PENGHARGAAN
+                  {t('certificateModal.officialTitle')}
                   <Sparkles className="w-3.5 h-3.5" />
                 </p>
 
                 <h3 className="text-lg sm:text-2xl font-extrabold text-slate-100 max-w-xl mx-auto mb-2 leading-snug">
-                  {certificate.title}
+                  {displayTitle}
                 </h3>
 
                 <p className="text-xs text-slate-400 max-w-md mx-auto mb-4">
-                  Diberikan atas kontribusi dan penyelesaian program pada:{' '}
+                  {t('certificateModal.awardedPrefix')}{' '}
                   <strong className="text-sky-300 font-semibold">{certificate.issuer}</strong>
                 </p>
 
                 <div className="inline-flex flex-wrap items-center justify-center gap-3 text-xs bg-slate-900/80 px-4 py-2 rounded-xl border border-slate-800 text-slate-300">
                   <span className="flex items-center gap-1 text-emerald-400 font-semibold">
                     <CheckCircle2 className="w-3.5 h-3.5" />
-                    Terverifikasi
+                    {t('certificateModal.verified')}
                   </span>
                   <span>·</span>
-                  <span>Penerbit: {certificate.issuer}</span>
-                  {certificate.issueDate && (
+                  <span>{t('certificateModal.issuerPrefix')} {certificate.issuer}</span>
+                  {displayIssueDate && (
                     <>
                       <span>·</span>
-                      <span>Periode: {certificate.issueDate}</span>
+                      <span>{t('certificateModal.periodPrefix')} {displayIssueDate}</span>
                     </>
                   )}
                 </div>
@@ -135,7 +141,7 @@ export default function CertificateModal({ certificate, onClose, onNavigateToSec
             <div className="p-3.5 rounded-xl bg-elevated border border-subtle flex items-start gap-2.5">
               <Building2 className="w-4 h-4 text-sky-400 shrink-0 mt-0.5" />
               <div>
-                <span className="text-muted block text-[11px]">Penerbit / Instansi</span>
+                <span className="text-muted block text-[11px]">{t('certificateModal.issuerLabel')}</span>
                 <span className="font-semibold text-sm">{certificate.issuer}</span>
               </div>
             </div>
@@ -143,8 +149,8 @@ export default function CertificateModal({ certificate, onClose, onNavigateToSec
             <div className="p-3.5 rounded-xl bg-elevated border border-subtle flex items-start gap-2.5">
               <Calendar className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
               <div>
-                <span className="text-muted block text-[11px]">Tanggal Penerbitan</span>
-                <span className="font-semibold text-sm">{certificate.issueDate || 'Tercatat'}</span>
+                <span className="text-muted block text-[11px]">{t('certificateModal.issueDateLabel')}</span>
+                <span className="font-semibold text-sm">{displayIssueDate || t('certificateModal.recordedFallback')}</span>
               </div>
             </div>
           </div>
@@ -152,9 +158,9 @@ export default function CertificateModal({ certificate, onClose, onNavigateToSec
           {/* Description */}
           {certificate.description && (
             <div className="space-y-1.5">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-accent">Keterangan &amp; Capaian</h4>
+              <h4 className="text-xs font-bold uppercase tracking-wider text-accent">{t('certificateModal.descriptionLabel')}</h4>
               <p className="text-sm text-secondary leading-relaxed bg-elevated/50 p-4 rounded-xl border border-subtle text-justify">
-                {certificate.description}
+                {tr(certificate.description)}
               </p>
             </div>
           )}
@@ -167,7 +173,7 @@ export default function CertificateModal({ certificate, onClose, onNavigateToSec
             onClick={handleScrollToCertificates}
             className="text-xs text-accent hover:underline font-semibold inline-flex items-center gap-1"
           >
-            <span>Buka di Menu Sertifikat &darr;</span>
+            <span>{t('certificateModal.goToSection')} &darr;</span>
           </button>
 
           <div className="flex items-center gap-2">
@@ -178,7 +184,7 @@ export default function CertificateModal({ certificate, onClose, onNavigateToSec
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-white text-xs sm:text-sm font-semibold transition-colors"
               >
-                <span>Verifikasi Kredensial</span>
+                <span>{t('certificateModal.verifyCredential')}</span>
                 <ExternalLink className="w-3.5 h-3.5" />
               </a>
             )}
@@ -187,7 +193,7 @@ export default function CertificateModal({ certificate, onClose, onNavigateToSec
               onClick={onClose}
               className="px-4 py-2 rounded-xl border border-subtle text-xs sm:text-sm font-semibold hover:bg-elevated transition-colors"
             >
-              Tutup
+              {t('certificateModal.close')}
             </button>
           </div>
         </div>

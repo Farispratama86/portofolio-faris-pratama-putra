@@ -12,6 +12,7 @@ import uploadRoutes from './routes/upload.js';
 import profileRoutes from './routes/profile.js';
 import certificateRoutes from './routes/certificates.js';
 import skillRoutes from './routes/skills.js';
+import translateRoutes from './routes/translate.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -34,6 +35,7 @@ app.use('/api/upload', uploadRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/certificates', certificateRoutes);
 app.use('/api/skills', skillRoutes);
+app.use('/api/translate', translateRoutes);
 
 // Layani hasil build React (dist/) jika sudah di-build
 if (fs.existsSync(distDir)) {

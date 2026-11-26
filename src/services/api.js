@@ -165,3 +165,16 @@ export async function deleteSkill(id, token) {
   });
 }
 
+export async function translateBatch(texts = [], targetLang = 'en', sourceLang = 'id') {
+  try {
+    const json = await request('/api/translate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ texts, sourceLang, targetLang }),
+    });
+    return json.translations || {};
+  } catch {
+    return {};
+  }
+}
+

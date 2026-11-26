@@ -44,6 +44,7 @@ import {
   getSkillRatingLabel,
 } from '../data/portfolioData';
 import { fetchCertificates, fetchExperiences, fetchProfile, fetchProjects, fetchSkills } from '../services/api';
+import { useLanguage } from '../context/LanguageContext';
 import {
   BerandaDecor,
   PengalamanDecor,
@@ -61,29 +62,29 @@ const SKILL_ICONS = {
 };
 
 // Helper sinkronisasi label kategori proyek agar tidak salah terbawa 'Web UI/UX' untuk IoT / Desktop
-function getProjectCategoryBadge(project) {
-  if (!project) return 'Web & Machine Learning';
+function getProjectCategoryBadge(project, tr = (s) => s) {
+  if (!project) return tr('Web & Machine Learning');
   const cat = project.category;
   const label = project.categoryLabel || '';
 
   if (cat === 'iot') {
     if (!label || /web|ui\/ux/i.test(label)) {
-      return 'IoT & Embedded';
+      return tr('IoT & Embedded');
     }
   } else if (cat === 'desktop') {
     if (!label || /web|ui\/ux/i.test(label)) {
-      return 'Desktop App';
+      return tr('Desktop App');
     }
   } else if (cat === 'web-ml') {
     if (!label) {
-      return 'Web & Machine Learning';
+      return tr('Web & Machine Learning');
     }
   }
-  return label || 'Web & ML';
+  return tr(label || 'Web & ML');
 }
 
 // Helper penamaan tombol tautan cerdas (Live Demo vs Publikasi / Jurnal)
-function getProjectLinkInfo(project) {
+function getProjectLinkInfo(project, t = (k) => k) {
   if (!project || !project.liveUrl) return null;
   const url = project.liveUrl.toLowerCase();
   const isJournal =
@@ -96,12 +97,12 @@ function getProjectLinkInfo(project) {
 
   if (isJournal || isIot) {
     return {
-      text: 'Publikasi / Jurnal',
+      text: t('projects.publicationJournal'),
       isJournal: true,
     };
   }
   return {
-    text: 'Live Demo',
+    text: t('projects.liveDemo'),
     isJournal: false,
   };
 }
@@ -117,6 +118,7 @@ function formatCertificateTitle(title = '') {
 }
 
 export default function PortfolioHome({ onNavigate }) {
+  const { lang, t, tr, ensureTranslations } = useLanguage();
   const [theme, setTheme] = useState(() => {
     try {
       return localStorage.getItem('faris-portfolio-theme') || 'dark';
@@ -140,7 +142,7 @@ export default function PortfolioHome({ onNavigate }) {
   const [toast, setToast] = useState('');
   const [formState, setFormState] = useState({
     name: '',
-    topic: 'Kolaborasi Web UI/UX',
+    topicIdx: 0,
     message: '',
   });
 
@@ -189,6 +191,50 @@ export default function PortfolioHome({ onNavigate }) {
       active = false;
     };
   }, []);
+
+  // Otomatis terjemahkan konten dinamis dari database saat bahasa Inggris dipilih
+  useEffect(() => {
+    if (lang !== 'en') return;
+
+    const batch = [];
+    if (profile?.role) batch.push(profile.role);
+    if (profile?.bio) batch.push(profile.bio);
+
+    experiences.forEach((exp) => {
+      if (exp.badge) batch.push(exp.badge);
+      if (exp.role) batch.push(exp.role);
+      if (exp.period) batch.push(exp.period);
+      (exp.sections || []).forEach((sec) => {
+        if (sec.heading) batch.push(sec.heading);
+        (sec.bullets || []).forEach((b) => {
+          if (b) batch.push(b);
+        });
+      });
+    });
+
+    projects.forEach((p) => {
+      if (p.title) batch.push(p.title);
+      if (p.categoryLabel) batch.push(p.categoryLabel);
+      if (p.summary) batch.push(p.summary);
+      (p.highlights || []).forEach((h) => {
+        if (h) batch.push(h);
+      });
+    });
+
+    certificates.forEach((c) => {
+      if (c.title) batch.push(c.title);
+      if (c.category) batch.push(c.category);
+      if (c.issueDate) batch.push(c.issueDate);
+      if (c.description) batch.push(c.description);
+    });
+
+    skills.forEach((s) => {
+      if (s.name) batch.push(s.name);
+      if (s.groupName) batch.push(s.groupName);
+    });
+
+    ensureTranslations(batch);
+  }, [lang, profile, experiences, projects, certificates, skills, ensureTranslations]);
 
   useEffect(() => {
     document.documentElement.classList.toggle('light-theme', theme === 'light');
@@ -257,29 +303,45 @@ export default function PortfolioHome({ onNavigate }) {
     ? filteredProjects.filter((p) => p.id !== featuredProject.id)
     : filteredProjects;
 
+  const topicOptions = t('contact.topics');
+  const activeTopicLabel =
+    (Array.isArray(topicOptions) && topicOptions[formState.topicIdx]?.label) ||
+    (Array.isArray(topicOptions) && topicOptions[0]?.label) ||
+    'Web UI/UX Collaboration';
+
   const copyEmail = async () => {
     try {
       await navigator.clipboard.writeText(PROFILE.email);
-      showToast(`Email disalin: ${PROFILE.email}`);
+      showToast(t('contact.toastCopied', { email: PROFILE.email }));
     } catch {
-      showToast(`Salin manual: ${PROFILE.email}`);
+      showToast(t('contact.toastCopyManual', { email: PROFILE.email }));
     }
   };
 
   const handleWhatsAppSubmit = (e) => {
     e.preventDefault();
-    const text = `Halo Faris, saya ${formState.name}.\nTopik: ${formState.topic}\n\n${formState.message}`;
+    const text = t('contact.waGreeting', {
+      name: formState.name,
+      topic: activeTopicLabel,
+      message: formState.message,
+    });
     window.open(`https://wa.me/${PROFILE.whatsappNumber}?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
-    showToast('Membuka WhatsApp...');
+    showToast(t('contact.toastOpeningWa'));
   };
 
   const handleEmailClick = () => {
     if (!formState.name.trim() || !formState.message.trim()) {
-      showToast('Mohon lengkapi nama dan pesan terlebih dahulu.');
+      showToast(t('contact.toastIncomplete'));
       return;
     }
-    const subject = `[Portofolio] ${formState.topic} — ${formState.name}`;
-    const body = `Halo Faris,\n\nSaya ${formState.name}.\n\n${formState.message}`;
+    const subject = t('contact.emailSubject', {
+      topic: activeTopicLabel,
+      name: formState.name,
+    });
+    const body = t('contact.emailBody', {
+      name: formState.name,
+      message: formState.message,
+    });
     window.location.href = `mailto:${PROFILE.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
 
@@ -314,15 +376,15 @@ export default function PortfolioHome({ onNavigate }) {
               <div className="lg:col-span-7 space-y-6">
                 <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold chip-tag">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <span>{PROFILE.campusBadge}</span>
+                  <span>{t('hero.campusBadge')}</span>
                 </div>
                 <div className="space-y-3">
                   <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight">
                     Faris Pratama <span className="text-accent">Putra</span>
                   </h1>
-                  <p className="text-base sm:text-lg font-semibold text-secondary">{profile.role}</p>
+                  <p className="text-base sm:text-lg font-semibold text-secondary">{tr(profile.role)}</p>
                 </div>
-                <p className="text-sm sm:text-base text-secondary leading-relaxed max-w-2xl text-justify">{profile.bio}</p>
+                <p className="text-sm sm:text-base text-secondary leading-relaxed max-w-2xl text-justify">{tr(profile.bio)}</p>
 
                 {/* Tombol CTA */}
                 <div className="flex flex-wrap items-center gap-3">
@@ -330,7 +392,7 @@ export default function PortfolioHome({ onNavigate }) {
                     href="#proyek"
                     className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-semibold text-sm shadow-lg shadow-sky-500/25 transition-all hover:scale-[1.02]"
                   >
-                    <span>Lihat Proyek</span>
+                    <span>{t('hero.viewProjects')}</span>
                     <ArrowDownRight className="w-4 h-4" />
                   </a>
                   <button
@@ -339,7 +401,7 @@ export default function PortfolioHome({ onNavigate }) {
                     className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl surface-card font-semibold text-sm hover:border-sky-500/50 transition-all hover:scale-[1.02]"
                   >
                     <FileText className="w-4 h-4 text-accent" />
-                    <span>Ringkasan CV</span>
+                    <span>{t('hero.cvSummary')}</span>
                   </button>
                   <a
                     href={profile.githubUrl || PROFILE.githubUrl}
@@ -359,7 +421,7 @@ export default function PortfolioHome({ onNavigate }) {
                       {projects.length}
                     </div>
                     <div className="text-[11px] sm:text-xs text-secondary mt-0.5 leading-snug">
-                      Proyek Utama
+                      {t('hero.statProjects')}
                     </div>
                   </div>
 
@@ -368,16 +430,16 @@ export default function PortfolioHome({ onNavigate }) {
                       {experiences.length}
                     </div>
                     <div className="text-[11px] sm:text-xs text-secondary mt-0.5 leading-snug">
-                      Pengalaman Industri
+                      {t('hero.statExperiences')}
                     </div>
                   </div>
 
                   <div className="surface-card rounded-xl p-3 sm:p-3.5 border border-subtle hover:border-sky-500/40 transition-all group">
                     <div className="text-xl sm:text-2xl font-extrabold text-[var(--text-primary)] group-hover:text-accent transition-colors">
-                      3+ Thn
+                      {t('hero.statYearsValue')}
                     </div>
                     <div className="text-[11px] sm:text-xs text-secondary mt-0.5 leading-snug">
-                      Teknisi IT &amp; Hardware
+                      {t('hero.statYearsLabel')}
                     </div>
                   </div>
                 </div>
@@ -406,33 +468,33 @@ export default function PortfolioHome({ onNavigate }) {
                     {/* Floating status badge di sudut foto */}
                     <div className="absolute bottom-3 left-3 z-10 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/90 backdrop-blur-md border border-emerald-500/40 text-emerald-300 text-xs font-semibold shadow-lg">
                       <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                      <span>Terbuka untuk Peluang</span>
+                      <span>{t('hero.openToWork')}</span>
                     </div>
                   </div>
 
                   <div className="space-y-2.5 text-sm">
                     <div className="flex items-center justify-between py-1.5 border-b border-subtle">
                       <span className="text-secondary flex items-center gap-2">
-                        <GraduationCap className="w-4 h-4 text-accent" /> Pendidikan
+                        <GraduationCap className="w-4 h-4 text-accent" /> {t('hero.educationLabel')}
                       </span>
-                      <span className="font-medium">S1 Teknik Informatika (UDB)</span>
+                      <span className="font-medium">{t('hero.educationValue')}</span>
                     </div>
                     <div className="flex items-center justify-between py-1.5 border-b border-subtle">
                       <span className="text-secondary flex items-center gap-2">
-                        <Briefcase className="w-4 h-4 text-accent" /> Magang Terbaru
+                        <Briefcase className="w-4 h-4 text-accent" /> {t('hero.latestInternLabel')}
                       </span>
                       <span className="font-medium">PT Vinix Seven Aurum</span>
                     </div>
                     <div className="flex items-center justify-between py-1.5 border-b border-subtle">
                       <span className="text-secondary flex items-center gap-2">
-                        <MapPin className="w-4 h-4 text-accent" /> Domisili
+                        <MapPin className="w-4 h-4 text-accent" /> {t('hero.locationLabel')}
                       </span>
                       <span className="font-medium">{PROFILE.cityShort}</span>
                     </div>
 
                     {/* Baris Tombol Ikon Cepat Sosial Media */}
                     <div className="pt-2.5 flex items-center justify-between gap-2">
-                      <span className="text-xs text-secondary font-medium">Hubungi / Ikuti:</span>
+                      <span className="text-xs text-secondary font-medium">{t('hero.connectFollow')}</span>
                       <div className="flex items-center gap-2">
                         <a
                           href={profile.githubUrl || PROFILE.githubUrl}
@@ -464,7 +526,7 @@ export default function PortfolioHome({ onNavigate }) {
                         <a
                           href={`mailto:${profile.email || PROFILE.email}`}
                           className="w-8 h-8 rounded-lg surface-card border border-subtle hover:border-sky-500 hover:text-accent text-secondary flex items-center justify-center transition-all hover:scale-110 shadow-sm"
-                          title="Kirim Email"
+                          title={t('hero.sendEmailTitle')}
                         >
                           <Mail className="w-4 h-4" />
                         </a>
@@ -479,7 +541,7 @@ export default function PortfolioHome({ onNavigate }) {
             <div className="mt-12 pt-8 border-t border-subtle flex flex-col md:flex-row items-center justify-between gap-4">
               <span className="text-xs font-semibold text-secondary uppercase tracking-wider shrink-0 flex items-center gap-2">
                 <Code2 className="w-4 h-4 text-accent" />
-                Fokus Teknologi Utama:
+                {t('hero.coreTechFocus')}
               </span>
               <div className="flex flex-wrap items-center justify-center md:justify-end gap-2">
                 {[
@@ -515,18 +577,18 @@ export default function PortfolioHome({ onNavigate }) {
               <div>
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold tone-sky border mb-3">
                   <Briefcase className="w-3.5 h-3.5" />
-                  Rekam Jejak Profesional
+                  {t('experience.badge')}
                 </span>
-                <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">Pengalaman Kerja &amp; Magang</h2>
+                <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">{t('experience.title')}</h2>
                 <p className="mt-2 text-sm sm:text-base text-secondary max-w-2xl text-justify">
-                  Perjalanan karier, kontribusi nyata dalam pengembangan aplikasi web modern, riset Machine Learning, hingga troubleshooting infrastruktur TI &amp; perangkat keras.
+                  {t('experience.subtitle')}
                 </p>
               </div>
 
               <div className="flex items-center gap-2 self-start md:self-end">
                 <span className="text-xs font-semibold px-3.5 py-1.5 rounded-xl surface-card border border-subtle text-secondary flex items-center gap-1.5 shadow-sm">
                   <Sparkles className="w-3.5 h-3.5 text-accent" />
-                  {experiences.length} Pengalaman Terverifikasi
+                  {t('experience.verifiedCount', { count: experiences.length })}
                 </span>
               </div>
             </div>
@@ -552,10 +614,10 @@ export default function PortfolioHome({ onNavigate }) {
                           <div>
                             <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-0.5 rounded-full mb-1.5 ${bStyle.chipClass}`}>
                               <span className={`w-1.5 h-1.5 rounded-full ${bStyle.dotClass} animate-pulse`} />
-                              {exp.badge}
+                              {tr(exp.badge)}
                             </span>
                             <h3 className="text-lg sm:text-xl font-bold group-hover:text-accent transition-colors">
-                              {exp.role}
+                              {tr(exp.role)}
                             </h3>
                             <p className="text-sm font-semibold text-accent mt-0.5">{exp.company}</p>
                           </div>
@@ -564,7 +626,7 @@ export default function PortfolioHome({ onNavigate }) {
                         <div className="text-left sm:text-right text-xs text-secondary shrink-0 pl-1 sm:pl-0">
                           <div className="font-semibold text-[var(--text-primary)] flex items-center sm:justify-end gap-1.5">
                             <Calendar className="w-3.5 h-3.5 text-accent" />
-                            <span>{exp.period}</span>
+                            <span>{tr(exp.period)}</span>
                           </div>
                           <div className="mt-1 flex items-center sm:justify-end gap-1.5 text-muted">
                             <MapPin className="w-3.5 h-3.5" />
@@ -585,7 +647,7 @@ export default function PortfolioHome({ onNavigate }) {
                                 0{sIdx + 1}
                               </span>
                               <h4 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-accent">
-                                {sec.heading}
+                                {tr(sec.heading)}
                               </h4>
                             </div>
 
@@ -593,7 +655,7 @@ export default function PortfolioHome({ onNavigate }) {
                               {(sec.bullets || []).map((b, bIdx) => (
                                 <li key={bIdx} className="flex items-start gap-2.5">
                                   <span className="w-1.5 h-1.5 rounded-full bg-sky-400 mt-2 shrink-0 group-hover:bg-cyan-300 transition-colors shadow-sm shadow-sky-400/50" />
-                                  <span className="flex-1 text-justify">{b}</span>
+                                  <span className="flex-1 text-justify">{tr(b)}</span>
                                 </li>
                               ))}
                             </ul>
@@ -625,14 +687,18 @@ export default function PortfolioHome({ onNavigate }) {
                             className="inline-flex items-center gap-2 px-4 py-2 rounded-xl tone-amber border text-xs font-semibold transition-all shadow-sm hover:brightness-105 hover:scale-[1.02] cursor-pointer group/btn"
                           >
                             <Award className="w-4 h-4 tone-amber-text group-hover/btn:scale-110 group-hover/btn:rotate-6 transition-all" />
-                            <span>Lihat Sertifikat Resmi ({linkedCert.category || 'Magang'})</span>
+                            <span>
+                              {t('experience.viewOfficialCert', {
+                                category: tr(linkedCert.category || 'Magang'),
+                              })}
+                            </span>
                             <ExternalLink className="w-3.5 h-3.5 opacity-80 group-hover/btn:translate-x-0.5 transition-transform" />
                           </button>
                           <a
                             href="#sertifikat"
                             className="text-xs text-secondary hover:text-accent font-medium transition-colors"
                           >
-                            Semua Sertifikat &rarr;
+                            {t('experience.allCertificates')} &rarr;
                           </a>
                         </div>
                       );
@@ -649,18 +715,18 @@ export default function PortfolioHome({ onNavigate }) {
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
               <div>
-                <p className="text-xs font-bold uppercase tracking-widest text-accent mb-2">Karya &amp; Implementasi</p>
-                <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">Proyek Utama</h2>
+                <p className="text-xs font-bold uppercase tracking-widest text-accent mb-2">{t('projects.eyebrow')}</p>
+                <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">{t('projects.title')}</h2>
                 {dataSource === 'api' && (
-                  <p className="text-xs tone-emerald-text mt-1">Tersinkronisasi langsung dengan Database Cloud</p>
+                  <p className="text-xs tone-emerald-text mt-1">{t('projects.syncedCloud')}</p>
                 )}
               </div>
               <div className="flex flex-wrap gap-2">
                 {[
-                  { id: 'all', label: `Semua (${counts.all})` },
-                  { id: 'web-ml', label: `Web & ML (${counts['web-ml']})` },
-                  { id: 'iot', label: `IoT (${counts.iot})` },
-                  { id: 'desktop', label: `Desktop (${counts.desktop})` },
+                  { id: 'all', label: t('projects.filterAll', { count: counts.all }) },
+                  { id: 'web-ml', label: t('projects.filterWebMl', { count: counts['web-ml'] }) },
+                  { id: 'iot', label: t('projects.filterIot', { count: counts.iot }) },
+                  { id: 'desktop', label: t('projects.filterDesktop', { count: counts.desktop }) },
                 ].map((tab) => (
                   <button
                     key={tab.id}
@@ -689,10 +755,10 @@ export default function PortfolioHome({ onNavigate }) {
                 <div className="lg:col-span-6 p-6 sm:p-8 flex flex-col justify-between space-y-5">
                   <div className="space-y-3">
                     <span className="chip-tag text-xs font-semibold px-3 py-1 rounded-full">
-                      Proyek Unggulan · {getProjectCategoryBadge(featuredProject)}
+                      {t('projects.featuredBadge')} · {getProjectCategoryBadge(featuredProject, tr)}
                     </span>
-                    <h3 className="text-xl sm:text-2xl font-extrabold">{featuredProject.title}</h3>
-                    <p className="text-sm sm:text-base text-secondary leading-relaxed text-justify">{featuredProject.summary}</p>
+                    <h3 className="text-xl sm:text-2xl font-extrabold">{tr(featuredProject.title)}</h3>
+                    <p className="text-sm sm:text-base text-secondary leading-relaxed text-justify">{tr(featuredProject.summary)}</p>
                     <div className="flex flex-wrap gap-2">
                       {(featuredProject.tags || []).map((t) => (
                         <span key={t} className="chip-tag text-xs font-medium px-2.5 py-1 rounded-lg">
@@ -710,7 +776,7 @@ export default function PortfolioHome({ onNavigate }) {
                         onClick={(e) => e.stopPropagation()}
                         className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-white text-sm font-semibold transition-all hover:scale-[1.02]"
                       >
-                        <span>{getProjectLinkInfo(featuredProject)?.text || 'Live Demo'}</span>
+                        <span>{getProjectLinkInfo(featuredProject, t)?.text || t('projects.liveDemo')}</span>
                         <ExternalLink className="w-3.5 h-3.5" />
                       </a>
                     )}
@@ -718,7 +784,7 @@ export default function PortfolioHome({ onNavigate }) {
                       type="button"
                       className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-subtle text-sm font-semibold"
                     >
-                      <span>Lihat Detail</span>
+                      <span>{t('projects.viewDetails')}</span>
                       <ArrowRight className="w-3.5 h-3.5 text-accent" />
                     </button>
                   </div>
@@ -740,25 +806,25 @@ export default function PortfolioHome({ onNavigate }) {
                     <div className="p-5 space-y-3">
                       <div className="flex items-center justify-between gap-2">
                         <span className="chip-tag text-[11px] font-semibold px-2.5 py-0.5 rounded-full">
-                          {getProjectCategoryBadge(project)}
+                          {getProjectCategoryBadge(project, tr)}
                         </span>
                         <span className="text-xs text-muted">{project.year}</span>
                       </div>
-                      <h3 className="font-bold text-base leading-snug">{project.title}</h3>
-                      <p className="text-xs sm:text-sm text-secondary leading-relaxed text-justify">{project.summary}</p>
+                      <h3 className="font-bold text-base leading-snug">{tr(project.title)}</h3>
+                      <p className="text-xs sm:text-sm text-secondary leading-relaxed text-justify">{tr(project.summary)}</p>
                     </div>
                   </div>
                   <div className="px-5 pb-5 pt-2 space-y-3">
                     <div className="flex flex-wrap gap-1.5">
-                      {(project.tags || []).map((t) => (
-                        <span key={t} className="text-[11px] font-medium px-2 py-0.5 rounded-md bg-elevated text-secondary border border-subtle">
-                          {t}
+                      {(project.tags || []).map((tag) => (
+                        <span key={tag} className="text-[11px] font-medium px-2 py-0.5 rounded-md bg-elevated text-secondary border border-subtle">
+                          {tag}
                         </span>
                       ))}
                     </div>
                     <div className="flex items-center justify-between pt-2 border-t border-subtle text-xs font-semibold">
                       <span className="text-accent inline-flex items-center gap-1">
-                        Detail Proyek <ArrowUpRight className="w-3.5 h-3.5" />
+                        {t('projects.projectDetails')} <ArrowUpRight className="w-3.5 h-3.5" />
                       </span>
                       {project.liveUrl ? (
                         <a
@@ -768,11 +834,11 @@ export default function PortfolioHome({ onNavigate }) {
                           onClick={(e) => e.stopPropagation()}
                           className="tone-emerald-text hover:underline inline-flex items-center gap-1"
                         >
-                          <span>{getProjectLinkInfo(project)?.text || 'Live Demo'}</span>
+                          <span>{getProjectLinkInfo(project, t)?.text || t('projects.liveDemo')}</span>
                           <ExternalLink className="w-3 h-3" />
                         </a>
                       ) : (
-                        <span className="text-muted">Studi Kasus</span>
+                        <span className="text-muted">{t('projects.caseStudy')}</span>
                       )}
                     </div>
                   </div>
@@ -788,82 +854,87 @@ export default function PortfolioHome({ onNavigate }) {
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
               <div>
-                <p className="text-xs font-bold uppercase tracking-widest text-accent mb-2">Pengakuan &amp; Kompetensi</p>
-                <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">Sertifikasi &amp; Lisensi</h2>
+                <p className="text-xs font-bold uppercase tracking-widest text-accent mb-2">{t('certificates.eyebrow')}</p>
+                <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">{t('certificates.title')}</h2>
                 <p className="text-sm text-secondary mt-1 text-justify">
-                  Dokumentasi resmi sertifikat magang industri, lisensi keahlian, dan pelatihan teknologi.
+                  {t('certificates.subtitle')}
                 </p>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-xs font-semibold px-3 py-1.5 rounded-full flex items-center gap-1.5 tone-amber border">
                   <Award className="w-3.5 h-3.5 tone-amber-text" />
-                  <span>{certificates.length} Sertifikat Terdaftar</span>
+                  <span>{t('certificates.countBadge', { count: certificates.length })}</span>
                 </span>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {certificates.map((cert) => (
-                <article
-                  key={cert.id}
-                  onClick={() => setSelectedCertificate(cert)}
-                  className="surface-card rounded-2xl overflow-hidden border border-subtle hover:border-sky-500/50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 cursor-pointer flex flex-col justify-between group"
-                >
-                  <div>
-                    {/* Thumbnail / Mockup Preview (Utuh & Tidak Terpotong) */}
-                    <div className="aspect-[16/10] bg-slate-950/60 border-b border-subtle overflow-hidden relative flex items-center justify-center p-2 sm:p-2.5">
-                      {cert.imageUrl ? (
-                        <img
-                          src={cert.imageUrl}
-                          alt={cert.title}
-                          className="w-full h-full object-contain group-hover:scale-[1.02] transition-transform duration-300 rounded-lg"
-                        />
-                      ) : (
-                        <div className="w-full h-full border-2 border-dashed border-amber-500/30 rounded-xl bg-gradient-to-br from-slate-950 to-[#0e1626] flex flex-col items-center justify-center p-3 text-center">
-                          <div className="w-10 h-10 rounded-full bg-amber-500/15 border border-amber-500/40 text-amber-400 flex items-center justify-center mb-1.5 shadow-md">
-                            <Award className="w-5 h-5" />
+              {certificates.map((cert) => {
+                const certTitle = formatCertificateTitle(tr(cert.title));
+                const certCategory = tr(cert.category || t('certificates.fallbackChip'));
+                const certDate = cert.issueDate ? tr(cert.issueDate) : t('certificates.fallbackChip');
+                return (
+                  <article
+                    key={cert.id}
+                    onClick={() => setSelectedCertificate(cert)}
+                    className="surface-card rounded-2xl overflow-hidden border border-subtle hover:border-sky-500/50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 cursor-pointer flex flex-col justify-between group"
+                  >
+                    <div>
+                      {/* Thumbnail / Mockup Preview (Utuh & Tidak Terpotong) */}
+                      <div className="aspect-[16/10] bg-slate-950/60 border-b border-subtle overflow-hidden relative flex items-center justify-center p-2 sm:p-2.5">
+                        {cert.imageUrl ? (
+                          <img
+                            src={cert.imageUrl}
+                            alt={certTitle}
+                            className="w-full h-full object-contain group-hover:scale-[1.02] transition-transform duration-300 rounded-lg"
+                          />
+                        ) : (
+                          <div className="w-full h-full border-2 border-dashed border-amber-500/30 rounded-xl bg-gradient-to-br from-slate-950 to-[#0e1626] flex flex-col items-center justify-center p-3 text-center">
+                            <div className="w-10 h-10 rounded-full bg-amber-500/15 border border-amber-500/40 text-amber-400 flex items-center justify-center mb-1.5 shadow-md">
+                              <Award className="w-5 h-5" />
+                            </div>
+                            <span className="text-xs font-bold text-slate-200 line-clamp-1">{cert.issuer}</span>
+                            <span className="text-[10px] text-amber-400 font-semibold mt-0.5">{certCategory}</span>
                           </div>
-                          <span className="text-xs font-bold text-slate-200 line-clamp-1">{cert.issuer}</span>
-                          <span className="text-[10px] text-amber-400 font-semibold mt-0.5">{cert.category}</span>
-                        </div>
-                      )}
-                      <span className="absolute top-2.5 right-2.5 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-900/90 text-sky-300 backdrop-blur border border-slate-700/80">
-                        {cert.issueDate || 'Sertifikat'}
-                      </span>
-                    </div>
-
-                    {/* Card Content */}
-                    <div className="p-5 space-y-2.5">
-                      <div className="flex items-center gap-2">
-                        <span className={`text-[10px] font-semibold px-2.5 py-0.5 rounded-full ${getCertificateCategoryStyle(cert.category).badgeClass}`}>
-                          {cert.category || 'Sertifikat'}
+                        )}
+                        <span className="absolute top-2.5 right-2.5 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-900/90 text-sky-300 backdrop-blur border border-slate-700/80">
+                          {certDate}
                         </span>
                       </div>
-                      <h3
-                        className="font-bold text-base leading-snug group-hover:text-accent transition-colors line-clamp-2"
-                        title={formatCertificateTitle(cert.title)}
-                      >
-                        {formatCertificateTitle(cert.title)}
-                      </h3>
-                      <p className="text-xs text-accent font-semibold">{cert.issuer}</p>
-                      {cert.description && (
-                        <p className="text-xs text-secondary line-clamp-2 leading-relaxed text-justify">
-                          {cert.description}
-                        </p>
+
+                      {/* Card Content */}
+                      <div className="p-5 space-y-2.5">
+                        <div className="flex items-center gap-2">
+                          <span className={`text-[10px] font-semibold px-2.5 py-0.5 rounded-full ${getCertificateCategoryStyle(cert.category).badgeClass}`}>
+                            {certCategory}
+                          </span>
+                        </div>
+                        <h3
+                          className="font-bold text-base leading-snug group-hover:text-accent transition-colors line-clamp-2"
+                          title={certTitle}
+                        >
+                          {certTitle}
+                        </h3>
+                        <p className="text-xs text-accent font-semibold">{cert.issuer}</p>
+                        {cert.description && (
+                          <p className="text-xs text-secondary line-clamp-2 leading-relaxed text-justify">
+                            {tr(cert.description)}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="p-5 pt-0 border-t border-subtle/50 mt-2 flex items-center justify-between text-xs font-semibold">
+                      <span className="text-accent inline-flex items-center gap-1 group-hover:underline">
+                        {t('certificates.viewCertificate')} <ArrowUpRight className="w-3.5 h-3.5" />
+                      </span>
+                      {cert.credentialUrl && (
+                        <span className="tone-emerald-text text-[11px]">{t('certificates.verified')}</span>
                       )}
                     </div>
-                  </div>
-
-                  <div className="p-5 pt-0 border-t border-subtle/50 mt-2 flex items-center justify-between text-xs font-semibold">
-                    <span className="text-accent inline-flex items-center gap-1 group-hover:underline">
-                      Lihat Sertifikat <ArrowUpRight className="w-3.5 h-3.5" />
-                    </span>
-                    {cert.credentialUrl && (
-                      <span className="tone-emerald-text text-[11px]">Terverifikasi</span>
-                    )}
-                  </div>
-                </article>
-              ))}
+                  </article>
+                );
+              })}
             </div>
           </div>
         </section>
@@ -873,10 +944,10 @@ export default function PortfolioHome({ onNavigate }) {
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
               <div>
-                <p className="text-xs font-bold uppercase tracking-widest text-accent mb-2">Kompetensi &amp; Penguasaan</p>
-                <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">Keahlian &amp; Kemampuan</h2>
+                <p className="text-xs font-bold uppercase tracking-widest text-accent mb-2">{t('skills.eyebrow')}</p>
+                <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">{t('skills.title')}</h2>
                 <p className="text-sm text-secondary mt-1 max-w-xl text-justify">
-                  Peta tingkat kemahiran teknis (Hard Skills) dan kecakapan interpersonal (Soft Skills) berdasarkan pengalaman dan implementasi proyek nyata.
+                  {t('skills.subtitle')}
                 </p>
               </div>
 
@@ -892,7 +963,7 @@ export default function PortfolioHome({ onNavigate }) {
                   }`}
                 >
                   <Code2 className="w-4 h-4" />
-                  <span>Hard Skills</span>
+                  <span>{t('skills.hardTab')}</span>
                   <span className={`text-[11px] px-2 py-0.5 rounded-full font-bold ${skillTab === 'hard' ? 'bg-white/20 text-white' : 'bg-[var(--bg-surface)] border border-subtle text-secondary'}`}>
                     {hardSkills.length}
                   </span>
@@ -907,7 +978,7 @@ export default function PortfolioHome({ onNavigate }) {
                   }`}
                 >
                   <Brain className="w-4 h-4" />
-                  <span>Soft Skills</span>
+                  <span>{t('skills.softTab')}</span>
                   <span className={`text-[11px] px-2 py-0.5 rounded-full font-bold ${skillTab === 'soft' ? 'bg-white/20 text-white' : 'bg-[var(--bg-surface)] border border-subtle text-secondary'}`}>
                     {softSkills.length}
                   </span>
@@ -926,23 +997,32 @@ export default function PortfolioHome({ onNavigate }) {
                       }`}>
                         {skillTab === 'hard' ? <Code2 className="w-4 h-4" /> : <Brain className="w-4 h-4" />}
                       </div>
-                      <h3 className="font-bold text-base sm:text-lg">{groupTitle}</h3>
+                      <h3 className="font-bold text-base sm:text-lg">{tr(groupTitle)}</h3>
                     </div>
                     <span className="text-xs text-secondary font-medium">
-                      {items.length} kemampuan
+                      {t('skills.countLabel', { count: items.length })}
                     </span>
                   </div>
 
                   <div className="space-y-4">
                     {items.map((skill) => {
                       const ratingInfo = getSkillRatingLabel(skill.ratePoint);
+                      const rVal = Number(skill.ratePoint) || 0;
+                      const ratingText =
+                        rVal >= 92
+                          ? t('skills.ratings.expert')
+                          : rVal >= 85
+                          ? t('skills.ratings.advanced')
+                          : rVal >= 75
+                          ? t('skills.ratings.proficient')
+                          : t('skills.ratings.intermediate');
                       return (
                         <div key={skill.id || skill.name} className="space-y-1.5">
                           <div className="flex items-center justify-between text-xs sm:text-sm gap-2">
-                            <span className="font-semibold text-[var(--text-primary)]">{skill.name}</span>
+                            <span className="font-semibold text-[var(--text-primary)]">{tr(skill.name)}</span>
                             <div className="flex items-center gap-1.5 shrink-0">
                               <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full border ${ratingInfo.badgeClass}`}>
-                                {ratingInfo.label.split('/')[0].trim()}
+                                {ratingText}
                               </span>
                               <span className="font-bold text-xs text-[var(--text-primary)] min-w-[36px] text-right">
                                 {skill.ratePoint}%
@@ -980,11 +1060,11 @@ export default function PortfolioHome({ onNavigate }) {
             <div className="text-center max-w-2xl mx-auto mb-12">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold tone-sky border mb-3">
                 <Sparkles className="w-3.5 h-3.5" />
-                Terhubung & Berkolaborasi
+                {t('contact.badge')}
               </span>
-              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">Mari Berkolaborasi</h2>
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">{t('contact.title')}</h2>
               <p className="mt-2 text-sm sm:text-base text-secondary text-justify">
-                Tertarik membangun proyek bersama, diskusi teknologi, atau membuka peluang karier & magang? Saya siap berdiskusi!
+                {t('contact.subtitle')}
               </p>
             </div>
 
@@ -996,13 +1076,13 @@ export default function PortfolioHome({ onNavigate }) {
                 </div>
                 <div>
                   <h3 className="text-base sm:text-lg font-bold flex items-center gap-2 justify-center sm:justify-start">
-                    Hub Media Sosial & Jejaring
+                    {t('contact.hubTitle')}
                     <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full tone-emerald border">
-                      Aktif
+                      {t('contact.hubActive')}
                     </span>
                   </h3>
                   <p className="text-xs sm:text-sm text-secondary mt-0.5 text-justify">
-                    Akses satu pintu ke semua akun resmi: LinkedIn, GitHub, Instagram, TikTok, WhatsApp & Email.
+                    {t('contact.hubDesc')}
                   </p>
                 </div>
               </div>
@@ -1014,7 +1094,7 @@ export default function PortfolioHome({ onNavigate }) {
                   className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-semibold text-sm shadow-md hover:shadow-sky-500/20 transition-all duration-200"
                 >
                   <Sparkles className="w-4 h-4" />
-                  <span>Buka Popup Media Sosial</span>
+                  <span>{t('contact.hubButton')}</span>
                 </button>
               </div>
             </div>
@@ -1023,13 +1103,13 @@ export default function PortfolioHome({ onNavigate }) {
               {/* Kolom Kiri: Kartu Media Sosial & Kontak */}
               <div className="lg:col-span-5 space-y-3.5">
                 <div className="flex items-center justify-between pb-1">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-muted">Kontak Langsung & Jejaring</h4>
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-muted">{t('contact.directTitle')}</h4>
                   <button
                     type="button"
                     onClick={() => setSocialModalOpen(true)}
                     className="text-xs text-accent hover:opacity-80 font-medium inline-flex items-center gap-1"
                   >
-                    Lihat Modal <ExternalLink className="w-3 h-3" />
+                    {t('contact.openModal')} <ExternalLink className="w-3 h-3" />
                   </button>
                 </div>
 
@@ -1040,7 +1120,7 @@ export default function PortfolioHome({ onNavigate }) {
                       <Mail className="w-5 h-5" />
                     </div>
                     <div className="min-w-0">
-                      <div className="text-[11px] font-medium text-secondary">Email Resmi</div>
+                      <div className="text-[11px] font-medium text-secondary">{t('contact.emailLabel')}</div>
                       <div className="text-sm font-semibold truncate text-[var(--text-primary)]">{profile.email || PROFILE.email}</div>
                     </div>
                   </a>
@@ -1048,9 +1128,9 @@ export default function PortfolioHome({ onNavigate }) {
                     type="button"
                     onClick={copyEmail}
                     className="px-3 py-1.5 rounded-lg text-xs font-semibold chip-tag hover:border-sky-500/50 shrink-0"
-                    title="Salin alamat email"
+                    title={t('contact.copyTitle')}
                   >
-                    Salin
+                    {t('contact.copy')}
                   </button>
                 </div>
 
@@ -1066,7 +1146,7 @@ export default function PortfolioHome({ onNavigate }) {
                       <MessageCircle className="w-5 h-5" />
                     </div>
                     <div className="min-w-0">
-                      <div className="text-[11px] font-medium text-secondary">WhatsApp (Chat Cepat)</div>
+                      <div className="text-[11px] font-medium text-secondary">{t('contact.whatsappLabel')}</div>
                       <div className="text-sm font-semibold text-[var(--text-primary)]">{profile.whatsappDisplay || PROFILE.whatsappDisplay}</div>
                     </div>
                   </div>
@@ -1085,7 +1165,7 @@ export default function PortfolioHome({ onNavigate }) {
                       <Github className="w-5 h-5" />
                     </div>
                     <div className="min-w-0">
-                      <div className="text-[11px] font-medium text-secondary">GitHub Repository</div>
+                      <div className="text-[11px] font-medium text-secondary">{t('contact.githubLabel')}</div>
                       <div className="text-sm font-semibold truncate text-[var(--text-primary)]">
                         {(profile.githubUrl || PROFILE.githubUrl).replace(/^https?:\/\//, '')}
                       </div>
@@ -1106,7 +1186,7 @@ export default function PortfolioHome({ onNavigate }) {
                       <Linkedin className="w-5 h-5" />
                     </div>
                     <div className="min-w-0">
-                      <div className="text-[11px] font-medium text-secondary">LinkedIn Profile</div>
+                      <div className="text-[11px] font-medium text-secondary">{t('contact.linkedinLabel')}</div>
                       <div className="text-sm font-semibold truncate text-[var(--text-primary)]">
                         {(profile.linkedinUrl || (profile.socials?.find((s) => s.id === 'linkedin')?.url) || 'linkedin.com/in/faris-pratama-putra').replace(/^https?:\/\//, '')}
                       </div>
@@ -1164,8 +1244,8 @@ export default function PortfolioHome({ onNavigate }) {
                 <form onSubmit={handleWhatsAppSubmit} className="surface-card rounded-2xl p-6 sm:p-7 space-y-4 border border-subtle shadow-md">
                   <div className="flex items-center justify-between border-b border-subtle/60 pb-3">
                     <div>
-                      <h3 className="text-lg font-bold">Kirim Pesan Cepat</h3>
-                      <p className="text-xs text-secondary mt-0.5">Pesan akan diteruskan langsung ke WhatsApp atau aplikasi email Anda</p>
+                      <h3 className="text-lg font-bold">{t('contact.formTitle')}</h3>
+                      <p className="text-xs text-secondary mt-0.5">{t('contact.formSubtitle')}</p>
                     </div>
                     <div className="w-8 h-8 rounded-lg tone-sky border flex items-center justify-center">
                       <Send className="w-4 h-4" />
@@ -1174,40 +1254,40 @@ export default function PortfolioHome({ onNavigate }) {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-semibold text-secondary mb-1.5">Nama Anda</label>
+                      <label className="block text-xs font-semibold text-secondary mb-1.5">{t('contact.nameLabel')}</label>
                       <input
                         type="text"
                         required
                         value={formState.name}
                         onChange={(e) => setFormState({ ...formState, name: e.target.value })}
-                        placeholder="Contoh: Budi Santoso"
+                        placeholder={t('contact.namePlaceholder')}
                         className="w-full px-3.5 py-2.5 rounded-xl bg-elevated border border-subtle text-sm focus:border-sky-500 focus:outline-none"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-secondary mb-1.5">Topik Diskusi</label>
+                      <label className="block text-xs font-semibold text-secondary mb-1.5">{t('contact.topicLabel')}</label>
                       <select
-                        value={formState.topic}
-                        onChange={(e) => setFormState({ ...formState, topic: e.target.value })}
+                        value={formState.topicIdx}
+                        onChange={(e) => setFormState({ ...formState, topicIdx: Number(e.target.value) })}
                         className="w-full px-3.5 py-2.5 rounded-xl bg-elevated border border-subtle text-sm focus:border-sky-500 focus:outline-none"
                       >
-                        <option value="Kolaborasi Web UI/UX">Kolaborasi Web UI/UX</option>
-                        <option value="Proyek Machine Learning / Data">Proyek Machine Learning / Data</option>
-                        <option value="Proyek IoT / Desktop / IT Support">Proyek IoT / Desktop / IT Support</option>
-                        <option value="Peluang Kerja / Magang">Peluang Kerja / Magang</option>
-                        <option value="Pertanyaan & Diskusi Lainnya">Pertanyaan & Diskusi Lainnya</option>
+                        {(Array.isArray(topicOptions) ? topicOptions : []).map((opt, idx) => (
+                          <option key={opt.value} value={idx}>
+                            {opt.label}
+                          </option>
+                        ))}
                       </select>
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-secondary mb-1.5">Isi Pesan</label>
+                    <label className="block text-xs font-semibold text-secondary mb-1.5">{t('contact.messageLabel')}</label>
                     <textarea
                       rows="4"
                       required
                       value={formState.message}
                       onChange={(e) => setFormState({ ...formState, message: e.target.value })}
-                      placeholder="Halo Faris, saya tertarik berdiskusi mengenai proyek..."
+                      placeholder={t('contact.messagePlaceholder')}
                       className="w-full px-3.5 py-2.5 rounded-xl bg-elevated border border-subtle text-sm resize-none focus:border-sky-500 focus:outline-none"
                     />
                   </div>
@@ -1219,7 +1299,7 @@ export default function PortfolioHome({ onNavigate }) {
                         className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm shadow-md transition-colors"
                       >
                         <MessageCircle className="w-4 h-4" />
-                        <span>Kirim via WhatsApp</span>
+                        <span>{t('contact.sendWhatsapp')}</span>
                       </button>
                       <button
                         type="button"
@@ -1227,7 +1307,7 @@ export default function PortfolioHome({ onNavigate }) {
                         className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-semibold text-sm shadow-md transition-colors"
                       >
                         <Mail className="w-4 h-4" />
-                        <span>Kirim via Email</span>
+                        <span>{t('contact.sendEmail')}</span>
                       </button>
                     </div>
 
@@ -1237,7 +1317,7 @@ export default function PortfolioHome({ onNavigate }) {
                       className="inline-flex items-center gap-1.5 text-xs text-secondary hover:text-accent font-medium py-1 px-2"
                     >
                       <Share2 className="w-3.5 h-3.5" />
-                      <span>Semua Media Sosial</span>
+                      <span>{t('contact.allSocials')}</span>
                     </button>
                   </div>
                 </form>
@@ -1250,7 +1330,7 @@ export default function PortfolioHome({ onNavigate }) {
       <footer className="border-t border-subtle py-8 bg-elevated">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4 text-sm">
           <div className="text-secondary text-center md:text-left">
-            © {new Date().getFullYear()} <strong className="font-semibold text-[var(--text-primary)]">{PROFILE.fullName}</strong> · All rights reserved.
+            © {new Date().getFullYear()} <strong className="font-semibold text-[var(--text-primary)]">{PROFILE.fullName}</strong> · {t('footer.rights')}
           </div>
           <div className="flex flex-wrap items-center justify-center gap-4 font-medium">
             <button
@@ -1259,7 +1339,7 @@ export default function PortfolioHome({ onNavigate }) {
               className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg tone-sky border hover:brightness-105 text-xs font-semibold transition-all"
             >
               <Share2 className="w-3.5 h-3.5" />
-              <span>Media Sosial</span>
+              <span>{t('footer.socialMedia')}</span>
             </button>
             <a
               href={profile.githubUrl || PROFILE.githubUrl}
@@ -1298,7 +1378,7 @@ export default function PortfolioHome({ onNavigate }) {
               onClick={() => onNavigate('/admin')}
               className="inline-flex items-center gap-1 text-xs text-muted hover:text-accent ml-2"
             >
-              <Lock className="w-3 h-3" /> Admin
+              <Lock className="w-3 h-3" /> {t('footer.admin')}
             </button>
           </div>
         </div>

@@ -1,8 +1,11 @@
 import React, { useEffect } from 'react';
 import { ExternalLink, Github, X } from 'lucide-react';
 import ProjectMockup from './ProjectMockup';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function ProjectModal({ project, onClose }) {
+  const { t, tr } = useLanguage();
+
   useEffect(() => {
     if (!project) return undefined;
     const onKey = (e) => {
@@ -13,6 +16,15 @@ export default function ProjectModal({ project, onClose }) {
   }, [project, onClose]);
 
   if (!project) return null;
+
+  const url = (project.liveUrl || '').toLowerCase();
+  const isPub =
+    url.includes('ojs.') ||
+    url.includes('journal') ||
+    url.includes('article') ||
+    url.includes('jurnal') ||
+    url.includes('doi.org') ||
+    project.category === 'iot';
 
   return (
     <div
@@ -27,14 +39,14 @@ export default function ProjectModal({ project, onClose }) {
         <div className="p-5 sm:p-6 border-b border-subtle flex items-start justify-between gap-4">
           <div>
             <span className="inline-block text-xs font-semibold chip-tag px-2.5 py-1 rounded-full mb-2">
-              {project.categoryLabel} · {project.year}
+              {tr(project.categoryLabel)} · {project.year}
             </span>
-            <h3 className="text-xl font-extrabold">{project.title}</h3>
+            <h3 className="text-xl font-extrabold">{tr(project.title)}</h3>
           </div>
           <button
             type="button"
             onClick={onClose}
-            aria-label="Tutup detail proyek"
+            aria-label={t('projectModal.closeAria')}
             className="p-2 rounded-lg border border-subtle hover:border-sky-400/60"
           >
             <X className="w-4 h-4" />
@@ -45,17 +57,17 @@ export default function ProjectModal({ project, onClose }) {
           <div className="aspect-video rounded-xl overflow-hidden border border-subtle bg-elevated">
             <ProjectMockup project={project} />
           </div>
-          <p className="text-sm sm:text-base text-secondary leading-relaxed text-justify">{project.summary}</p>
+          <p className="text-sm sm:text-base text-secondary leading-relaxed text-justify">{tr(project.summary)}</p>
           <div>
-            <h4 className="text-xs font-bold uppercase tracking-wider text-accent mb-2">Poin Utama</h4>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-accent mb-2">{t('projectModal.highlightsTitle')}</h4>
             <ul className="space-y-1.5 text-sm text-secondary list-disc list-inside">
               {project.highlights.map((item) => (
-                <li key={item} className="text-justify">{item}</li>
+                <li key={item} className="text-justify">{tr(item)}</li>
               ))}
             </ul>
           </div>
           <div>
-            <h4 className="text-xs font-bold uppercase tracking-wider text-accent mb-2">Teknologi</h4>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-accent mb-2">{t('projectModal.techTitle')}</h4>
             <div className="flex flex-wrap gap-2">
               {project.tags.map((tag) => (
                 <span key={tag} className="chip-tag text-xs font-medium px-2.5 py-1 rounded-lg">
@@ -73,7 +85,7 @@ export default function ProjectModal({ project, onClose }) {
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-white text-sm font-semibold"
               >
                 <ExternalLink className="w-4 h-4" />
-                <span>Buka Live Demo</span>
+                <span>{isPub ? t('projectModal.openPublication') : t('projectModal.openLiveDemo')}</span>
               </a>
             )}
             {project.repoUrl && (
@@ -84,7 +96,7 @@ export default function ProjectModal({ project, onClose }) {
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-subtle hover:border-sky-400/60 text-sm font-semibold"
               >
                 <Github className="w-4 h-4 text-accent" />
-                <span>Lihat GitHub</span>
+                <span>{t('projectModal.viewGithub')}</span>
               </a>
             )}
           </div>

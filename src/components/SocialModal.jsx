@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Check, Copy, ExternalLink, Github, Globe, Instagram, Linkedin, Mail, MessageCircle, Sparkles, X } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 export function TikTokIcon({ className = 'w-5 h-5' }) {
   return (
@@ -11,6 +12,7 @@ export function TikTokIcon({ className = 'w-5 h-5' }) {
 
 export default function SocialModal({ open, onClose, profile }) {
   const [copied, setCopied] = useState(false);
+  const { t, tr } = useLanguage();
 
   useEffect(() => {
     if (!open) return;
@@ -36,66 +38,66 @@ export default function SocialModal({ open, onClose, profile }) {
       name: 'LinkedIn',
       handle: 'Faris Pratama Putra',
       url: linkedinUrl,
-      desc: 'Jejaring profesional, rekam jejak karier & relasi industri',
+      desc: t('socialModal.cards.linkedin.desc'),
       icon: Linkedin,
       color: 'tone-blue border group-hover:brightness-110',
-      badge: 'Profesional',
-      btnText: 'Buka LinkedIn',
+      badge: t('socialModal.cards.linkedin.badge'),
+      btnText: t('socialModal.cards.linkedin.btnText'),
     },
     {
       id: 'github',
       name: 'GitHub',
       handle: '@Farispratama86',
       url: githubUrl,
-      desc: 'Repositori kode, source code web, ML, dan proyek IoT',
+      desc: t('socialModal.cards.github.desc'),
       icon: Github,
       color: 'tone-purple border group-hover:brightness-110',
-      badge: 'Code & Proyek',
-      btnText: 'Buka GitHub',
+      badge: t('socialModal.cards.github.badge'),
+      btnText: t('socialModal.cards.github.btnText'),
     },
     {
       id: 'instagram',
       name: 'Instagram',
       handle: '@fpratamaputra',
       url: instagramUrl,
-      desc: 'Dokumentasi kegiatan kampus, project insight & networking',
+      desc: t('socialModal.cards.instagram.desc'),
       icon: Instagram,
       color: 'tone-rose border group-hover:brightness-110',
-      badge: 'Aktivitas & Media',
-      btnText: 'Buka Instagram',
+      badge: t('socialModal.cards.instagram.badge'),
+      btnText: t('socialModal.cards.instagram.btnText'),
     },
     {
       id: 'tiktok',
       name: 'TikTok',
       handle: '@fpratamaputra',
       url: tiktokUrl,
-      desc: 'Short video seputar teknologi, tutorial koding & IT hardware',
+      desc: t('socialModal.cards.tiktok.desc'),
       icon: TikTokIcon,
       color: 'tone-cyan border group-hover:brightness-110',
-      badge: 'Video Edukasi',
-      btnText: 'Buka TikTok',
+      badge: t('socialModal.cards.tiktok.badge'),
+      btnText: t('socialModal.cards.tiktok.btnText'),
     },
     {
       id: 'whatsapp',
       name: 'WhatsApp',
       handle: profile?.whatsappDisplay || '+62 812-1953-4692',
       url: whatsappUrl,
-      desc: 'Komunikasi langsung, konsultasi cepat & koordinasi proyek',
+      desc: t('socialModal.cards.whatsapp.desc'),
       icon: MessageCircle,
       color: 'tone-emerald border group-hover:brightness-110',
-      badge: 'Fast Response',
-      btnText: 'Chat WhatsApp',
+      badge: t('socialModal.cards.whatsapp.badge'),
+      btnText: t('socialModal.cards.whatsapp.btnText'),
     },
     {
       id: 'email',
-      name: 'Email Resmi',
+      name: t('socialModal.cards.email.name'),
       handle: emailAddr,
       url: `mailto:${emailAddr}`,
-      desc: 'Proposal kerja sama resmi, rekrutmen & korespondensi',
+      desc: t('socialModal.cards.email.desc'),
       icon: Mail,
       color: 'tone-sky border group-hover:brightness-110',
-      badge: 'Email Kontak',
-      btnText: 'Kirim Email',
+      badge: t('socialModal.cards.email.badge'),
+      btnText: t('socialModal.cards.email.btnText'),
     },
   ];
 
@@ -138,7 +140,7 @@ export default function SocialModal({ open, onClose, profile }) {
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" title="Online" />
               </div>
               <p className="text-xs text-accent truncate">
-                {profile?.role || 'Web UI/UX Developer · Machine Learning · IoT'}
+                {tr(profile?.role || 'Web UI/UX Developer · Machine Learning · IoT')}
               </p>
             </div>
           </div>
@@ -146,7 +148,7 @@ export default function SocialModal({ open, onClose, profile }) {
           <button
             type="button"
             onClick={onClose}
-            aria-label="Tutup modal"
+            aria-label={t('socialModal.closeAria')}
             className="p-2 rounded-xl text-secondary hover:text-[var(--text-primary)] hover:bg-elevated transition-colors shrink-0"
           >
             <X className="w-5 h-5" />
@@ -157,11 +159,11 @@ export default function SocialModal({ open, onClose, profile }) {
         <div className="p-5 sm:p-6 space-y-4">
           <div className="flex items-center justify-between">
             <p className="text-xs text-secondary font-medium">
-              Pilih platform media sosial untuk terhubung langsung:
+              {t('socialModal.subtitle')}
             </p>
             <span className="chip-tag text-[10px] font-semibold px-2 py-0.5 rounded-full flex items-center gap-1">
               <Sparkles className="w-3 h-3 tone-amber-text" />
-              <span>Semua Saluran Resmi</span>
+              <span>{t('socialModal.officialChannels')}</span>
             </span>
           </div>
 
@@ -217,7 +219,7 @@ export default function SocialModal({ open, onClose, profile }) {
             className="inline-flex items-center gap-1.5 text-xs text-secondary hover:text-[var(--text-primary)] transition-colors"
           >
             {copied ? <Check className="w-3.5 h-3.5 tone-emerald-text" /> : <Copy className="w-3.5 h-3.5" />}
-            <span>{copied ? 'Tautan Portofolio Disalin!' : 'Salin Tautan Portofolio'}</span>
+            <span>{copied ? t('socialModal.copiedUrl') : t('socialModal.copyUrl')}</span>
           </button>
 
           <button
@@ -225,7 +227,7 @@ export default function SocialModal({ open, onClose, profile }) {
             onClick={onClose}
             className="px-4 py-2 rounded-xl border border-subtle text-xs sm:text-sm font-semibold hover:bg-elevated transition-colors"
           >
-            Tutup
+            {t('socialModal.close')}
           </button>
         </div>
       </div>

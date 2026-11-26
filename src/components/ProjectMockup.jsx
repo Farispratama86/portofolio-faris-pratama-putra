@@ -1,11 +1,14 @@
 import React from 'react';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function ProjectMockup({ project }) {
+  const { t, tr } = useLanguage();
+
   if (project.imageUrl) {
     return (
       <img
         src={project.imageUrl}
-        alt={project.title}
+        alt={tr(project.title)}
         className="w-full h-full object-contain bg-slate-950/80 p-1.5 sm:p-2"
       />
     );
@@ -59,7 +62,7 @@ export default function ProjectMockup({ project }) {
           <text x="256" y="176" fill="#38bdf8" fontSize="24" fontWeight="bold" fontFamily="sans-serif">31.73%</text>
           <rect x="428" y="120" width="140" height="72" rx="10" fill="#1e293b" />
           <text x="444" y="144" fill="#94a3b8" fontSize="11" fontFamily="sans-serif">Target Classes</text>
-          <text x="444" y="176" fill="#34d399" fontSize="24" fontWeight="bold" fontFamily="sans-serif">4 Jalur</text>
+          <text x="444" y="176" fill="#34d399" fontSize="24" fontWeight="bold" fontFamily="sans-serif">{t('mockup.paths4')}</text>
           <rect x="72" y="216" width="496" height="84" rx="10" fill="#1e293b" />
           <rect x="96" y="264" width="76" height="22" rx="4" fill="#38bdf8" />
           <rect x="206" y="246" width="76" height="40" rx="4" fill="#818cf8" />
@@ -78,9 +81,9 @@ export default function ProjectMockup({ project }) {
           <circle cx="170" cy="210" r="64" fill="none" stroke="#34d399" strokeWidth="14" strokeDasharray="290 402" strokeLinecap="round" />
           <text x="142" y="217" fill="#f1f5f9" fontSize="22" fontWeight="bold" fontFamily="sans-serif">72%</text>
           <rect x="286" y="148" width="270" height="48" rx="10" fill="#1e293b" />
-          <text x="306" y="177" fill="#e2e8f0" fontSize="13" fontFamily="sans-serif">Status Pompa: OTOMATIS</text>
+          <text x="306" y="177" fill="#e2e8f0" fontSize="13" fontFamily="sans-serif">{t('mockup.pumpAuto')}</text>
           <rect x="286" y="212" width="270" height="48" rx="10" fill="#065f46" fillOpacity="0.45" stroke="#34d399" strokeOpacity="0.4" />
-          <text x="306" y="241" fill="#6ee7b7" fontSize="13" fontWeight="bold" fontFamily="sans-serif">Blynk API: Terhubung</text>
+          <text x="306" y="241" fill="#6ee7b7" fontSize="13" fontWeight="bold" fontFamily="sans-serif">{t('mockup.blynkConnected')}</text>
         </svg>
       );
     case 'iot-gas':
@@ -88,16 +91,16 @@ export default function ProjectMockup({ project }) {
         <svg viewBox="0 0 640 360" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
           <rect width="640" height="360" fill="#2a1215" />
           <rect x="48" y="40" width="544" height="280" rx="14" fill="#0f172a" stroke="#fb7185" strokeOpacity="0.45" strokeWidth="2" />
-          <text x="76" y="82" fill="#fda4af" fontSize="15" fontWeight="bold" fontFamily="sans-serif">ESP32 · Deteksi Kebocoran Gas LPG</text>
+          <text x="76" y="82" fill="#fda4af" fontSize="15" fontWeight="bold" fontFamily="sans-serif">{t('mockup.lpgTitle')}</text>
           <text x="76" y="102" fill="#94a3b8" fontSize="11" fontFamily="sans-serif">MQ-2 Gas Sensor · Early Warning Buzzer · C++</text>
           <rect x="76" y="136" width="220" height="148" rx="12" fill="#1e293b" />
-          <text x="98" y="172" fill="#94a3b8" fontSize="12" fontFamily="sans-serif">Pembacaan Sensor MQ-2</text>
+          <text x="98" y="172" fill="#94a3b8" fontSize="12" fontFamily="sans-serif">{t('mockup.mq2Reading')}</text>
           <text x="98" y="220" fill="#fb7185" fontSize="34" fontWeight="bold" fontFamily="sans-serif">PPM</text>
-          <text x="98" y="256" fill="#34d399" fontSize="12" fontFamily="sans-serif">Monitoring Real-Time Aktif</text>
+          <text x="98" y="256" fill="#34d399" fontSize="12" fontFamily="sans-serif">{t('mockup.realtimeMonitoring')}</text>
           <rect x="322" y="136" width="234" height="66" rx="12" fill="#881337" fillOpacity="0.45" stroke="#fb7185" strokeOpacity="0.5" />
-          <text x="344" y="174" fill="#fecdd3" fontSize="14" fontWeight="bold" fontFamily="sans-serif">Alarm Buzzer Siaga</text>
+          <text x="344" y="174" fill="#fecdd3" fontSize="14" fontWeight="bold" fontFamily="sans-serif">{t('mockup.buzzerReady')}</text>
           <rect x="322" y="218" width="234" height="66" rx="12" fill="#1e293b" />
-          <text x="344" y="256" fill="#cbd5e1" fontSize="13" fontFamily="sans-serif">Mikrokontroler ESP32</text>
+          <text x="344" y="256" fill="#cbd5e1" fontSize="13" fontFamily="sans-serif">{t('mockup.esp32Chip')}</text>
         </svg>
       );
     case 'iot-height':
@@ -105,10 +108,10 @@ export default function ProjectMockup({ project }) {
         <svg viewBox="0 0 640 360" className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
           <rect width="640" height="360" fill="#0c1e35" />
           <rect x="48" y="40" width="544" height="280" rx="14" fill="#0f172a" stroke="#38bdf8" strokeOpacity="0.4" strokeWidth="2" />
-          <text x="76" y="82" fill="#38bdf8" fontSize="15" fontWeight="bold" fontFamily="sans-serif">Arduino Uno · Pengukur Tinggi Badan</text>
-          <text x="76" y="102" fill="#94a3b8" fontSize="11" fontFamily="sans-serif">Sensor Ultrasonik HC-SR04 · LCD 16x2 Display</text>
+          <text x="76" y="82" fill="#38bdf8" fontSize="15" fontWeight="bold" fontFamily="sans-serif">{t('mockup.heightTitle')}</text>
+          <text x="76" y="102" fill="#94a3b8" fontSize="11" fontFamily="sans-serif">{t('mockup.ultrasonicSub')}</text>
           <rect x="76" y="140" width="290" height="136" rx="12" fill="#064e3b" stroke="#34d399" strokeWidth="2" />
-          <text x="102" y="188" fill="#a7f3d0" fontSize="18" fontFamily="monospace">TINGGI BADAN:</text>
+          <text x="102" y="188" fill="#a7f3d0" fontSize="18" fontFamily="monospace">{t('mockup.heightLabel')}</text>
           <text x="102" y="236" fill="#ecfdf5" fontSize="32" fontWeight="bold" fontFamily="monospace">172.5 cm</text>
           <rect x="394" y="140" width="162" height="136" rx="12" fill="#1e293b" />
           <circle cx="448" cy="208" r="24" fill="#0f172a" stroke="#38bdf8" strokeWidth="3" />
@@ -122,15 +125,15 @@ export default function ProjectMockup({ project }) {
           <rect width="640" height="360" fill="#172554" />
           <rect x="44" y="34" width="552" height="292" rx="12" fill="#0f172a" stroke="#60a5fa" strokeOpacity="0.4" strokeWidth="2" />
           <rect x="44" y="34" width="552" height="34" rx="12" fill="#1e293b" />
-          <text x="68" y="56" fill="#e2e8f0" fontSize="12" fontWeight="bold" fontFamily="sans-serif">Inventory Toko Komputer — Python + SQLite</text>
+          <text x="68" y="56" fill="#e2e8f0" fontSize="12" fontWeight="bold" fontFamily="sans-serif">{t('mockup.invTitle')}</text>
           <rect x="68" y="88" width="504" height="32" rx="6" fill="#1e293b" />
-          <text x="84" y="109" fill="#38bdf8" fontSize="11" fontWeight="bold" fontFamily="sans-serif">KODE · NAMA BARANG · STOK · STATUS</text>
+          <text x="84" y="109" fill="#38bdf8" fontSize="11" fontWeight="bold" fontFamily="sans-serif">{t('mockup.invHeader')}</text>
           <rect x="68" y="132" width="504" height="36" rx="6" fill="#1e293b" fillOpacity="0.55" />
-          <text x="84" y="155" fill="#f1f5f9" fontSize="11" fontFamily="sans-serif">SP-001 — SSD NVMe 512GB (Stok: 24 · Aman)</text>
+          <text x="84" y="155" fill="#f1f5f9" fontSize="11" fontFamily="sans-serif">SP-001 — SSD NVMe 512GB ({t('mockup.invStock')}: 24 · {t('mockup.invSafe')})</text>
           <rect x="68" y="178" width="504" height="36" rx="6" fill="#1e293b" fillOpacity="0.55" />
-          <text x="84" y="201" fill="#f1f5f9" fontSize="11" fontFamily="sans-serif">SP-002 — RAM DDR4 8GB 3200MHz (Stok: 18 · Aman)</text>
+          <text x="84" y="201" fill="#f1f5f9" fontSize="11" fontFamily="sans-serif">SP-002 — RAM DDR4 8GB 3200MHz ({t('mockup.invStock')}: 18 · {t('mockup.invSafe')})</text>
           <rect x="68" y="224" width="504" height="36" rx="6" fill="#1e293b" fillOpacity="0.55" />
-          <text x="84" y="247" fill="#fbbf24" fontSize="11" fontFamily="sans-serif">SP-003 — Thermal Paste CPU (Stok: 4 · Restock)</text>
+          <text x="84" y="247" fill="#fbbf24" fontSize="11" fontFamily="sans-serif">SP-003 — Thermal Paste CPU ({t('mockup.invStock')}: 4 · Restock)</text>
         </svg>
       );
     default:
@@ -139,17 +142,17 @@ export default function ProjectMockup({ project }) {
           <rect width="640" height="360" fill="#1e1b4b" />
           <rect x="44" y="34" width="552" height="292" rx="12" fill="#0f172a" stroke="#fbbf24" strokeOpacity="0.4" strokeWidth="2" />
           <rect x="44" y="34" width="552" height="34" rx="12" fill="#1e293b" />
-          <text x="68" y="56" fill="#e2e8f0" fontSize="12" fontWeight="bold" fontFamily="sans-serif">Point of Sale (POS) — Java Swing + MySQL</text>
+          <text x="68" y="56" fill="#e2e8f0" fontSize="12" fontWeight="bold" fontFamily="sans-serif">{t('mockup.posTitle')}</text>
           <rect x="68" y="88" width="290" height="212" rx="10" fill="#1e293b" />
-          <text x="86" y="116" fill="#fbbf24" fontSize="12" fontWeight="bold" fontFamily="sans-serif">Keranjang Transaksi</text>
+          <text x="86" y="116" fill="#fbbf24" fontSize="12" fontWeight="bold" fontFamily="sans-serif">{t('mockup.posCart')}</text>
           <rect x="86" y="132" width="254" height="28" rx="6" fill="#0f172a" />
           <rect x="86" y="170" width="254" height="28" rx="6" fill="#0f172a" />
           <rect x="86" y="208" width="254" height="28" rx="6" fill="#0f172a" />
           <rect x="378" y="88" width="194" height="212" rx="10" fill="#1e293b" />
-          <text x="398" y="122" fill="#94a3b8" fontSize="11" fontFamily="sans-serif">TOTAL BAYAR</text>
+          <text x="398" y="122" fill="#94a3b8" fontSize="11" fontFamily="sans-serif">{t('mockup.posTotal')}</text>
           <text x="398" y="156" fill="#34d399" fontSize="22" fontWeight="bold" fontFamily="sans-serif">Rp 450.000</text>
           <rect x="398" y="190" width="154" height="36" rx="8" fill="#0ea5e9" />
-          <text x="434" y="213" fill="#ffffff" fontSize="12" fontWeight="bold" fontFamily="sans-serif">PROSES POS</text>
+          <text x="434" y="213" fill="#ffffff" fontSize="12" fontWeight="bold" fontFamily="sans-serif">{t('mockup.posProcess')}</text>
         </svg>
       );
   }

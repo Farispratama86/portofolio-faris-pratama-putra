@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import PortfolioHome from './pages/PortfolioHome';
 import AdminPanel from './pages/AdminPanel';
+import { LanguageProvider } from './context/LanguageContext';
 
 export default function App() {
   const [path, setPath] = useState(() => window.location.pathname || '/');
@@ -23,5 +24,9 @@ export default function App() {
     return <AdminPanel onNavigate={navigate} />;
   }
 
-  return <PortfolioHome onNavigate={navigate} />;
+  return (
+    <LanguageProvider>
+      <PortfolioHome onNavigate={navigate} />
+    </LanguageProvider>
+  );
 }

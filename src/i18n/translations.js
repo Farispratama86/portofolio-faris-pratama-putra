@@ -1,0 +1,599 @@
+// Kamus terjemahan statis ID <-> EN untuk seluruh UI portofolio + glosarium istilah/bulan lokal
+
+export const UI_TRANSLATIONS = {
+  id: {
+    // Navbar & Language Switcher
+    nav: {
+      beranda: 'Beranda',
+      pengalaman: 'Pengalaman',
+      proyek: 'Proyek',
+      sertifikat: 'Sertifikat',
+      keahlian: 'Keahlian',
+      kontak: 'Kontak',
+      cv: 'CV',
+      viewCvMobile: 'Lihat Ringkasan CV',
+      toggleThemeLabel: 'Ubah tema gelap atau terang',
+      toggleMenuLabel: 'Buka menu navigasi',
+      langButtonLabel: 'Pilih bahasa',
+      langMenuTitle: 'Pilih Bahasa',
+      langId: 'Bahasa Indonesia (ID)',
+      langEn: 'English (EN)',
+      translatingNote: 'Menerjemahkan konten...',
+    },
+    // Hero Section (#beranda)
+    hero: {
+      campusBadge: 'Mahasiswa S1 Teknik Informatika · Universitas Duta Bangsa Surakarta',
+      viewProjects: 'Lihat Proyek',
+      cvSummary: 'Ringkasan CV',
+      statProjects: 'Proyek Utama',
+      statExperiences: 'Pengalaman Industri',
+      statYearsValue: '3+ Thn',
+      statYearsLabel: 'Teknisi IT & Hardware',
+      openToWork: 'Terbuka untuk Peluang',
+      educationLabel: 'Pendidikan',
+      educationValue: 'S1 Teknik Informatika (UDB)',
+      latestInternLabel: 'Magang Terbaru',
+      locationLabel: 'Domisili',
+      connectFollow: 'Hubungi / Ikuti:',
+      sendEmailTitle: 'Kirim Email',
+      coreTechFocus: 'Fokus Teknologi Utama:',
+    },
+    // Experience Section (#pengalaman)
+    experience: {
+      badge: 'Rekam Jejak Profesional',
+      title: 'Pengalaman Kerja & Magang',
+      subtitle:
+        'Perjalanan karier, kontribusi nyata dalam pengembangan aplikasi web modern, riset Machine Learning, hingga troubleshooting infrastruktur TI & perangkat keras.',
+      verifiedCount: '{count} Pengalaman Terverifikasi',
+      viewOfficialCert: 'Lihat Sertifikat Resmi ({category})',
+      allCertificates: 'Semua Sertifikat',
+    },
+    // Projects Section (#proyek)
+    projects: {
+      eyebrow: 'Karya & Implementasi',
+      title: 'Proyek Utama',
+      syncedCloud: 'Tersinkronisasi langsung dengan Database Cloud',
+      filterAll: 'Semua ({count})',
+      filterWebMl: 'Web & ML ({count})',
+      filterIot: 'IoT ({count})',
+      filterDesktop: 'Desktop ({count})',
+      featuredBadge: 'Proyek Unggulan',
+      liveDemo: 'Live Demo',
+      publicationJournal: 'Publikasi / Jurnal',
+      viewDetails: 'Lihat Detail',
+      projectDetails: 'Detail Proyek',
+      caseStudy: 'Studi Kasus',
+    },
+    // Certificates Section (#sertifikat)
+    certificates: {
+      eyebrow: 'Pengakuan & Kompetensi',
+      title: 'Sertifikasi & Lisensi',
+      subtitle: 'Dokumentasi resmi sertifikat magang industri, lisensi keahlian, dan pelatihan teknologi.',
+      countBadge: '{count} Sertifikat Terdaftar',
+      fallbackChip: 'Sertifikat',
+      viewCertificate: 'Lihat Sertifikat',
+      verified: 'Terverifikasi',
+    },
+    // Skills Section (#keahlian)
+    skills: {
+      eyebrow: 'Kompetensi & Penguasaan',
+      title: 'Keahlian & Kemampuan',
+      subtitle:
+        'Peta tingkat kemahiran teknis (Hard Skills) dan kecakapan interpersonal (Soft Skills) berdasarkan pengalaman dan implementasi proyek nyata.',
+      hardTab: 'Hard Skills',
+      softTab: 'Soft Skills',
+      countLabel: '{count} kemampuan',
+      ratings: {
+        expert: 'Expert',
+        advanced: 'Advanced',
+        proficient: 'Proficient',
+        intermediate: 'Intermediate',
+      },
+    },
+    // Contact Section (#kontak)
+    contact: {
+      badge: 'Terhubung & Berkolaborasi',
+      title: 'Mari Berkolaborasi',
+      subtitle:
+        'Tertarik membangun proyek bersama, diskusi teknologi, atau membuka peluang karier & magang? Saya siap berdiskusi!',
+      hubTitle: 'Hub Media Sosial & Jejaring',
+      hubActive: 'Aktif',
+      hubDesc: 'Akses satu pintu ke semua akun resmi: LinkedIn, GitHub, Instagram, TikTok, WhatsApp & Email.',
+      hubButton: 'Buka Popup Media Sosial',
+      directTitle: 'Kontak Langsung & Jejaring',
+      openModal: 'Lihat Modal',
+      emailLabel: 'Email Resmi',
+      copy: 'Salin',
+      copyTitle: 'Salin alamat email',
+      whatsappLabel: 'WhatsApp (Chat Cepat)',
+      githubLabel: 'GitHub Repository',
+      linkedinLabel: 'LinkedIn Profile',
+      formTitle: 'Kirim Pesan Cepat',
+      formSubtitle: 'Pesan akan diteruskan langsung ke WhatsApp atau aplikasi email Anda',
+      nameLabel: 'Nama Anda',
+      namePlaceholder: 'Contoh: Budi Santoso',
+      topicLabel: 'Topik Diskusi',
+      topics: [
+        { value: 'Kolaborasi Web UI/UX', label: 'Kolaborasi Web UI/UX' },
+        { value: 'Proyek Machine Learning / Data', label: 'Proyek Machine Learning / Data' },
+        { value: 'Proyek IoT / Desktop / IT Support', label: 'Proyek IoT / Desktop / IT Support' },
+        { value: 'Peluang Kerja / Magang', label: 'Peluang Kerja / Magang' },
+        { value: 'Pertanyaan & Diskusi Lainnya', label: 'Pertanyaan & Diskusi Lainnya' },
+      ],
+      messageLabel: 'Isi Pesan',
+      messagePlaceholder: 'Halo Faris, saya tertarik berdiskusi mengenai proyek...',
+      sendWhatsapp: 'Kirim via WhatsApp',
+      sendEmail: 'Kirim via Email',
+      allSocials: 'Semua Media Sosial',
+      toastCopied: 'Email disalin: {email}',
+      toastCopyManual: 'Salin manual: {email}',
+      toastOpeningWa: 'Membuka WhatsApp...',
+      toastIncomplete: 'Mohon lengkapi nama dan pesan terlebih dahulu.',
+      waGreeting: 'Halo Faris, saya {name}.\nTopik: {topic}\n\n{message}',
+      emailSubject: '[Portofolio] {topic} — {name}',
+      emailBody: 'Halo Faris,\n\nSaya {name}.\n\n{message}',
+    },
+    // Footer
+    footer: {
+      rights: 'All rights reserved.',
+      socialMedia: 'Media Sosial',
+      admin: 'Admin',
+    },
+    // Modals
+    projectModal: {
+      closeAria: 'Tutup detail proyek',
+      highlightsTitle: 'Poin Utama',
+      techTitle: 'Teknologi',
+      openLiveDemo: 'Buka Live Demo',
+      openPublication: 'Buka Publikasi / Jurnal',
+      viewGithub: 'Lihat GitHub',
+    },
+    certificateModal: {
+      closeAria: 'Tutup modal',
+      officialTitle: 'SERTIFIKAT RESMI & PENGHARGAAN',
+      awardedPrefix: 'Diberikan atas kontribusi dan penyelesaian program pada:',
+      verified: 'Terverifikasi',
+      issuerPrefix: 'Penerbit:',
+      periodPrefix: 'Periode:',
+      issuerLabel: 'Penerbit / Instansi',
+      issueDateLabel: 'Tanggal Penerbitan',
+      recordedFallback: 'Tercatat',
+      descriptionLabel: 'Keterangan & Capaian',
+      goToSection: 'Buka di Menu Sertifikat',
+      verifyCredential: 'Verifikasi Kredensial',
+      close: 'Tutup',
+    },
+    socialModal: {
+      closeAria: 'Tutup modal',
+      subtitle: 'Pilih platform media sosial untuk terhubung langsung:',
+      officialChannels: 'Semua Saluran Resmi',
+      copyUrl: 'Salin Tautan Portofolio',
+      copiedUrl: 'Tautan Portofolio Disalin!',
+      close: 'Tutup',
+      cards: {
+        linkedin: {
+          desc: 'Jejaring profesional, rekam jejak karier & relasi industri',
+          badge: 'Profesional',
+          btnText: 'Buka LinkedIn',
+        },
+        github: {
+          desc: 'Repositori kode, source code web, ML, dan proyek IoT',
+          badge: 'Code & Proyek',
+          btnText: 'Buka GitHub',
+        },
+        instagram: {
+          desc: 'Dokumentasi kegiatan kampus, project insight & networking',
+          badge: 'Aktivitas & Media',
+          btnText: 'Buka Instagram',
+        },
+        tiktok: {
+          desc: 'Short video seputar teknologi, tutorial koding & IT hardware',
+          badge: 'Video Edukasi',
+          btnText: 'Buka TikTok',
+        },
+        whatsapp: {
+          desc: 'Komunikasi langsung, konsultasi cepat & koordinasi proyek',
+          badge: 'Fast Response',
+          btnText: 'Chat WhatsApp',
+        },
+        email: {
+          name: 'Email Resmi',
+          desc: 'Proposal kerja sama resmi, rekrutmen & korespondensi',
+          badge: 'Email Kontak',
+          btnText: 'Kirim Email',
+        },
+      },
+    },
+    cvModal: {
+      previewTitle: 'Pratinjau Cetak CV / Portofolio (Format A4 ATS)',
+      syncSubtitle: 'Otomatis tersinkronisasi dengan {expCount} pengalaman & {projCount} proyek terbaru dari database',
+      printBtn: 'Cetak / Simpan PDF',
+      closeAria: 'Tutup',
+      locationLine: 'Karanganyar, Jawa Tengah, Indonesia',
+      educationHeading: 'EDUCATION',
+      degree: 'S1 Teknik Informatika — Semester 6',
+      studyPeriod: 'Agustus 2023 – Sekarang',
+      coursework:
+        'Mata kuliah relevan: Jaringan Komputer, Internet of Things (IoT), Pemrograman Web, Pemrograman Python, Sistem Operasi, Pemecahan Masalah Hardware & Software.',
+      experienceHeading: 'INTERNSHIP & WORK EXPERIENCE',
+      projectsHeading: 'FEATURED PROJECTS',
+      skillsHeading: 'TECHNICAL SKILLS',
+      interestsHeading: 'INTERESTS & FOCUS AREA',
+      langSkillLabel: 'Bahasa',
+      langSkillValue: 'Bahasa Indonesia (Native), Inggris (Basic)',
+      hwSkillValue:
+        'Troubleshooting Hardware & Software, PC Assembly (Rakit PC), Jaringan Komputer (LAN/WLAN), Mikrotik (Basic), Routing & Switching',
+    },
+    mockup: {
+      paths4: '4 Jalur',
+      pumpAuto: 'Status Pompa: OTOMATIS',
+      blynkConnected: 'Blynk API: Terhubung',
+      lpgTitle: 'ESP32 · Deteksi Kebocoran Gas LPG',
+      mq2Reading: 'Pembacaan Sensor MQ-2',
+      realtimeMonitoring: 'Monitoring Real-Time Aktif',
+      buzzerReady: 'Alarm Buzzer Siaga',
+      esp32Chip: 'Mikrokontroler ESP32',
+      heightTitle: 'Arduino Uno · Pengukur Tinggi Badan',
+      ultrasonicSub: 'Sensor Ultrasonik HC-SR04 · LCD 16x2 Display',
+      heightLabel: 'TINGGI BADAN:',
+      invTitle: 'Inventory Toko Komputer — Python + SQLite',
+      invHeader: 'KODE · NAMA BARANG · STOK · STATUS',
+      invSafe: 'Aman',
+      invStock: 'Stok',
+      posTitle: 'Point of Sale (POS) — Java Swing + MySQL',
+      posCart: 'Keranjang Transaksi',
+      posTotal: 'TOTAL BAYAR',
+      posProcess: 'PROSES POS',
+    },
+  },
+
+  en: {
+    // Navbar & Language Switcher
+    nav: {
+      beranda: 'Home',
+      pengalaman: 'Experience',
+      proyek: 'Projects',
+      sertifikat: 'Certifications',
+      keahlian: 'Skills',
+      kontak: 'Contact',
+      cv: 'CV',
+      viewCvMobile: 'View CV Summary',
+      toggleThemeLabel: 'Toggle light or dark theme',
+      toggleMenuLabel: 'Toggle navigation menu',
+      langButtonLabel: 'Select language',
+      langMenuTitle: 'Select Language',
+      langId: 'Bahasa Indonesia (ID)',
+      langEn: 'English (EN)',
+      translatingNote: 'Translating content...',
+    },
+    // Hero Section (#beranda)
+    hero: {
+      campusBadge: 'Informatics Engineering Undergraduate · Universitas Duta Bangsa Surakarta',
+      viewProjects: 'View Projects',
+      cvSummary: 'CV Summary',
+      statProjects: 'Featured Projects',
+      statExperiences: 'Industry Experience',
+      statYearsValue: '3+ Yrs',
+      statYearsLabel: 'IT & Hardware Technician',
+      openToWork: 'Open to Opportunities',
+      educationLabel: 'Education',
+      educationValue: 'B.Sc. Informatics Engineering (UDB)',
+      latestInternLabel: 'Latest Internship',
+      locationLabel: 'Location',
+      connectFollow: 'Connect / Follow:',
+      sendEmailTitle: 'Send Email',
+      coreTechFocus: 'Core Tech Stack:',
+    },
+    // Experience Section (#pengalaman)
+    experience: {
+      badge: 'Professional Track Record',
+      title: 'Work & Internship Experience',
+      subtitle:
+        'Career journey and hands-on contributions across modern web UI/UX engineering, Machine Learning research, and IT infrastructure & hardware troubleshooting.',
+      verifiedCount: '{count} Verified Experiences',
+      viewOfficialCert: 'View Official Certificate ({category})',
+      allCertificates: 'All Certificates',
+    },
+    // Projects Section (#proyek)
+    projects: {
+      eyebrow: 'Works & Implementations',
+      title: 'Featured Projects',
+      syncedCloud: 'Live synced with Cloud Database',
+      filterAll: 'All ({count})',
+      filterWebMl: 'Web & ML ({count})',
+      filterIot: 'IoT ({count})',
+      filterDesktop: 'Desktop ({count})',
+      featuredBadge: 'Featured Project',
+      liveDemo: 'Live Demo',
+      publicationJournal: 'Publication / Journal',
+      viewDetails: 'View Details',
+      projectDetails: 'Project Details',
+      caseStudy: 'Case Study',
+    },
+    // Certificates Section (#sertifikat)
+    certificates: {
+      eyebrow: 'Recognition & Credentials',
+      title: 'Certifications & Licenses',
+      subtitle: 'Official documentation of industry internships, competency licenses, and technology training.',
+      countBadge: '{count} Registered Certificates',
+      fallbackChip: 'Certificate',
+      viewCertificate: 'View Certificate',
+      verified: 'Verified',
+    },
+    // Skills Section (#keahlian)
+    skills: {
+      eyebrow: 'Competencies & Proficiency',
+      title: 'Skills & Capabilities',
+      subtitle:
+        'Proficiency overview of technical abilities (Hard Skills) and interpersonal strengths (Soft Skills) built through real-world projects and experience.',
+      hardTab: 'Hard Skills',
+      softTab: 'Soft Skills',
+      countLabel: '{count} skills',
+      ratings: {
+        expert: 'Expert',
+        advanced: 'Advanced',
+        proficient: 'Proficient',
+        intermediate: 'Intermediate',
+      },
+    },
+    // Contact Section (#kontak)
+    contact: {
+      badge: 'Connect & Collaborate',
+      title: "Let's Collaborate",
+      subtitle:
+        'Interested in building a project together, discussing technology, or exploring career & internship opportunities? Let us connect!',
+      hubTitle: 'Social Media & Network Hub',
+      hubActive: 'Active',
+      hubDesc: 'One-stop access to all official channels: LinkedIn, GitHub, Instagram, TikTok, WhatsApp & Email.',
+      hubButton: 'Open Social Media Popup',
+      directTitle: 'Direct Contact & Network',
+      openModal: 'Open Modal',
+      emailLabel: 'Official Email',
+      copy: 'Copy',
+      copyTitle: 'Copy email address',
+      whatsappLabel: 'WhatsApp (Quick Chat)',
+      githubLabel: 'GitHub Repository',
+      linkedinLabel: 'LinkedIn Profile',
+      formTitle: 'Send a Quick Message',
+      formSubtitle: 'Your message will be forwarded directly to WhatsApp or your email app',
+      nameLabel: 'Your Name',
+      namePlaceholder: 'Example: Alex Pratama',
+      topicLabel: 'Discussion Topic',
+      topics: [
+        { value: 'Web UI/UX Collaboration', label: 'Web UI/UX Collaboration' },
+        { value: 'Machine Learning / Data Project', label: 'Machine Learning / Data Project' },
+        { value: 'IoT / Desktop / IT Support Project', label: 'IoT / Desktop / IT Support Project' },
+        { value: 'Job / Internship Opportunity', label: 'Job / Internship Opportunity' },
+        { value: 'Other Questions & Discussions', label: 'Other Questions & Discussions' },
+      ],
+      messageLabel: 'Message',
+      messagePlaceholder: 'Hi Faris, I am interested in discussing a project regarding...',
+      sendWhatsapp: 'Send via WhatsApp',
+      sendEmail: 'Send via Email',
+      allSocials: 'All Social Media',
+      toastCopied: 'Email copied: {email}',
+      toastCopyManual: 'Copy manually: {email}',
+      toastOpeningWa: 'Opening WhatsApp...',
+      toastIncomplete: 'Please enter your name and message first.',
+      waGreeting: 'Hi Faris, I am {name}.\nTopic: {topic}\n\n{message}',
+      emailSubject: '[Portfolio] {topic} — {name}',
+      emailBody: 'Hi Faris,\n\nI am {name}.\n\n{message}',
+    },
+    // Footer
+    footer: {
+      rights: 'All rights reserved.',
+      socialMedia: 'Social Media',
+      admin: 'Admin',
+    },
+    // Modals
+    projectModal: {
+      closeAria: 'Close project details',
+      highlightsTitle: 'Key Highlights',
+      techTitle: 'Technologies',
+      openLiveDemo: 'Open Live Demo',
+      openPublication: 'Open Publication / Journal',
+      viewGithub: 'View GitHub',
+    },
+    certificateModal: {
+      closeAria: 'Close modal',
+      officialTitle: 'OFFICIAL CERTIFICATE & AWARD',
+      awardedPrefix: 'Awarded for contribution and completion of the program at:',
+      verified: 'Verified',
+      issuerPrefix: 'Issuer:',
+      periodPrefix: 'Period:',
+      issuerLabel: 'Issuer / Institution',
+      issueDateLabel: 'Issue Date',
+      recordedFallback: 'Recorded',
+      descriptionLabel: 'Description & Achievements',
+      goToSection: 'Go to Certifications',
+      verifyCredential: 'Verify Credential',
+      close: 'Close',
+    },
+    socialModal: {
+      closeAria: 'Close modal',
+      subtitle: 'Choose a social media platform to connect directly:',
+      officialChannels: 'All Official Channels',
+      copyUrl: 'Copy Portfolio Link',
+      copiedUrl: 'Portfolio Link Copied!',
+      close: 'Close',
+      cards: {
+        linkedin: {
+          desc: 'Professional network, career track record & industry connections',
+          badge: 'Professional',
+          btnText: 'Open LinkedIn',
+        },
+        github: {
+          desc: 'Code repositories, web source code, ML, and IoT projects',
+          badge: 'Code & Projects',
+          btnText: 'Open GitHub',
+        },
+        instagram: {
+          desc: 'Campus activities documentation, project insights & networking',
+          badge: 'Activity & Media',
+          btnText: 'Open Instagram',
+        },
+        tiktok: {
+          desc: 'Short videos about technology, coding tutorials & IT hardware',
+          badge: 'Tech Videos',
+          btnText: 'Open TikTok',
+        },
+        whatsapp: {
+          desc: 'Direct communication, quick consultation & project coordination',
+          badge: 'Fast Response',
+          btnText: 'Chat WhatsApp',
+        },
+        email: {
+          name: 'Official Email',
+          desc: 'Formal collaboration proposals, recruitment & correspondence',
+          badge: 'Contact Email',
+          btnText: 'Send Email',
+        },
+      },
+    },
+    cvModal: {
+      previewTitle: 'CV / Portfolio Print Preview (A4 ATS Format)',
+      syncSubtitle: 'Automatically synced with {expCount} experiences & {projCount} latest projects from database',
+      printBtn: 'Print / Save PDF',
+      closeAria: 'Close',
+      locationLine: 'Karanganyar, Central Java, Indonesia',
+      educationHeading: 'EDUCATION',
+      degree: 'B.Sc. in Informatics Engineering — Semester 6',
+      studyPeriod: 'August 2023 – Present',
+      coursework:
+        'Relevant coursework: Computer Networks, Internet of Things (IoT), Web Programming, Python Programming, Operating Systems, Hardware & Software Troubleshooting.',
+      experienceHeading: 'INTERNSHIP & WORK EXPERIENCE',
+      projectsHeading: 'FEATURED PROJECTS',
+      skillsHeading: 'TECHNICAL SKILLS',
+      interestsHeading: 'INTERESTS & FOCUS AREA',
+      langSkillLabel: 'Languages',
+      langSkillValue: 'Indonesian (Native), English (Basic)',
+      hwSkillValue:
+        'Hardware & Software Troubleshooting, PC Assembly, Computer Networking (LAN/WLAN), Mikrotik (Basic), Routing & Switching',
+    },
+    mockup: {
+      paths4: '4 Paths',
+      pumpAuto: 'Pump Status: AUTO',
+      blynkConnected: 'Blynk API: Connected',
+      lpgTitle: 'ESP32 · LPG Gas Leak Detection',
+      mq2Reading: 'MQ-2 Sensor Reading',
+      realtimeMonitoring: 'Real-Time Monitoring Active',
+      buzzerReady: 'Buzzer Alarm Armed',
+      esp32Chip: 'ESP32 Microcontroller',
+      heightTitle: 'Arduino Uno · Height Measurement Tool',
+      ultrasonicSub: 'HC-SR04 Ultrasonic Sensor · 16x2 LCD Display',
+      heightLabel: 'HEIGHT:',
+      invTitle: 'Computer Store Inventory — Python + SQLite',
+      invHeader: 'CODE · ITEM NAME · STOCK · STATUS',
+      invSafe: 'In Stock',
+      invStock: 'Stock',
+      posTitle: 'Point of Sale (POS) — Java Swing + MySQL',
+      posCart: 'Transaction Cart',
+      posTotal: 'TOTAL DUE',
+      posProcess: 'PROCESS POS',
+    },
+  },
+};
+
+// Glosarium deterministik lokal (ID -> EN) untuk bulan, badge, kategori, grup skill & label pendek
+const LOCAL_EN_GLOSSARY = {
+  // Badges pengalaman
+  'Magang · Hybrid': 'Internship · Hybrid',
+  'Magang · On-site': 'Internship · On-site',
+  'Magang · Remote': 'Internship · Remote',
+  Magang: 'Internship',
+  'Magang (Internship)': 'Internship',
+  'Aktif · On-site': 'Active · On-site',
+  'Aktif · Hybrid': 'Active · Hybrid',
+  'Aktif · Remote': 'Active · Remote',
+  'Aktif Bekerja': 'Currently Employed',
+  'Resign (Nonaktif)': 'Resigned (Inactive)',
+  Nonaktif: 'Inactive',
+  'Selesai Kontrak': 'Contract Completed',
+  'Pelatihan Skill': 'Skill Training',
+  'Pelatihan · Online': 'Training · Online',
+  'Pelatihan · On-site': 'Training · On-site',
+  'Sertifikasi Profesi': 'Professional Certification',
+  'Workshop & Kursus': 'Workshop & Course',
+
+  // Kategori Sertifikat & Proyek
+  'Seminar / Webinar': 'Seminar / Webinar',
+  Penghargaan: 'Award',
+  'Kerja / Teknis': 'Work / Technical',
+  Sertifikat: 'Certificate',
+  'Web UI/UX · Production': 'Web UI/UX · Production',
+  'Web & Machine Learning': 'Web & Machine Learning',
+  'IoT & Embedded': 'IoT & Embedded',
+  'Desktop App': 'Desktop App',
+  'Machine Learning': 'Machine Learning',
+
+  // Subjudul Pengalaman umum
+  'Tanggung Jawab Utama': 'Main Responsibilities',
+  'Pengembangan Web & UI/UX': 'Web & UI/UX Development',
+  'Machine Learning & Evaluasi Data': 'Machine Learning & Data Evaluation',
+  'Troubleshooting & Instalasi': 'Troubleshooting & Installation',
+  'Marketing & Customer Service': 'Marketing & Customer Service',
+
+  // Grup Keahlian & Beberapa Skill
+  'Problem Solving & Analisis': 'Problem Solving & Analysis',
+  'Komunikasi & Tim': 'Communication & Teamwork',
+  'Manajemen & Kerja Profesional': 'Management & Professional Work',
+  Umum: 'General',
+  'Jaringan LAN/WLAN & Mikrotik': 'LAN/WLAN Networking & Mikrotik',
+  'Analisis Masalah & Debugging Terstruktur': 'Problem Analysis & Structured Debugging',
+  'Riset & Evaluasi Berbasis Data': 'Data-Driven Research & Evaluation',
+  'Kerja Sama Tim & Kolaborasi Antar Divisi': 'Teamwork & Cross-Division Collaboration',
+  'Komunikasi Interpersonal & Presentasi Teknis': 'Interpersonal Communication & Technical Presentation',
+  'Customer Service & Negosiasi Klien': 'Customer Service & Client Negotiation',
+  'Manajemen Waktu & Ketepatan Deadline': 'Time Management & Deadline Reliability',
+  'Adaptabilitas Cepat Terhadap Teknologi Baru': 'Fast Adaptability to New Technologies',
+  'Kemandirian Kerja & Inisiatif Solutif': 'Independent Work & Solution-Oriented Initiative',
+
+  // Role default
+  'Web UI/UX Developer · Machine Learning Enthusiast · IoT & IT Technician':
+    'Web UI/UX Developer · Machine Learning Enthusiast · IoT & IT Technician',
+  'Teknisi Komputer': 'Computer Technician',
+};
+
+const ID_MONTH_MAP = [
+  [/\bJanuari\b/gi, 'January'],
+  [/\bFebruari\b/gi, 'February'],
+  [/\bMaret\b/gi, 'March'],
+  [/\bApril\b/gi, 'April'],
+  [/\bMei\b/gi, 'May'],
+  [/\bJuni\b/gi, 'June'],
+  [/\bJuli\b/gi, 'July'],
+  [/\bAgustus\b/gi, 'August'],
+  [/\bSeptember\b/gi, 'September'],
+  [/\bOktober\b/gi, 'October'],
+  [/\bNovember\b/gi, 'November'],
+  [/\bDesember\b/gi, 'December'],
+  [/\bSekarang\b/gi, 'Present'],
+  [/\bSaat Ini\b/gi, 'Present'],
+];
+
+/**
+ * Mengembalikan terjemahan lokal jika teks cocok dengan glosarium atau merupakan string tanggal/periode Indonesia.
+ * Mengembalikan null jika perlu dikirim ke endpoint /api/translate.
+ */
+export function resolveLocalTranslation(text) {
+  if (typeof text !== 'string') return null;
+  const trimmed = text.trim();
+  if (!trimmed) return text;
+
+  if (LOCAL_EN_GLOSSARY[trimmed]) {
+    return LOCAL_EN_GLOSSARY[trimmed];
+  }
+
+  // Cek apakah hanya tanggal/periode (contoh: "Agustus 2026 – November 2026", "Juni 2023 – Sekarang", "Oktober 2023")
+  const dateOnlyRegex =
+    /^(Januari|Februari|Maret|April|Mei|Juni|Juli|Agustus|September|Oktober|November|Desember|Sekarang|Saat Ini|\d{1,4}|\s|[-–—/,])+$/i;
+  if (dateOnlyRegex.test(trimmed)) {
+    let out = trimmed;
+    for (const [regex, replacement] of ID_MONTH_MAP) {
+      out = out.replace(regex, replacement);
+    }
+    return out;
+  }
+
+  return null;
+}

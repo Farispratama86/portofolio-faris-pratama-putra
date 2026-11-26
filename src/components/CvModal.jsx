@@ -1,8 +1,11 @@
 import React, { useEffect } from 'react';
 import { Printer, X } from 'lucide-react';
 import { EXPERIENCES as FALLBACK_EXPERIENCES, PROFILE as DEFAULT_PROFILE, PROJECTS as FALLBACK_PROJECTS } from '../data/portfolioData';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function CvModal({ open, onClose, profile, experiences, projects }) {
+  const { t, tr } = useLanguage();
+
   useEffect(() => {
     if (!open) return undefined;
     const onKey = (e) => {
@@ -30,7 +33,7 @@ export default function CvModal({ open, onClose, profile, experiences, projects 
     },
     {
       label: 'Hardware & Networking',
-      value: 'Troubleshooting Hardware & Software, PC Assembly (Rakit PC), Jaringan Komputer (LAN/WLAN), Mikrotik (Basic), Routing & Switching',
+      value: t('cvModal.hwSkillValue'),
     },
     {
       label: 'Languages',
@@ -45,8 +48,8 @@ export default function CvModal({ open, onClose, profile, experiences, projects 
       value: 'Arduino IDE, ESP32 / ESP8266, Sensor Integration (MQ-2, HC-SR04, Soil Moisture), Blynk API, Telegram Bot API',
     },
     {
-      label: 'Bahasa',
-      value: 'Bahasa Indonesia (Native), Inggris (Basic)',
+      label: t('cvModal.langSkillLabel'),
+      value: t('cvModal.langSkillValue'),
     },
   ];
 
@@ -67,9 +70,12 @@ export default function CvModal({ open, onClose, profile, experiences, projects 
         {/* Modal Action Bar (hidden when printing) */}
         <div className="no-print sticky top-0 z-10 bg-slate-900 text-slate-100 px-5 py-3.5 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h3 className="text-sm font-bold">Pratinjau Cetak CV / Portofolio (Format A4 ATS)</h3>
+            <h3 className="text-sm font-bold">{t('cvModal.previewTitle')}</h3>
             <p className="text-[11px] text-slate-400">
-              Otomatis tersinkronisasi dengan {activeExperiences.length} pengalaman &amp; {activeProjects.length} proyek terbaru dari database
+              {t('cvModal.syncSubtitle', {
+                expCount: activeExperiences.length,
+                projCount: activeProjects.length,
+              })}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -79,12 +85,12 @@ export default function CvModal({ open, onClose, profile, experiences, projects 
               className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-sky-500 hover:bg-sky-400 text-white text-xs font-semibold"
             >
               <Printer className="w-3.5 h-3.5" />
-              <span>Cetak / Simpan PDF</span>
+              <span>{t('cvModal.printBtn')}</span>
             </button>
             <button
               type="button"
               onClick={onClose}
-              aria-label="Tutup"
+              aria-label={t('cvModal.closeAria')}
               className="p-2 rounded-lg border border-slate-700 hover:border-slate-500 text-slate-300"
             >
               <X className="w-4 h-4" />
@@ -104,7 +110,7 @@ export default function CvModal({ open, onClose, profile, experiences, projects 
               {activeProfile.fullName}
             </h1>
             <p className="text-[9.5pt] text-slate-600">
-              Karanganyar, Jawa Tengah, Indonesia &nbsp;|&nbsp; {activeProfile.whatsappDisplay} &nbsp;|&nbsp; {activeProfile.email}
+              {t('cvModal.locationLine')} &nbsp;|&nbsp; {activeProfile.whatsappDisplay} &nbsp;|&nbsp; {activeProfile.email}
             </p>
             <p className="text-[9.5pt] text-slate-600">
               https://portofolio-faris-pratama-putra.vercel.app/ &nbsp;|&nbsp; {activeProfile.githubDisplay} &nbsp;|&nbsp; instagram: {instagramHandle}
@@ -114,45 +120,45 @@ export default function CvModal({ open, onClose, profile, experiences, projects 
           {/* EDUCATION */}
           <section className="cv-avoid-break space-y-1.5">
             <h2 className="text-[10.5pt] font-bold uppercase tracking-wide border-b-[1.5px] border-black pb-0.5 text-black">
-              EDUCATION
+              {t('cvModal.educationHeading')}
             </h2>
             <div className="flex items-baseline justify-between gap-4">
               <strong className="font-bold text-black">Universitas Duta Bangsa Surakarta</strong>
               <span className="italic text-[9.5pt] text-slate-700 shrink-0">Surakarta, Indonesia</span>
             </div>
             <div className="flex items-baseline justify-between gap-4 text-[10pt]">
-              <span className="italic">S1 Teknik Informatika — Semester 6</span>
-              <span className="italic text-[9.5pt] text-slate-700 shrink-0">Agustus 2023 – Sekarang</span>
+              <span className="italic">{t('cvModal.degree')}</span>
+              <span className="italic text-[9.5pt] text-slate-700 shrink-0">{t('cvModal.studyPeriod')}</span>
             </div>
             <p className="text-[9.5pt] text-slate-800 pt-0.5 text-justify">
-              Mata kuliah relevan: Jaringan Komputer, Internet of Things (IoT), Pemrograman Web, Pemrograman Python, Sistem Operasi, Pemecahan Masalah Hardware &amp; Software.
+              {t('cvModal.coursework')}
             </p>
           </section>
 
           {/* INTERNSHIP & WORK EXPERIENCE (Unlimited Dynamic) */}
           <section className="space-y-3">
             <h2 className="text-[10.5pt] font-bold uppercase tracking-wide border-b-[1.5px] border-black pb-0.5 text-black">
-              INTERNSHIP &amp; WORK EXPERIENCE
+              {t('cvModal.experienceHeading')}
             </h2>
             {activeExperiences.map((exp) => (
               <div key={exp.id} className="cv-avoid-break space-y-1.5">
                 <div className="flex items-baseline justify-between gap-4">
                   <strong className="font-bold text-black">
-                    {exp.company} — {exp.role}
+                    {exp.company} — {tr(exp.role)}
                   </strong>
                   <span className="italic text-[9.5pt] text-slate-700 shrink-0">{exp.location}</span>
                 </div>
                 {(exp.sections || []).map((sec, idx) => (
                   <div key={sec.heading + idx} className="space-y-1">
                     <div className="flex items-baseline justify-between gap-4">
-                      <span className="italic text-[10pt] text-slate-900">{sec.heading}</span>
+                      <span className="italic text-[10pt] text-slate-900">{tr(sec.heading)}</span>
                       {idx === 0 && (
-                        <span className="italic text-[9.5pt] text-slate-700 shrink-0">{exp.period}</span>
+                        <span className="italic text-[9.5pt] text-slate-700 shrink-0">{tr(exp.period)}</span>
                       )}
                     </div>
                     <ul className="list-disc pl-5 space-y-0.5 text-[9.8pt] text-slate-900 text-justify">
                       {(sec.bullets || []).map((b, bIdx) => (
-                        <li key={bIdx}>{b}</li>
+                        <li key={bIdx}>{tr(b)}</li>
                       ))}
                     </ul>
                   </div>
@@ -164,16 +170,16 @@ export default function CvModal({ open, onClose, profile, experiences, projects 
           {/* FEATURED PROJECTS (Unlimited Dynamic) */}
           <section className="space-y-2.5">
             <h2 className="text-[10.5pt] font-bold uppercase tracking-wide border-b-[1.5px] border-black pb-0.5 text-black">
-              FEATURED PROJECTS
+              {t('cvModal.projectsHeading')}
             </h2>
             {activeProjects.map((proj) => (
               <div key={proj.id} className="cv-avoid-break space-y-0.5">
                 <div className="flex items-baseline justify-between gap-4">
-                  <strong className="font-bold text-black">{proj.title}</strong>
+                  <strong className="font-bold text-black">{tr(proj.title)}</strong>
                   <span className="italic text-[9.5pt] text-slate-700 shrink-0">{proj.year}</span>
                 </div>
                 <ul className="list-disc pl-5 space-y-0.5 text-[9.8pt] text-slate-900 text-justify">
-                  <li>{proj.summary}</li>
+                  <li>{tr(proj.summary)}</li>
                   {proj.tags && proj.tags.length > 0 && (
                     <li>
                       <span className="font-semibold">Stack:</span> {proj.tags.join(', ')}
@@ -188,7 +194,7 @@ export default function CvModal({ open, onClose, profile, experiences, projects 
           {/* TECHNICAL SKILLS */}
           <section className="cv-avoid-break space-y-1.5">
             <h2 className="text-[10.5pt] font-bold uppercase tracking-wide border-b-[1.5px] border-black pb-0.5 text-black">
-              TECHNICAL SKILLS
+              {t('cvModal.skillsHeading')}
             </h2>
             <table className="w-full text-[9.8pt] border-collapse">
               <tbody>
@@ -205,7 +211,7 @@ export default function CvModal({ open, onClose, profile, experiences, projects 
           {/* INTERESTS & FOCUS AREA */}
           <section className="cv-avoid-break space-y-1">
             <h2 className="text-[10.5pt] font-bold uppercase tracking-wide border-b-[1.5px] border-black pb-0.5 text-black">
-              INTERESTS &amp; FOCUS AREA
+              {t('cvModal.interestsHeading')}
             </h2>
             <p className="text-[9.8pt] text-slate-900">
               Web UI/UX Development • Machine Learning &amp; Data Science • Internet of Things (IoT) • Computer Hardware Technology • Network Engineering • IT Support &amp; Operations
