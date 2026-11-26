@@ -11,8 +11,9 @@ export default function ImageCropperModal({ aspect = 16 / 9, initialLabel = '16:
   const [ratioMode, setRatioMode] = useState(aspect === 16 / 9 ? '16:9' : '4:3');
   const canvasRef = useRef(null);
 
-  const targetWidth = ratioMode === '16:9' ? 1280 : 800;
-  const targetHeight = ratioMode === '16:9' ? 720 : 600;
+  // Output resolusi tinggi: 4:3 → 2000×1500, 16:9 → 1920×1080
+  const targetWidth = ratioMode === '16:9' ? 1920 : 2000;
+  const targetHeight = ratioMode === '16:9' ? 1080 : 1500;
 
   const drawCanvas = useCallback(() => {
     const canvas = canvasRef.current;
@@ -87,6 +88,10 @@ export default function ImageCropperModal({ aspect = 16 / 9, initialLabel = '16:
     ctx.fillStyle = '#090f1d';
     ctx.fillRect(0, 0, targetWidth, targetHeight);
 
+    // Aktifkan image smoothing kualitas tinggi agar hasil crop tajam & presisi
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+
     const previewCanvas = canvasRef.current;
     const ratioX = targetWidth / previewCanvas.width;
     const ratioY = targetHeight / previewCanvas.height;
@@ -99,7 +104,7 @@ export default function ImageCropperModal({ aspect = 16 / 9, initialLabel = '16:
 
     ctx.drawImage(imgObj, x, y, drawW, drawH);
 
-    const dataUrl = outCanvas.toDataURL('image/webp', 0.86);
+    const dataUrl = outCanvas.toDataURL('image/webp', 0.95);
     const approxKb = Math.round((dataUrl.length * 3) / 4 / 1024);
 
     outCanvas.toBlob(
@@ -107,7 +112,7 @@ export default function ImageCropperModal({ aspect = 16 / 9, initialLabel = '16:
         onApply({ dataUrl, blob, width: targetWidth, height: targetHeight, approxKb });
       },
       'image/webp',
-      0.86
+      0.95
     );
   };
 

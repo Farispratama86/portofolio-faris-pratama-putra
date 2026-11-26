@@ -7,7 +7,7 @@ const router = Router();
 
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 5 * 1024 * 1024 }, // Maks 5 MB
+  limits: { fileSize: 15 * 1024 * 1024 }, // Naikkan ke 15 MB untuk mendukung output 2000×1500 WebP HQ
   fileFilter: (_req, file, cb) => {
     const allowed = ['image/jpeg', 'image/png', 'image/webp'];
     if (allowed.includes(file.mimetype)) return cb(null, true);
@@ -27,10 +27,10 @@ router.post('/', requireAdmin, upload.single('image'), async (req, res) => {
     const type = req.query.type === 'profile' ? 'profile' : req.query.type === 'certificate' ? 'certificate' : 'project';
     const transformation =
       type === 'profile'
-        ? [{ width: 800, height: 600, crop: 'fill', gravity: 'face' }, { quality: 'auto:good' }]
+        ? [{ width: 2000, height: 1500, crop: 'limit' }, { quality: 'auto:best' }]
         : type === 'certificate'
-        ? [{ width: 1600, height: 1200, crop: 'limit' }, { quality: 'auto:good' }]
-        : [{ width: 1280, height: 720, crop: 'limit' }, { quality: 'auto:good' }];
+        ? [{ width: 2000, height: 1500, crop: 'limit' }, { quality: 'auto:best' }]
+        : [{ width: 1920, height: 1080, crop: 'limit' }, { quality: 'auto:best' }];
 
     const result = await uploadBufferToCloudinary(req.file.buffer, {
       folder: `portofolio-faris/${type}`,
