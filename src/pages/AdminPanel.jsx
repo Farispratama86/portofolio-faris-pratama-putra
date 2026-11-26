@@ -28,6 +28,7 @@ import {
 import ImageCropperModal from '../components/ImageCropperModal';
 import CvModal from '../components/CvModal';
 import CertificateModal from '../components/CertificateModal';
+import ConfirmActionModal from '../components/ConfirmActionModal';
 import {
   CERTIFICATES as FALLBACK_CERTIFICATES,
   DEFAULT_SKILLS,
@@ -85,6 +86,7 @@ export default function AdminPanel({ onNavigate }) {
   const [cropperTarget, setCropperTarget] = useState(null); // null | 'project' | 'profile' | 'certificate'
   const [cvPreviewOpen, setCvPreviewOpen] = useState(false);
   const [previewCert, setPreviewCert] = useState(null);
+  const [pendingAction, setPendingAction] = useState(null);
 
   const [profileForm, setProfileForm] = useState({
     photoUrl: '',
@@ -220,8 +222,7 @@ export default function AdminPanel({ onNavigate }) {
     }
   };
 
-  const handleSaveProfile = async (e) => {
-    e.preventDefault();
+  const executeSaveProfile = async () => {
     setLoading(true);
     try {
       let photoUrl = profileForm.photoUrl;
@@ -258,7 +259,21 @@ export default function AdminPanel({ onNavigate }) {
       notify(`Error: ${err.message}`);
     } finally {
       setLoading(false);
+      setPendingAction(null);
     }
+  };
+
+  const handleSaveProfile = (e) => {
+    e.preventDefault();
+    setPendingAction({
+      type: 'update',
+      entityLabel: 'Profil & Foto',
+      itemName: profileForm.role || 'Profil Utama',
+      itemSubtitle: profileForm.photoBlob
+        ? 'Termasuk unggahan foto profil baru ke Cloudinary'
+        : 'Pembaruan bio & tautan media sosial',
+      onConfirm: executeSaveProfile,
+    });
   };
 
   const resetProjectForm = () => {
@@ -316,8 +331,7 @@ export default function AdminPanel({ onNavigate }) {
     });
   };
 
-  const handleSaveProject = async (e) => {
-    e.preventDefault();
+  const executeSaveProject = async () => {
     setLoading(true);
     try {
       let imageUrl = projForm.imageUrl;
@@ -365,21 +379,45 @@ export default function AdminPanel({ onNavigate }) {
       notify(`Error: ${err.message}`);
     } finally {
       setLoading(false);
+      setPendingAction(null);
     }
   };
 
-  const handleDeleteProject = async (id) => {
-    try {
-      await deleteProject(id, token);
-      setProjects((prev) => prev.filter((p) => p.id !== id));
-      notify('Proyek dihapus.');
-    } catch (err) {
-      notify(`Error: ${err.message}`);
-    }
-  };
-
-  const handleSaveExperience = async (e) => {
+  const handleSaveProject = (e) => {
     e.preventDefault();
+    setPendingAction({
+      type: editingProjectId ? 'update' : 'create',
+      entityLabel: 'Proyek',
+      itemName: projForm.title,
+      itemSubtitle: `${projForm.categoryLabel || projForm.category} · ${projForm.year}`,
+      onConfirm: executeSaveProject,
+    });
+  };
+
+  const handleDeleteProject = (project) => {
+    setPendingAction({
+      type: 'delete',
+      entityLabel: 'Proyek',
+      itemName: project.title,
+      itemSubtitle: `${project.categoryLabel || project.category} · ${project.year}`,
+      onConfirm: async () => {
+        setLoading(true);
+        try {
+          await deleteProject(project.id, token);
+          setProjects((prev) => prev.filter((p) => p.id !== project.id));
+          if (editingProjectId === project.id) resetProjectForm();
+          notify('Proyek dihapus.');
+        } catch (err) {
+          notify(`Error: ${err.message}`);
+        } finally {
+          setLoading(false);
+          setPendingAction(null);
+        }
+      },
+    });
+  };
+
+  const executeSaveExperience = async () => {
     setLoading(true);
     try {
       const formattedSections = expForm.sections
@@ -417,17 +455,42 @@ export default function AdminPanel({ onNavigate }) {
       notify(`Error: ${err.message}`);
     } finally {
       setLoading(false);
+      setPendingAction(null);
     }
   };
 
-  const handleDeleteExp = async (id) => {
-    try {
-      await deleteExperience(id, token);
-      setExperiences((prev) => prev.filter((x) => x.id !== id));
-      notify('Pengalaman dihapus.');
-    } catch (err) {
-      notify(`Error: ${err.message}`);
-    }
+  const handleSaveExperience = (e) => {
+    e.preventDefault();
+    setPendingAction({
+      type: editingExpId ? 'update' : 'create',
+      entityLabel: 'Pengalaman Kerja / Magang',
+      itemName: `${expForm.role} — ${expForm.company}`,
+      itemSubtitle: `${expForm.badge} · ${expForm.period}`,
+      onConfirm: executeSaveExperience,
+    });
+  };
+
+  const handleDeleteExp = (exp) => {
+    setPendingAction({
+      type: 'delete',
+      entityLabel: 'Pengalaman Kerja / Magang',
+      itemName: `${exp.role} — ${exp.company}`,
+      itemSubtitle: `${exp.badge} · ${exp.period}`,
+      onConfirm: async () => {
+        setLoading(true);
+        try {
+          await deleteExperience(exp.id, token);
+          setExperiences((prev) => prev.filter((x) => x.id !== exp.id));
+          if (editingExpId === exp.id) resetExpForm();
+          notify('Pengalaman dihapus.');
+        } catch (err) {
+          notify(`Error: ${err.message}`);
+        } finally {
+          setLoading(false);
+          setPendingAction(null);
+        }
+      },
+    });
   };
 
   const resetCertForm = () => {
@@ -446,8 +509,7 @@ export default function AdminPanel({ onNavigate }) {
     });
   };
 
-  const handleSaveCertificate = async (e) => {
-    e.preventDefault();
+  const executeSaveCertificate = async () => {
     setLoading(true);
     try {
       let imageUrl = certForm.imageUrl;
@@ -485,17 +547,42 @@ export default function AdminPanel({ onNavigate }) {
       notify(`Error: ${err.message}`);
     } finally {
       setLoading(false);
+      setPendingAction(null);
     }
   };
 
-  const handleDeleteCert = async (id) => {
-    try {
-      await deleteCertificate(id, token);
-      setCertificates((prev) => prev.filter((c) => c.id !== id));
-      notify('Sertifikat dihapus.');
-    } catch (err) {
-      notify(`Error: ${err.message}`);
-    }
+  const handleSaveCertificate = (e) => {
+    e.preventDefault();
+    setPendingAction({
+      type: editingCertId ? 'update' : 'create',
+      entityLabel: 'Sertifikat',
+      itemName: certForm.title,
+      itemSubtitle: `${certForm.issuer} · ${certForm.category}${certForm.issueDate ? ` (${certForm.issueDate})` : ''}`,
+      onConfirm: executeSaveCertificate,
+    });
+  };
+
+  const handleDeleteCert = (cert) => {
+    setPendingAction({
+      type: 'delete',
+      entityLabel: 'Sertifikat',
+      itemName: cert.title,
+      itemSubtitle: `${cert.issuer} · ${cert.category}${cert.issueDate ? ` (${cert.issueDate})` : ''}`,
+      onConfirm: async () => {
+        setLoading(true);
+        try {
+          await deleteCertificate(cert.id, token);
+          setCertificates((prev) => prev.filter((c) => c.id !== cert.id));
+          if (editingCertId === cert.id) resetCertForm();
+          notify('Sertifikat dihapus.');
+        } catch (err) {
+          notify(`Error: ${err.message}`);
+        } finally {
+          setLoading(false);
+          setPendingAction(null);
+        }
+      },
+    });
   };
 
   const resetSkillForm = () => {
@@ -509,8 +596,7 @@ export default function AdminPanel({ onNavigate }) {
     });
   };
 
-  const handleSaveSkill = async (e) => {
-    e.preventDefault();
+  const executeSaveSkill = async () => {
     setLoading(true);
     try {
       const payload = {
@@ -535,17 +621,42 @@ export default function AdminPanel({ onNavigate }) {
       notify(`Error: ${err.message}`);
     } finally {
       setLoading(false);
+      setPendingAction(null);
     }
   };
 
-  const handleDeleteSkill = async (id) => {
-    try {
-      await deleteSkill(id, token);
-      setSkills((prev) => prev.filter((s) => s.id !== id));
-      notify('Keahlian dihapus.');
-    } catch (err) {
-      notify(`Error: ${err.message}`);
-    }
+  const handleSaveSkill = (e) => {
+    e.preventDefault();
+    setPendingAction({
+      type: editingSkillId ? 'update' : 'create',
+      entityLabel: 'Keahlian',
+      itemName: skillForm.name,
+      itemSubtitle: `${skillForm.category === 'hard' ? 'Hard Skill' : 'Soft Skill'} · ${skillForm.groupName} (${skillForm.ratePoint}%)`,
+      onConfirm: executeSaveSkill,
+    });
+  };
+
+  const handleDeleteSkill = (skill) => {
+    setPendingAction({
+      type: 'delete',
+      entityLabel: 'Keahlian',
+      itemName: skill.name,
+      itemSubtitle: `${skill.category === 'hard' ? 'Hard Skill' : 'Soft Skill'} · ${skill.groupName || 'Umum'} (${skill.ratePoint}%)`,
+      onConfirm: async () => {
+        setLoading(true);
+        try {
+          await deleteSkill(skill.id, token);
+          setSkills((prev) => prev.filter((s) => s.id !== skill.id));
+          if (editingSkillId === skill.id) resetSkillForm();
+          notify('Keahlian dihapus.');
+        } catch (err) {
+          notify(`Error: ${err.message}`);
+        } finally {
+          setLoading(false);
+          setPendingAction(null);
+        }
+      },
+    });
   };
 
   if (!token) {
@@ -1047,7 +1158,7 @@ export default function AdminPanel({ onNavigate }) {
                         </button>
                         <button
                           type="button"
-                          onClick={() => handleDeleteProject(p.id)}
+                          onClick={() => handleDeleteProject(p)}
                           className="p-1.5 rounded-lg border border-rose-500/30 hover:bg-rose-500/15 text-rose-400"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -1375,7 +1486,7 @@ export default function AdminPanel({ onNavigate }) {
                         </button>
                         <button
                           type="button"
-                          onClick={() => handleDeleteExp(exp.id)}
+                          onClick={() => handleDeleteExp(exp)}
                           className="p-1.5 rounded-lg border border-rose-500/30 hover:bg-rose-500/15 text-rose-400"
                           title="Hapus Pengalaman"
                         >
@@ -1629,7 +1740,7 @@ export default function AdminPanel({ onNavigate }) {
                           </button>
                           <button
                             type="button"
-                            onClick={() => handleDeleteCert(cert.id)}
+                            onClick={() => handleDeleteCert(cert)}
                             className="p-1.5 rounded-lg border border-rose-500/30 hover:bg-rose-500/15 text-rose-400"
                             title="Hapus Sertifikat"
                           >
@@ -1899,7 +2010,7 @@ export default function AdminPanel({ onNavigate }) {
                             </button>
                             <button
                               type="button"
-                              onClick={() => handleDeleteSkill(skill.id)}
+                              onClick={() => handleDeleteSkill(skill)}
                               className="p-1.5 rounded-lg border border-rose-500/30 hover:bg-rose-500/15 text-rose-400"
                               title="Hapus Keahlian"
                             >
@@ -1996,6 +2107,14 @@ export default function AdminPanel({ onNavigate }) {
       <CertificateModal
         certificate={previewCert}
         onClose={() => setPreviewCert(null)}
+      />
+
+      <ConfirmActionModal
+        action={pendingAction}
+        loading={loading}
+        onCancel={() => {
+          if (!loading) setPendingAction(null);
+        }}
       />
 
       {toast && (
