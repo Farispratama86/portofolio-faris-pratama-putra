@@ -604,13 +604,18 @@ export default function PortfolioHome({ onNavigate }) {
 
                     {/* Tombol Popup Sertifikat Terkait (Interaktif & Glowing) */}
                     {(() => {
-                      const linkedCert = certificates.find((c) =>
-                        (c.experienceId && (String(c.experienceId) === String(exp.id) || c.experienceId === exp.id)) ||
-                        (c.issuer && exp.company && (
-                          (c.issuer.toLowerCase().includes('vinix') && exp.company.toLowerCase().includes('vinix')) ||
-                          (c.issuer.toLowerCase().includes('speed') && exp.company.toLowerCase().includes('speed'))
-                        ))
+                      // Langkah 1: kumpulkan semua sertifikat yang terhubung lewat experienceId
+                      const linked = certificates.filter(
+                        (c) => c.experienceId && String(c.experienceId) === String(exp.id)
                       );
+
+                      // Langkah 2: pilih yang paling relevan —
+                      //   utamakan kategori 'Magang', fallback ke entri pertama yang ada
+                      const linkedCert =
+                        linked.find((c) => c.category && c.category.toLowerCase().includes('magang')) ||
+                        linked[0] ||
+                        null;
+
                       if (!linkedCert) return null;
                       return (
                         <div className="pt-4 mt-5 border-t border-subtle flex flex-wrap items-center justify-between gap-2">
