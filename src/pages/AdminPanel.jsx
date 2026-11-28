@@ -96,11 +96,11 @@ export default function AdminPanel({ onNavigate }) {
     bio: PROFILE.bio,
     availabilityStatus: PROFILE.availabilityStatus || 'Terbuka untuk Peluang',
     education: PROFILE.educationSummary || 'S1 Teknik Informatika (UDB)',
-    currentRole: PROFILE.currentRole || 'Web UI/UX & IT Developer',
+    profession: PROFILE.currentRole || 'Web UI/UX & IT Developer',
     coreSkills: PROFILE.coreSkills || 'Web UI/UX · Machine Learning · IoT',
     location: PROFILE.cityShort || 'Surakarta, Indonesia',
     email: PROFILE.email || 'farispakez1209@gmail.com',
-    whatsapp: PROFILE.whatsappDisplay || '+62 812-1953-4692',
+    whatsapp: PROFILE.whatsappNumber || '6281219534692',
     githubUrl: PROFILE.githubUrl || 'https://github.com/Farispratama86',
     linkedinUrl: '',
     instagramUrl: '',
@@ -187,11 +187,11 @@ export default function AdminPanel({ onNavigate }) {
           bio: prof.bio || PROFILE.bio,
           availabilityStatus: prof.availabilityStatus || PROFILE.availabilityStatus || 'Terbuka untuk Peluang',
           education: prof.education || PROFILE.educationSummary || 'S1 Teknik Informatika (UDB)',
-          currentRole: prof.currentRole || PROFILE.currentRole || 'Web UI/UX & IT Developer',
+          profession: prof.profession || prof.currentRole || PROFILE.currentRole || 'Web UI/UX & IT Developer',
           coreSkills: prof.coreSkills || PROFILE.coreSkills || 'Web UI/UX · Machine Learning · IoT',
           location: prof.location || PROFILE.cityShort || 'Surakarta, Indonesia',
-          email: prof.email || PROFILE.email || '',
-          whatsapp: prof.whatsapp || PROFILE.whatsappDisplay || '',
+          email: prof.email || PROFILE.email || 'farispakez1209@gmail.com',
+          whatsapp: prof.whatsapp || PROFILE.whatsappNumber || '6281219534692',
           githubUrl: prof.githubUrl || PROFILE.githubUrl || '',
           linkedinUrl: prof.linkedinUrl || '',
           instagramUrl: prof.instagramUrl || '',
@@ -256,7 +256,7 @@ export default function AdminPanel({ onNavigate }) {
           bio: profileForm.bio,
           availabilityStatus: profileForm.availabilityStatus,
           education: profileForm.education,
-          currentRole: profileForm.currentRole,
+          profession: profileForm.profession,
           coreSkills: profileForm.coreSkills,
           location: profileForm.location,
           email: profileForm.email,
@@ -276,7 +276,7 @@ export default function AdminPanel({ onNavigate }) {
         photoMeta: saved.photoUrl ? 'Tersimpan di Cloudinary & TiDB' : '',
         availabilityStatus: saved.availabilityStatus || prev.availabilityStatus,
         education: saved.education || prev.education,
-        currentRole: saved.currentRole || prev.currentRole,
+        profession: saved.profession || saved.currentRole || prev.profession,
         coreSkills: saved.coreSkills || prev.coreSkills,
         location: saved.location || prev.location,
         email: saved.email || prev.email,
@@ -880,7 +880,7 @@ export default function AdminPanel({ onNavigate }) {
             </div>
 
             <div className="lg:col-span-7 bg-[#111a2e] border border-slate-800 rounded-2xl p-5 space-y-4">
-              <h2 className="font-bold text-base">Identitas Kartu Hero, Bio &amp; Tautan Sosial</h2>
+              <h2 className="font-bold text-base">Bio &amp; Tautan Media Sosial</h2>
               <div>
                 <label className="block text-xs font-semibold text-slate-400 mb-1">Peran / Tagline Hero</label>
                 <input
@@ -900,9 +900,9 @@ export default function AdminPanel({ onNavigate }) {
                 />
               </div>
 
-              {/* Detail Kartu Identitas Hero */}
+              {/* Detail Kartu Identitas */}
               <div className="pt-2 border-t border-slate-800 space-y-3">
-                <p className="text-xs font-bold uppercase tracking-wider text-sky-400">Detail Kartu Identitas (Hero Kanan)</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-sky-400">Detail Kartu Identitas</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-semibold text-slate-400 mb-1">Status Ketersediaan / Badge Foto</label>
@@ -925,16 +925,26 @@ export default function AdminPanel({ onNavigate }) {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-400 mb-1">Profesi / Peran Saat Ini atau Sebelumnya</label>
+                    <label className="block text-xs font-semibold text-slate-400 mb-1">Profesi / Peran</label>
                     <input
                       type="text"
-                      value={profileForm.currentRole}
-                      onChange={(e) => setProfileForm({ ...profileForm, currentRole: e.target.value })}
+                      value={profileForm.profession}
+                      onChange={(e) => setProfileForm({ ...profileForm, profession: e.target.value })}
                       placeholder="Web UI/UX & IT Developer"
                       className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
                     />
                   </div>
                   <div>
+                    <label className="block text-xs font-semibold text-slate-400 mb-1">Keahlian Utama</label>
+                    <input
+                      type="text"
+                      value={profileForm.coreSkills}
+                      onChange={(e) => setProfileForm({ ...profileForm, coreSkills: e.target.value })}
+                      placeholder="Web UI/UX · Machine Learning · IoT"
+                      className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                    />
+                  </div>
+                  <div className="sm:col-span-2">
                     <label className="block text-xs font-semibold text-slate-400 mb-1">Domisili</label>
                     <input
                       type="text"
@@ -945,16 +955,6 @@ export default function AdminPanel({ onNavigate }) {
                     />
                   </div>
                 </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-400 mb-1">Keahlian Utama (Ringkasan Kartu)</label>
-                  <input
-                    type="text"
-                    value={profileForm.coreSkills}
-                    onChange={(e) => setProfileForm({ ...profileForm, coreSkills: e.target.value })}
-                    placeholder="Web UI/UX · Machine Learning · IoT"
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
-                  />
-                </div>
               </div>
 
               {/* Tautan Kontak & Media Sosial */}
@@ -962,7 +962,7 @@ export default function AdminPanel({ onNavigate }) {
                 <p className="text-xs font-bold uppercase tracking-wider text-sky-400">Tautan Kontak &amp; Media Sosial</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-400 mb-1">Email Resmi</label>
+                    <label className="block text-xs font-semibold text-slate-400 mb-1">Email</label>
                     <input
                       type="email"
                       value={profileForm.email}
@@ -972,12 +972,12 @@ export default function AdminPanel({ onNavigate }) {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-400 mb-1">WhatsApp</label>
+                    <label className="block text-xs font-semibold text-slate-400 mb-1">Nomor WhatsApp</label>
                     <input
                       type="text"
                       value={profileForm.whatsapp}
                       onChange={(e) => setProfileForm({ ...profileForm, whatsapp: e.target.value })}
-                      placeholder="+62 812-1953-4692"
+                      placeholder="6281219534692"
                       className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
                     />
                   </div>

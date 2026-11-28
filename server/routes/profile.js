@@ -17,7 +17,7 @@ async function ensureProfileTable() {
       bio TEXT,
       availability_status VARCHAR(255) DEFAULT '',
       education VARCHAR(255) DEFAULT '',
-      \`current_role\` VARCHAR(255) DEFAULT '',
+      profession VARCHAR(255) DEFAULT '',
       core_skills VARCHAR(255) DEFAULT '',
       location VARCHAR(255) DEFAULT '',
       github_url VARCHAR(500) DEFAULT '',
@@ -33,7 +33,7 @@ async function ensureProfileTable() {
   const requiredColumns = [
     ['availability_status', "VARCHAR(255) DEFAULT ''"],
     ['education', "VARCHAR(255) DEFAULT ''"],
-    ['current_role', "VARCHAR(255) DEFAULT ''"],
+    ['profession', "VARCHAR(255) DEFAULT ''"],
     ['core_skills', "VARCHAR(255) DEFAULT ''"],
     ['location', "VARCHAR(255) DEFAULT ''"],
     ['github_url', "VARCHAR(500) DEFAULT ''"],
@@ -66,6 +66,7 @@ function normalizeProfile(row) {
       bio: '',
       availabilityStatus: '',
       education: '',
+      profession: '',
       currentRole: '',
       coreSkills: '',
       location: '',
@@ -77,6 +78,7 @@ function normalizeProfile(row) {
       email: '',
     };
   }
+  const profVal = row.profession || row.current_role || '';
   return {
     photoUrl: row.photo_url || '',
     photoPublicId: row.photo_public_id || '',
@@ -84,7 +86,8 @@ function normalizeProfile(row) {
     bio: row.bio || '',
     availabilityStatus: row.availability_status || '',
     education: row.education || '',
-    currentRole: row.current_role || '',
+    profession: profVal,
+    currentRole: profVal,
     coreSkills: row.core_skills || '',
     location: row.location || '',
     githubUrl: row.github_url || '',
@@ -116,11 +119,17 @@ router.put('/', requireAdmin, async (req, res) => {
 
     const nextPhotoUrl = body.photoUrl !== undefined ? body.photoUrl : (prev.photo_url || '');
     const nextPhotoPublicId = body.photoPublicId !== undefined ? body.photoPublicId : (prev.photo_public_id || '');
+    const nextProfession =
+      body.profession !== undefined
+        ? body.profession
+        : body.currentRole !== undefined
+        ? body.currentRole
+        : (prev.profession || prev.current_role || '');
 
     await pool.query(
       `UPDATE profile_settings SET
         photo_url = ?, photo_public_id = ?, role = ?, bio = ?,
-        availability_status = ?, education = ?, \`current_role\` = ?, core_skills = ?, location = ?,
+        availability_status = ?, education = ?, profession = ?, core_skills = ?, location = ?,
         github_url = ?, linkedin_url = ?, instagram_url = ?, tiktok_url = ?,
         whatsapp = ?, email = ?
        WHERE id = 1`,
@@ -131,7 +140,7 @@ router.put('/', requireAdmin, async (req, res) => {
         body.bio !== undefined ? body.bio : (prev.bio || ''),
         body.availabilityStatus !== undefined ? body.availabilityStatus : (prev.availability_status || ''),
         body.education !== undefined ? body.education : (prev.education || ''),
-        body.currentRole !== undefined ? body.currentRole : (prev.current_role || ''),
+        nextProfession,
         body.coreSkills !== undefined ? body.coreSkills : (prev.core_skills || ''),
         body.location !== undefined ? body.location : (prev.location || ''),
         body.githubUrl !== undefined ? body.githubUrl : (prev.github_url || ''),

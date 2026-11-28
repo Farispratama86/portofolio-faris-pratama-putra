@@ -114,6 +114,19 @@ function normalizeWaDigits(raw = '') {
   return digits.startsWith('0') ? `62${digits.slice(1)}` : digits;
 }
 
+// Helper memformat tampilan nomor WhatsApp agar rapi (+62 812-1953-4692)
+function formatWaDisplay(raw = '') {
+  const str = String(raw || '').trim();
+  if (!str) return '';
+  if (/[+\-\s]/.test(str)) return str;
+  const digits = normalizeWaDigits(str);
+  if (digits.startsWith('62') && digits.length >= 11) {
+    const rest = digits.slice(2);
+    return `+62 ${rest.slice(0, 3)}-${rest.slice(3, 7)}-${rest.slice(7)}`;
+  }
+  return str;
+}
+
 // Helper merapikan tanda kutip sertifikat
 function formatCertificateTitle(title = '') {
   let t = (title || '').trim();
@@ -171,12 +184,13 @@ export default function PortfolioHome({ onNavigate }) {
         if (liveSkills.length > 0) setSkills(liveSkills);
         if (liveProfile) {
           setProfile((prev) => {
-            const nextWaDisplay = liveProfile.whatsapp || prev.whatsappDisplay || PROFILE.whatsappDisplay;
+            const nextWaDisplay = formatWaDisplay(liveProfile.whatsapp) || prev.whatsappDisplay || PROFILE.whatsappDisplay;
             const nextWaDigits = normalizeWaDigits(liveProfile.whatsapp) || prev.whatsappNumber || PROFILE.whatsappNumber;
             const nextGithub = liveProfile.githubUrl || prev.githubUrl || 'https://github.com/Farispratama86';
             const nextLinkedin = liveProfile.linkedinUrl || prev.linkedinUrl || '';
             const nextInstagram = liveProfile.instagramUrl || prev.instagramUrl || '';
             const nextTiktok = liveProfile.tiktokUrl || prev.tiktokUrl || '';
+            const nextProfession = liveProfile.profession || liveProfile.currentRole || prev.currentRole || PROFILE.currentRole;
             return {
               ...prev,
               photoUrl: liveProfile.photoUrl || prev.photoUrl,
@@ -184,7 +198,7 @@ export default function PortfolioHome({ onNavigate }) {
               bio: liveProfile.bio || prev.bio,
               availabilityStatus: liveProfile.availabilityStatus || prev.availabilityStatus || PROFILE.availabilityStatus,
               educationSummary: liveProfile.education || prev.educationSummary || PROFILE.educationSummary,
-              currentRole: liveProfile.currentRole || prev.currentRole || PROFILE.currentRole,
+              currentRole: nextProfession,
               coreSkills: liveProfile.coreSkills || prev.coreSkills || PROFILE.coreSkills,
               cityShort: liveProfile.location || prev.cityShort || PROFILE.cityShort,
               whatsappDisplay: nextWaDisplay,
