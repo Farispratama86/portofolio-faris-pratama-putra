@@ -2,57 +2,86 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================
+   DOSSIER NOIR (Default Dark Theme) & ARSIP KERTAS MANILA (Light Theme)
+   ============================================================ */
 :root {
-  --bg-page: #090f1d;
-  --bg-surface: #111a2e;
-  --bg-elevated: #0d1526;
-  --border-subtle: rgba(148, 163, 184, 0.16);
-  --border-accent: rgba(56, 189, 248, 0.45);
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
-  --accent: #38bdf8;
-  --accent-strong: #0ea5e9;
-  --accent-soft: rgba(56, 189, 248, 0.12);
-  --nav-bg: rgba(9, 15, 29, 0.85);
+  --bg-page: #100F0E;
+  --bg-surface: #181615;
+  --bg-card: #1C1917;
+  --bg-elevated: #231F1C;
+  --border-subtle: #302A26;
+  --border-accent: rgba(220, 38, 38, 0.55);
+  --text-primary: #EDE6D6;
+  --text-secondary: #C2B8A7;
+  --text-muted: #938878;
+  --accent: #DC2626;
+  --accent-text: #EF4444;
+  --accent-strong: #B91C1C;
+  --accent-soft: rgba(220, 38, 38, 0.13);
+  --pin-brass: #D97706;
+  --nav-bg: rgba(16, 15, 14, 0.90);
+  --bg-img-opacity: 0.20;
+  --vignette-color: rgba(10, 9, 8, 0.72);
+  --tape-bg: rgba(217, 189, 132, 0.42);
+  --tape-border: rgba(217, 189, 132, 0.25);
 }
 
 html.light-theme {
-  --bg-page: #f8fafc;
-  --bg-surface: #ffffff;
-  --bg-elevated: #f1f5f9;
-  --border-subtle: rgba(15, 23, 42, 0.1);
-  --border-accent: rgba(2, 132, 199, 0.4);
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-muted: #64748b;
-  --accent: #0284c7;
-  --accent-strong: #0369a1;
-  --accent-soft: rgba(2, 132, 199, 0.1);
-  --nav-bg: rgba(248, 250, 252, 0.88);
+  --bg-page: #ECE5D3;
+  --bg-surface: #F6F1E3;
+  --bg-card: #FAF6EC;
+  --bg-elevated: #E3DAC3;
+  --border-subtle: #CFC4AC;
+  --border-accent: rgba(153, 27, 27, 0.48);
+  --text-primary: #181411;
+  --text-secondary: #433A32;
+  --text-muted: #6C6054;
+  --accent: #991B1B;
+  --accent-text: #991B1B;
+  --accent-strong: #7F1D1D;
+  --accent-soft: rgba(153, 27, 27, 0.10);
+  --pin-brass: #B45309;
+  --nav-bg: rgba(236, 229, 211, 0.92);
+  --bg-img-opacity: 0.08;
+  --vignette-color: rgba(236, 229, 211, 0.55);
+  --tape-bg: rgba(180, 149, 92, 0.35);
+  --tape-border: rgba(150, 120, 68, 0.28);
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background-color: var(--bg-page);
   color: var(--text-primary);
   transition: background-color 0.25s ease, color 0.25s ease;
   overflow-x: hidden;
 }
 
+.font-serif-editorial {
+  font-family: 'Instrument Serif', Georgia, serif;
+}
+
+.font-stamp {
+  font-family: 'Special Elite', 'JetBrains Mono', monospace;
+}
+
+.font-mono-code {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
 .surface-card {
-  background-color: var(--bg-surface);
+  background-color: var(--bg-card);
   border: 1px solid var(--border-subtle);
-  transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+  transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease, background-color 0.22s ease;
 }
 
 .surface-card:hover {
   border-color: var(--border-accent);
 }
 
-.project-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 18px 36px -14px rgba(2, 132, 199, 0.22);
+.surface-panel {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
 }
 
 .nav-glass {
@@ -63,23 +92,8 @@ body {
 
 .chip-tag {
   background-color: var(--accent-soft);
-  color: var(--accent);
-  border: 1px solid rgba(56, 189, 248, 0.2);
-}
-
-.hero-glow {
-  background: radial-gradient(650px circle at 20% 10%, rgba(56, 189, 248, 0.14), transparent 60%),
-    radial-gradient(500px circle at 85% 25%, rgba(99, 102, 241, 0.12), transparent 60%);
-}
-
-.hero-grid-pattern {
-  background-image: radial-gradient(rgba(148, 163, 184, 0.14) 1px, transparent 1px);
-  background-size: 24px 24px;
-}
-
-html.light-theme .hero-grid-pattern {
-  background-image: radial-gradient(rgba(15, 23, 42, 0.08) 1px, transparent 1px);
-  background-size: 24px 24px;
+  color: var(--accent-text);
+  border: 1px solid var(--border-accent);
 }
 
 .text-secondary {
@@ -91,7 +105,7 @@ html.light-theme .hero-grid-pattern {
 }
 
 .text-accent {
-  color: var(--accent);
+  color: var(--accent-text);
 }
 
 .bg-elevated {
@@ -102,179 +116,161 @@ html.light-theme .hero-grid-pattern {
   border-color: var(--border-subtle);
 }
 
-.text-justify {
-  text-align: justify;
-  text-justify: inter-word;
+/* ============================================================
+   DOSSIER RUBBER STAMPS, POLAROID TAPE & REDACTED CENSOR
+   ============================================================ */
+.rubber-stamp {
+  font-family: 'Special Elite', 'JetBrains Mono', monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 2px solid var(--accent-text);
+  color: var(--accent-text);
+  background-color: var(--accent-soft);
+  box-shadow: inset 0 0 0 1px rgba(220, 38, 38, 0.14);
 }
 
-/* Theme-aware badge & tone utilities (high contrast in Dark & Light Mode) */
-.tone-emerald {
-  background-color: rgba(16, 185, 129, 0.14);
-  color: #34d399;
-  border-color: rgba(16, 185, 129, 0.3);
+.polaroid-tape {
+  background-color: var(--tape-bg);
+  border: 1px solid var(--tape-border);
+  backdrop-filter: blur(2px);
 }
 
-html.light-theme .tone-emerald {
-  background-color: #ecfdf5;
-  color: #047857;
-  border-color: #a7f3d0;
+.redacted-bar {
+  background-color: #0B0A09;
+  color: #0B0A09;
+  padding: 0.08rem 0.35rem;
+  border-radius: 2px;
+  transition: background-color 0.22s ease, color 0.22s ease;
+  cursor: pointer;
+  user-select: none;
 }
 
-.tone-slate {
-  background-color: rgba(100, 116, 139, 0.2);
-  color: #cbd5e1;
-  border-color: rgba(100, 116, 139, 0.35);
-}
-
-html.light-theme .tone-slate {
-  background-color: #f1f5f9;
-  color: #334155;
-  border-color: #cbd5e1;
-}
-
-.tone-sky {
-  background-color: rgba(14, 165, 233, 0.14);
-  color: #38bdf8;
-  border-color: rgba(14, 165, 233, 0.3);
-}
-
-html.light-theme .tone-sky {
-  background-color: #f0f9ff;
-  color: #0369a1;
-  border-color: #bae6fd;
-}
-
-.tone-purple {
-  background-color: rgba(168, 85, 247, 0.15);
-  color: #d8b4fe;
-  border-color: rgba(168, 85, 247, 0.3);
-}
-
-html.light-theme .tone-purple {
-  background-color: #faf5ff;
-  color: #7e22ce;
-  border-color: #e9d5ff;
-}
-
-.tone-cyan {
-  background-color: rgba(6, 182, 212, 0.15);
-  color: #67e8f9;
-  border-color: rgba(6, 182, 212, 0.3);
-}
-
-html.light-theme .tone-cyan {
-  background-color: #ecfeff;
-  color: #0e7490;
-  border-color: #a5f3fc;
-}
-
-.tone-amber {
-  background-color: rgba(245, 158, 11, 0.15);
-  color: #fcd34d;
-  border-color: rgba(245, 158, 11, 0.35);
-}
-
-html.light-theme .tone-amber {
-  background-color: #fffbeb;
-  color: #b45309;
-  border-color: #fde68a;
-}
-
-.tone-rose {
-  background-color: rgba(244, 63, 94, 0.15);
-  color: #fda4af;
-  border-color: rgba(244, 63, 94, 0.3);
-}
-
-html.light-theme .tone-rose {
-  background-color: #fff1f2;
-  color: #be123c;
-  border-color: #fecdd3;
-}
-
-.tone-blue {
-  background-color: rgba(59, 130, 246, 0.15);
-  color: #93c5fd;
-  border-color: rgba(59, 130, 246, 0.3);
-}
-
-html.light-theme .tone-blue {
-  background-color: #eff6ff;
-  color: #1d4ed8;
-  border-color: #bfdbfe;
-}
-
-.tone-indigo {
-  background-color: rgba(99, 102, 241, 0.15);
-  color: #a5b4fc;
-  border-color: rgba(99, 102, 241, 0.3);
-}
-
-html.light-theme .tone-indigo {
-  background-color: #eef2ff;
-  color: #4338ca;
-  border-color: #c7d2fe;
-}
-
-.tone-emerald-text {
-  color: #34d399;
-}
-
-html.light-theme .tone-emerald-text {
-  color: #047857;
-}
-
-.tone-amber-text {
-  color: #fbbf24;
-}
-
-html.light-theme .tone-amber-text {
-  color: #b45309;
+.redacted-bar:hover,
+.redacted-bar.revealed {
+  background-color: var(--accent-soft);
+  color: var(--text-primary);
+  user-select: text;
 }
 
 /* ============================================================
-   ALPINE DEVELOPER — Section Decoration Animations
+   SECTION BACKGROUND IMAGES & VIGNETTE MASK
    ============================================================ */
-@keyframes float-slow {
-  0%, 100% { transform: translateY(0px); }
-  50%       { transform: translateY(-12px); }
+.section-bg-photo {
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: var(--bg-img-opacity);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 16%, black 84%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, black 16%, black 84%, transparent 100%);
+  filter: contrast(1.08) saturate(0.72);
 }
-@keyframes twinkle {
-  0%, 100% { opacity: 0.2; transform: scale(0.8); }
-  50%       { opacity: 1;   transform: scale(1.2); }
-}
-@keyframes campfire-flicker {
-  0%, 100% { transform: scaleY(1)    scaleX(1);    opacity: 0.9; }
-  25%       { transform: scaleY(1.08) scaleX(0.96); opacity: 1;   }
-  50%       { transform: scaleY(0.95) scaleX(1.04); opacity: 0.85; }
-  75%       { transform: scaleY(1.05) scaleX(0.98); opacity: 0.95; }
-}
-@keyframes flag-wave {
-  0%, 100% { transform: skewX(0deg);  }
-  50%       { transform: skewX(-8deg); }
-}
-@keyframes trail-dash {
-  0%   { stroke-dashoffset: 400; }
-  100% { stroke-dashoffset: 0; }
-}
-@keyframes orbit-spin {
-  0%   { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-.animate-float-slow          { animation: float-slow      5s   ease-in-out        infinite; }
-.animate-float-slow-delay    { animation: float-slow      6s   ease-in-out 1.5s   infinite; }
-.animate-twinkle             { animation: twinkle         2s   ease-in-out        infinite; }
-.animate-twinkle-delay-1     { animation: twinkle         2.5s ease-in-out 0.3s   infinite; }
-.animate-twinkle-delay-2     { animation: twinkle         3s   ease-in-out 0.7s   infinite; }
-.animate-twinkle-delay-3     { animation: twinkle         2s   ease-in-out 1.1s   infinite; }
-.animate-twinkle-delay-4     { animation: twinkle         2.8s ease-in-out 0.5s   infinite; }
-.animate-campfire            { animation: campfire-flicker 0.8s ease-in-out        infinite; }
-.animate-flag-wave           { animation: flag-wave       2.5s ease-in-out        infinite; }
-.animate-trail-dash          { animation: trail-dash      3s   ease-in-out        forwards; }
-.animate-orbit-spin          { animation: orbit-spin      8s   linear             infinite; }
 
-/* Light-mode: reduce alpine deco opacity so it stays subtle */
-html:not(.dark) .alpine-deco-svg { opacity: 0.55; }
+.section-bg-vignette {
+  background: radial-gradient(ellipse at center, transparent 22%, var(--vignette-color) 92%);
+}
+
+/* ============================================================
+   ANALOG VHS SCANLINE + VIGNETTE OVERLAY
+   ============================================================ */
+.vhs-scanlines {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0) 0px,
+    rgba(255, 255, 255, 0) 2px,
+    rgba(0, 0, 0, 0.18) 3px,
+    rgba(0, 0, 0, 0.18) 4px
+  );
+  opacity: 0.42;
+}
+
+html.light-theme .vhs-scanlines {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 0px,
+    rgba(0, 0, 0, 0) 2px,
+    rgba(24, 20, 17, 0.06) 3px,
+    rgba(24, 20, 17, 0.06) 4px
+  );
+  opacity: 0.55;
+}
+
+.vhs-vignette {
+  background: radial-gradient(circle at 50% 45%, transparent 55%, rgba(0, 0, 0, 0.42) 100%);
+}
+
+html.light-theme .vhs-vignette {
+  background: radial-gradient(circle at 50% 45%, transparent 62%, rgba(82, 66, 44, 0.16) 100%);
+}
+
+/* ============================================================
+   DOSSIER TONE BADGES (High Contrast Noir & Manila Paper)
+   ============================================================ */
+.tone-emerald {
+  background-color: rgba(22, 163, 74, 0.14);
+  color: #4ADE80;
+  border-color: rgba(74, 222, 128, 0.34);
+}
+html.light-theme .tone-emerald {
+  background-color: #E7F5EC;
+  color: #166534;
+  border-color: #86EFAC;
+}
+
+.tone-slate {
+  background-color: rgba(148, 136, 120, 0.16);
+  color: #D6CEBF;
+  border-color: rgba(148, 136, 120, 0.34);
+}
+html.light-theme .tone-slate {
+  background-color: #E6DFCE;
+  color: #3F372F;
+  border-color: #BFB39A;
+}
+
+.tone-sky,
+.tone-blue,
+.tone-cyan,
+.tone-indigo,
+.tone-purple,
+.tone-rose {
+  background-color: var(--accent-soft);
+  color: var(--accent-text);
+  border-color: var(--border-accent);
+}
+
+.tone-amber {
+  background-color: rgba(217, 119, 6, 0.15);
+  color: #FBBF24;
+  border-color: rgba(217, 119, 6, 0.38);
+}
+html.light-theme .tone-amber {
+  background-color: #FEF3C7;
+  color: #92400E;
+  border-color: #FCD34D;
+}
+
+.tone-emerald-text {
+  color: #4ADE80;
+}
+html.light-theme .tone-emerald-text {
+  color: #15803D;
+}
+
+.tone-amber-text {
+  color: #FBBF24;
+}
+html.light-theme .tone-amber-text {
+  color: #B45309;
+}
+
+/* Subtle REC blink */
+@keyframes rec-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.22; }
+}
+.animate-rec-blink {
+  animation: rec-pulse 1.15s steps(2, start) infinite;
+}
 
 @page {
   size: A4 portrait;
@@ -282,7 +278,6 @@ html:not(.dark) .alpine-deco-svg { opacity: 0.55; }
 }
 
 @media print {
-
   html,
   body {
     background: #ffffff !important;

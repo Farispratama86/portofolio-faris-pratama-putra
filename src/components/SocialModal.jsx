@@ -125,10 +125,10 @@ export default function SocialModal({ open, onClose, profile }) {
               <img
                 src={profile.photoUrl}
                 alt={profile.fullName || 'Faris Pratama Putra'}
-                className="w-12 h-12 rounded-xl object-cover border border-sky-500/40 shrink-0"
+                className="w-12 h-12 rounded-xl object-cover border border-[var(--border-accent)] shrink-0"
               />
             ) : (
-              <div className="w-12 h-12 rounded-xl bg-sky-500 text-white font-extrabold text-base flex items-center justify-center shrink-0 shadow-md">
+              <div className="w-12 h-12 rounded-xl bg-[var(--accent)] text-white font-extrabold text-base flex items-center justify-center shrink-0 shadow-md">
                 FP
               </div>
             )}
@@ -176,7 +176,7 @@ export default function SocialModal({ open, onClose, profile }) {
                   href={item.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="surface-card rounded-2xl p-4 border border-subtle hover:border-sky-500/50 hover:bg-elevated/70 transition-all duration-200 flex flex-col justify-between group space-y-3 cursor-pointer shadow-sm hover:-translate-y-0.5"
+                  className="surface-card rounded-2xl p-4 border border-subtle hover:border-[var(--border-accent)] hover:bg-elevated/70 transition-all duration-200 flex flex-col justify-between group space-y-3 cursor-pointer shadow-sm hover:-translate-y-0.5"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-center gap-3 min-w-0">

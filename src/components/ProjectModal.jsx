@@ -47,7 +47,7 @@ export default function ProjectModal({ project, onClose }) {
             type="button"
             onClick={onClose}
             aria-label={t('projectModal.closeAria')}
-            className="p-2 rounded-lg border border-subtle hover:border-sky-400/60"
+            className="p-2 rounded-lg border border-subtle hover:border-[var(--border-accent)]"
           >
             <X className="w-4 h-4" />
           </button>
@@ -57,20 +57,20 @@ export default function ProjectModal({ project, onClose }) {
           <div className="aspect-video rounded-xl overflow-hidden border border-subtle bg-elevated">
             <ProjectMockup project={project} />
           </div>
-          <p className="text-sm sm:text-base text-secondary leading-relaxed text-justify">{tr(project.summary)}</p>
+          <p className="text-sm sm:text-base text-secondary leading-relaxed text-left">{tr(project.summary)}</p>
           <div>
-            <h4 className="text-xs font-bold uppercase tracking-wider text-accent mb-2">{t('projectModal.highlightsTitle')}</h4>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-accent mb-2 font-mono-code">{t('projectModal.highlightsTitle')}</h4>
             <ul className="space-y-1.5 text-sm text-secondary list-disc list-inside">
               {project.highlights.map((item) => (
-                <li key={item} className="text-justify">{tr(item)}</li>
+                <li key={item} className="text-left">{tr(item)}</li>
               ))}
             </ul>
           </div>
           <div>
-            <h4 className="text-xs font-bold uppercase tracking-wider text-accent mb-2">{t('projectModal.techTitle')}</h4>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-accent mb-2 font-mono-code">{t('projectModal.techTitle')}</h4>
             <div className="flex flex-wrap gap-2">
               {project.tags.map((tag) => (
-                <span key={tag} className="chip-tag text-xs font-medium px-2.5 py-1 rounded-lg">
+                <span key={tag} className="chip-tag text-xs font-medium px-2.5 py-1 rounded-lg font-mono-code">
                   {tag}
                 </span>
               ))}
@@ -82,7 +82,7 @@ export default function ProjectModal({ project, onClose }) {
                 href={project.liveUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-white text-sm font-semibold"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[var(--accent)] hover:bg-[var(--accent-strong)] text-white text-sm font-semibold transition-colors"
               >
                 <ExternalLink className="w-4 h-4" />
                 <span>{isPub ? t('projectModal.openPublication') : t('projectModal.openLiveDemo')}</span>
@@ -93,7 +93,7 @@ export default function ProjectModal({ project, onClose }) {
                 href={project.repoUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-subtle hover:border-sky-400/60 text-sm font-semibold"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-subtle hover:border-[var(--border-accent)] text-sm font-semibold transition-colors"
               >
                 <Github className="w-4 h-4 text-accent" />
                 <span>{t('projectModal.viewGithub')}</span>

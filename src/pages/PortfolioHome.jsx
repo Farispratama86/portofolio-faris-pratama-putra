@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowDownRight,
   ArrowRight,
@@ -10,21 +10,21 @@ import {
   CheckCircle2,
   Code2,
   Cpu,
-  Database,
   ExternalLink,
+  Eye,
   FileText,
+  FolderOpen,
   Github,
   GraduationCap,
-  LayoutDashboard,
+  Instagram,
+  Linkedin,
   Lock,
   Mail,
   MapPin,
   MessageCircle,
   Send,
   Share2,
-  Sparkles,
-  Instagram,
-  Linkedin,
+  ShieldCheck,
 } from 'lucide-react';
 import Navbar from '../components/Navbar';
 import ProjectMockup from '../components/ProjectMockup';
@@ -32,36 +32,21 @@ import ProjectModal from '../components/ProjectModal';
 import CvModal from '../components/CvModal';
 import CertificateModal from '../components/CertificateModal';
 import SocialModal, { TikTokIcon } from '../components/SocialModal';
+import CrimeMapOverlay from '../components/CrimeMapOverlay';
+import { SectionBackdrop } from '../components/SectionDecorations';
 import {
   CERTIFICATES as FALLBACK_CERTIFICATES,
   DEFAULT_SKILLS,
   EXPERIENCES as FALLBACK_EXPERIENCES,
   PROFILE,
   PROJECTS as FALLBACK_PROJECTS,
-  SKILLS,
   getBadgeStyle,
   getCertificateCategoryStyle,
   getSkillRatingLabel,
 } from '../data/portfolioData';
 import { fetchCertificates, fetchExperiences, fetchProfile, fetchProjects, fetchSkills } from '../services/api';
 import { useLanguage } from '../context/LanguageContext';
-import {
-  BerandaDecor,
-  PengalamanDecor,
-  ProyekDecor,
-  SertifikatDecor,
-  KeahlianDecor,
-  KontakDecor,
-} from '../components/SectionDecorations';
 
-const SKILL_ICONS = {
-  layout: LayoutDashboard,
-  code: Code2,
-  cpu: Cpu,
-  database: Database,
-};
-
-// Helper sinkronisasi label kategori proyek agar tidak salah terbawa 'Web UI/UX' untuk IoT / Desktop
 function getProjectCategoryBadge(project, tr = (s) => s) {
   if (!project) return tr('Web & Machine Learning');
   const cat = project.category;
@@ -83,7 +68,6 @@ function getProjectCategoryBadge(project, tr = (s) => s) {
   return tr(label || 'Web & ML');
 }
 
-// Helper penamaan tombol tautan cerdas (Live Demo vs Publikasi / Jurnal)
 function getProjectLinkInfo(project, t = (k) => k) {
   if (!project || !project.liveUrl) return null;
   const url = project.liveUrl.toLowerCase();
@@ -107,14 +91,12 @@ function getProjectLinkInfo(project, t = (k) => k) {
   };
 }
 
-// Helper normalisasi nomor WhatsApp menjadi digit internasional (62...)
 function normalizeWaDigits(raw = '') {
   const digits = String(raw || '').replace(/\D/g, '');
   if (!digits) return '';
   return digits.startsWith('0') ? `62${digits.slice(1)}` : digits;
 }
 
-// Helper memformat tampilan nomor WhatsApp agar rapi (+62 812-1953-4692)
 function formatWaDisplay(raw = '') {
   const str = String(raw || '').trim();
   if (!str) return '';
@@ -127,7 +109,6 @@ function formatWaDisplay(raw = '') {
   return str;
 }
 
-// Helper merapikan tanda kutip sertifikat
 function formatCertificateTitle(title = '') {
   let t = (title || '').trim();
   const quoteCount = (t.match(/"/g) || []).length;
@@ -137,8 +118,17 @@ function formatCertificateTitle(title = '') {
   return t;
 }
 
+function formatRecTime(totalSeconds) {
+  const hrs = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+  const mins = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+  const secs = String(totalSeconds % 60).padStart(2, '0');
+  return `${hrs}:${mins}:${secs}`;
+}
+
 export default function PortfolioHome({ onNavigate }) {
   const { lang, t, tr, ensureTranslations } = useLanguage();
+  const mainRef = useRef(null);
+
   const [theme, setTheme] = useState(() => {
     try {
       return localStorage.getItem('faris-portfolio-theme') || 'dark';
@@ -146,15 +136,35 @@ export default function PortfolioHome({ onNavigate }) {
       return 'dark';
     }
   });
+  const [vhsEnabled, setVhsEnabled] = useState(() => {
+    try {
+      return localStorage.getItem('faris-portfolio-vhs') !== 'false';
+    } catch {
+      return true;
+    }
+  });
+  const [mapEnabled, setMapEnabled] = useState(() => {
+    try {
+      return localStorage.getItem('faris-portfolio-map') !== 'false';
+    } catch {
+      return true;
+    }
+  });
+  const [recSeconds, setRecSeconds] = useState(0);
+
   const [activeSection, setActiveSection] = useState('beranda');
   const [filter, setFilter] = useState('all');
+  const [activeProjectId, setActiveProjectId] = useState(null);
+  const [certFilter, setCertFilter] = useState('all');
   const [skillTab, setSkillTab] = useState('hard'); // 'hard' | 'soft'
+  const [noteRevealed, setNoteRevealed] = useState(false);
+
   const [projects, setProjects] = useState(FALLBACK_PROJECTS);
   const [experiences, setExperiences] = useState(FALLBACK_EXPERIENCES);
   const [certificates, setCertificates] = useState(FALLBACK_CERTIFICATES);
   const [skills, setSkills] = useState(DEFAULT_SKILLS);
   const [profile, setProfile] = useState(PROFILE);
-  const [dataSource, setDataSource] = useState('loading'); // 'api' | 'fallback' | 'loading'
+  const [dataSource, setDataSource] = useState('loading');
   const [selectedProject, setSelectedProject] = useState(null);
   const [selectedCertificate, setSelectedCertificate] = useState(null);
   const [cvOpen, setCvOpen] = useState(false);
@@ -165,6 +175,14 @@ export default function PortfolioHome({ onNavigate }) {
     topicIdx: 0,
     message: '',
   });
+
+  // Live VHS REC timer
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      setRecSeconds((s) => s + 1);
+    }, 1000);
+    return () => window.clearInterval(id);
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -288,6 +306,22 @@ export default function PortfolioHome({ onNavigate }) {
   }, [theme]);
 
   useEffect(() => {
+    try {
+      localStorage.setItem('faris-portfolio-vhs', String(vhsEnabled));
+    } catch {
+      // ignore
+    }
+  }, [vhsEnabled]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('faris-portfolio-map', String(mapEnabled));
+    } catch {
+      // ignore
+    }
+  }, [mapEnabled]);
+
+  useEffect(() => {
     const sections = ['beranda', 'pengalaman', 'proyek', 'sertifikat', 'keahlian', 'kontak'];
     const handleScroll = () => {
       const nearBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 40;
@@ -313,17 +347,10 @@ export default function PortfolioHome({ onNavigate }) {
     setTimeout(() => setToast(''), 2800);
   };
 
-  const activeSocials = useMemo(
-    () => profile.socials.filter((item) => item.url && item.url.trim().length > 0),
-    [profile.socials]
-  );
-
   const hardSkills = useMemo(() => skills.filter((s) => s.category === 'hard'), [skills]);
   const softSkills = useMemo(() => skills.filter((s) => s.category === 'soft'), [skills]);
 
-  const activeSkills = useMemo(() => {
-    return skills.filter((s) => s.category === skillTab);
-  }, [skills, skillTab]);
+  const activeSkills = useMemo(() => skills.filter((s) => s.category === skillTab), [skills, skillTab]);
 
   const skillGroups = useMemo(() => {
     const groups = {};
@@ -340,10 +367,41 @@ export default function PortfolioHome({ onNavigate }) {
     return projects.filter((p) => p.category === filter);
   }, [filter, projects]);
 
-  const featuredProject = filter === 'all' ? filteredProjects.find((p) => p.featured) : null;
-  const gridProjects = featuredProject
-    ? filteredProjects.filter((p) => p.id !== featuredProject.id)
-    : filteredProjects;
+  // Sinkronkan berkas kasus aktif di drawer saat filter berubah
+  useEffect(() => {
+    if (filteredProjects.length === 0) {
+      setActiveProjectId(null);
+      return;
+    }
+    const stillExists = filteredProjects.some((p) => String(p.id) === String(activeProjectId));
+    if (!stillExists) {
+      const preferred = filteredProjects.find((p) => p.featured) || filteredProjects[0];
+      setActiveProjectId(preferred.id);
+    }
+  }, [filteredProjects, activeProjectId]);
+
+  const activeCase = useMemo(() => {
+    if (filteredProjects.length === 0) return null;
+    return filteredProjects.find((p) => String(p.id) === String(activeProjectId)) || filteredProjects[0];
+  }, [filteredProjects, activeProjectId]);
+
+  // Kategori sertifikat dinamis untuk filter Seksi 4
+  const certCategories = useMemo(() => {
+    const countsByCat = new Map();
+    certificates.forEach((c) => {
+      const raw = (c.category || 'Sertifikat').trim();
+      countsByCat.set(raw, (countsByCat.get(raw) || 0) + 1);
+    });
+    return Array.from(countsByCat.entries()).map(([cat, count]) => ({
+      id: cat,
+      count,
+    }));
+  }, [certificates]);
+
+  const filteredCertificates = useMemo(() => {
+    if (certFilter === 'all') return certificates;
+    return certificates.filter((c) => (c.category || 'Sertifikat').trim() === certFilter);
+  }, [certFilter, certificates]);
 
   const topicOptions = t('contact.topics');
   const activeTopicLabel =
@@ -397,45 +455,76 @@ export default function PortfolioHome({ onNavigate }) {
     desktop: projects.filter((p) => p.category === 'desktop').length,
   };
 
+  const mapTriggerKey = `${filter}-${certFilter}-${skillTab}-${lang}-${projects.length}-${experiences.length}-${certificates.length}-${skills.length}-${activeProjectId}`;
+
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen relative">
+      {/* Analog VHS Scanline + Vignette Overlay (toggleable, non-blocking) */}
+      {vhsEnabled && (
+        <div className="fixed inset-0 pointer-events-none select-none z-50" aria-hidden="true">
+          <div className="vhs-scanlines absolute inset-0" />
+          <div className="vhs-vignette absolute inset-0" />
+        </div>
+      )}
+
       <Navbar
         activeSection={activeSection}
         theme={theme}
-        onToggleTheme={() => setTheme((t) => (t === 'light' ? 'dark' : 'light'))}
+        onToggleTheme={() => setTheme((prev) => (prev === 'light' ? 'dark' : 'light'))}
         onOpenCv={() => setCvOpen(true)}
+        vhsEnabled={vhsEnabled}
+        onToggleVhs={() => setVhsEnabled((prev) => !prev)}
+        mapEnabled={mapEnabled}
+        onToggleMap={() => setMapEnabled((prev) => !prev)}
       />
 
-      <main className="pt-16">
-        <section id="beranda" className="hero-glow py-16 sm:py-24 border-b border-subtle relative overflow-hidden">
-          <BerandaDecor />
-          {/* Subtle tech dot/grid pattern & ambient lighting */}
-          <div className="absolute inset-0 hero-grid-pattern pointer-events-none opacity-50" />
-          <div className="absolute top-1/4 -left-20 w-80 h-80 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute top-1/3 -right-20 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+      <main ref={mainRef} className="pt-16 relative">
+        {/* Peta Kasus Zig-Zag Merah (z-index: 3, di belakang konten z-index: 6) */}
+        <CrimeMapOverlay enabled={mapEnabled} containerRef={mainRef} triggerKey={mapTriggerKey} />
 
-          {/* Kontainer Utama max-w-7xl agar proporsional di monitor lebar */}
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        {/* ============================================================
+            SEKSI 1 — BERANDA (SAMPUL BERKAS SUBJEK)
+           ============================================================ */}
+        <section id="beranda" className="py-14 sm:py-20 border-b border-subtle relative overflow-hidden">
+          <SectionBackdrop imagePath="/images/bg-dossier-hero.jpg" />
+
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-[6]">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
-              {/* Kolom Kiri: Informasi Hero & Statistik Dinamis */}
+              {/* Kolom Kiri: Timer REC, Stempel Status, Judul Serif, Narasi & Statistik Tanpa Kotak */}
               <div className="lg:col-span-7 space-y-6">
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold chip-tag">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <span>{t('hero.campusBadge')}</span>
-                </div>
-                <div className="space-y-3">
-                  <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight">
-                    Faris Pratama <span className="text-accent">Putra</span>
-                  </h1>
-                  <p className="text-base sm:text-lg font-semibold text-secondary">{tr(profile.role)}</p>
-                </div>
-                <p className="text-sm sm:text-base text-secondary leading-relaxed max-w-2xl text-justify">{tr(profile.bio)}</p>
+                <div className="flex flex-wrap items-center gap-3">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded border border-subtle bg-[var(--bg-surface)] font-mono-code text-xs font-semibold tracking-widest">
+                    <span className="w-2 h-2 rounded-full bg-[var(--accent)] animate-rec-blink" />
+                    <span>REC {formatRecTime(recSeconds)}</span>
+                  </div>
 
-                {/* Tombol CTA */}
+                  {/* Stempel Miring Status Ketersediaan dari DB */}
+                  <span className="rubber-stamp inline-block px-3 py-1 rounded-sm text-xs font-bold -rotate-2">
+                    {tr(profile.availabilityStatus || PROFILE.availabilityStatus)}
+                  </span>
+                </div>
+
+                <div className="space-y-3">
+                  <p className="font-mono-code text-xs uppercase tracking-widest text-secondary">
+                    {t('hero.campusBadge')}
+                  </p>
+                  <h1 className="font-serif-editorial text-5xl sm:text-6xl lg:text-7xl font-normal tracking-tight leading-[1.02]">
+                    Faris Pratama <em className="italic text-accent">Putra</em>
+                  </h1>
+                  <p className="text-base sm:text-lg font-semibold text-secondary">
+                    {tr(profile.role)}
+                  </p>
+                </div>
+
+                <p className="text-sm sm:text-base text-secondary leading-relaxed max-w-2xl text-left">
+                  {tr(profile.bio)}
+                </p>
+
+                {/* 3 Tombol CTA */}
                 <div className="flex flex-wrap items-center gap-3">
                   <a
                     href="#proyek"
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-semibold text-sm shadow-lg shadow-sky-500/25 transition-all hover:scale-[1.02]"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[var(--accent)] hover:bg-[var(--accent-strong)] text-white font-semibold text-sm transition-colors shadow-sm"
                   >
                     <span>{t('hero.viewProjects')}</span>
                     <ArrowDownRight className="w-4 h-4" />
@@ -443,7 +532,7 @@ export default function PortfolioHome({ onNavigate }) {
                   <button
                     type="button"
                     onClick={() => setCvOpen(true)}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl surface-card font-semibold text-sm hover:border-sky-500/50 transition-all hover:scale-[1.02]"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg surface-card font-semibold text-sm hover:border-[var(--border-accent)] transition-colors"
                   >
                     <FileText className="w-4 h-4 text-accent" />
                     <span>{t('hero.cvSummary')}</span>
@@ -452,144 +541,157 @@ export default function PortfolioHome({ onNavigate }) {
                     href={profile.githubUrl || PROFILE.githubUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl surface-card font-semibold text-sm hover:border-sky-500/50 transition-all hover:scale-[1.02]"
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg surface-card font-semibold text-sm hover:border-[var(--border-accent)] transition-colors"
                   >
                     <Github className="w-4 h-4 text-accent" />
                     <span>GitHub</span>
                   </a>
                 </div>
 
-                {/* 3 Kartu Statistik Dinamis */}
-                <div className="grid grid-cols-3 gap-3 pt-3 sm:pt-4 max-w-xl">
-                  <div className="surface-card rounded-xl p-3 sm:p-3.5 border border-subtle hover:border-sky-500/40 transition-all group">
-                    <div className="text-xl sm:text-2xl font-extrabold text-[var(--text-primary)] group-hover:text-accent transition-colors">
+                {/* 3 Angka Statistik Bersih Tanpa Kotak Bersarang */}
+                <div className="grid grid-cols-3 gap-6 pt-5 border-t border-subtle max-w-xl">
+                  <div>
+                    <div className="font-serif-editorial text-3xl sm:text-4xl text-[var(--text-primary)] leading-none">
                       {projects.length}
                     </div>
-                    <div className="text-[11px] sm:text-xs text-secondary mt-0.5 leading-snug">
+                    <div className="font-mono-code text-[11px] uppercase tracking-wider text-secondary mt-1.5">
                       {t('hero.statProjects')}
                     </div>
                   </div>
-
-                  <div className="surface-card rounded-xl p-3 sm:p-3.5 border border-subtle hover:border-sky-500/40 transition-all group">
-                    <div className="text-xl sm:text-2xl font-extrabold text-[var(--text-primary)] group-hover:text-accent transition-colors">
+                  <div className="border-l border-subtle pl-5">
+                    <div className="font-serif-editorial text-3xl sm:text-4xl text-[var(--text-primary)] leading-none">
                       {experiences.length}
                     </div>
-                    <div className="text-[11px] sm:text-xs text-secondary mt-0.5 leading-snug">
+                    <div className="font-mono-code text-[11px] uppercase tracking-wider text-secondary mt-1.5">
                       {t('hero.statExperiences')}
                     </div>
                   </div>
-
-                  <div className="surface-card rounded-xl p-3 sm:p-3.5 border border-subtle hover:border-sky-500/40 transition-all group">
-                    <div className="text-xl sm:text-2xl font-extrabold text-[var(--text-primary)] group-hover:text-accent transition-colors">
+                  <div className="border-l border-subtle pl-5">
+                    <div className="font-serif-editorial text-3xl sm:text-4xl text-[var(--text-primary)] leading-none">
                       {t('hero.statYearsValue')}
                     </div>
-                    <div className="text-[11px] sm:text-xs text-secondary mt-0.5 leading-snug">
+                    <div className="font-mono-code text-[11px] uppercase tracking-wider text-secondary mt-1.5">
                       {t('hero.statYearsLabel')}
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Kolom Kanan: Kartu Profil & Identitas */}
-              <div className="lg:col-span-5 relative">
-                {/* Efek Pendaran Cahaya (Ambient Glow Cyan & Indigo) */}
-                <div className="absolute -inset-2 sm:-inset-4 bg-gradient-to-r from-sky-500/20 via-cyan-500/15 to-indigo-500/20 rounded-3xl blur-2xl -z-10 opacity-75 pointer-events-none" />
-
-                <div className="surface-card rounded-2xl p-6 space-y-5 max-w-md mx-auto lg:ml-auto shadow-xl border border-subtle hover:border-sky-500/40 transition-all">
-                  {/* Foto dengan Floating Status Badge */}
-                  <div className="aspect-[4/3] rounded-xl overflow-hidden bg-elevated border border-subtle flex items-center justify-center relative group">
-                    {profile.photoUrl ? (
-                      <img src={profile.photoUrl} alt={PROFILE.fullName} className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-300" />
-                    ) : (
-                      <div className="flex flex-col items-center text-center p-6">
-                        <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-sky-500 to-indigo-600 text-white flex items-center justify-center text-3xl font-extrabold mb-3">
-                          {PROFILE.initials}
-                        </div>
-                        <p className="text-sm font-semibold">{PROFILE.fullName}</p>
-                        <p className="text-xs text-secondary mt-1">{PROFILE.location}</p>
-                      </div>
-                    )}
-
-                    {/* Floating status badge di sudut foto */}
-                    <div className="absolute bottom-3 left-3 z-10 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/90 backdrop-blur-md border border-emerald-500/40 text-emerald-300 text-xs font-semibold shadow-lg">
-                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                      <span>{tr(profile.availabilityStatus || PROFILE.availabilityStatus)}</span>
-                    </div>
+              {/* Kolom Kanan: Kartu Dossier Bertab SUBJEK // IDENTITAS + Polaroid Selotip */}
+              <div className="lg:col-span-5">
+                <div className="max-w-md mx-auto lg:ml-auto">
+                  {/* Tab Folder Dossier */}
+                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-t-lg border border-b-0 border-subtle bg-[var(--bg-card)] font-mono-code text-[11px] font-bold tracking-widest text-accent">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]" />
+                    <span>{t('hero.dossierTab')}</span>
                   </div>
 
-                  <div className="space-y-2 text-[13px] sm:text-sm">
-                    <div className="flex items-center justify-between gap-3 py-1.5 border-b border-subtle">
-                      <span className="text-secondary flex items-center gap-2 shrink-0">
-                        <GraduationCap className="w-4 h-4 text-accent" /> {t('hero.educationLabel')}
-                      </span>
-                      <span className="font-medium text-right">{tr(profile.educationSummary || PROFILE.educationSummary)}</span>
-                    </div>
-                    <div className="flex items-center justify-between gap-3 py-1.5 border-b border-subtle">
-                      <span className="text-secondary flex items-center gap-2 shrink-0">
-                        <Briefcase className="w-4 h-4 text-accent" /> {t('hero.currentRoleLabel')}
-                      </span>
-                      <span className="font-medium text-right">{tr(profile.currentRole || PROFILE.currentRole)}</span>
-                    </div>
-                    <div className="flex items-center justify-between gap-3 py-1.5 border-b border-subtle">
-                      <span className="text-secondary flex items-center gap-2 shrink-0">
-                        <Cpu className="w-4 h-4 text-accent" /> {t('hero.coreSkillsLabel')}
-                      </span>
-                      <span className="font-medium text-right">{tr(profile.coreSkills || PROFILE.coreSkills)}</span>
-                    </div>
-                    <div className="flex items-center justify-between gap-3 py-1.5 border-b border-subtle">
-                      <span className="text-secondary flex items-center gap-2 shrink-0">
-                        <MapPin className="w-4 h-4 text-accent" /> {t('hero.locationLabel')}
-                      </span>
-                      <span className="font-medium text-right">{tr(profile.cityShort || PROFILE.cityShort)}</span>
+                  <div className="surface-card rounded-b-xl rounded-tr-xl p-5 sm:p-6 space-y-5 shadow-xl">
+                    {/* Bingkai Polaroid ber-selotip dengan foto 4:3 Cloudinary */}
+                    <div className="relative bg-[var(--bg-surface)] border border-subtle p-2.5 pb-4 rounded-sm shadow-md group">
+                      {/* Selotip sudut atas */}
+                      <span className="polaroid-tape absolute -top-2.5 left-4 w-12 h-4 -rotate-6 z-10 pointer-events-none" />
+                      <span className="polaroid-tape absolute -top-2.5 right-4 w-12 h-4 rotate-6 z-10 pointer-events-none" />
+
+                      <div className="aspect-[4/3] overflow-hidden bg-elevated border border-subtle flex items-center justify-center relative">
+                        {profile.photoUrl ? (
+                          <img
+                            src={profile.photoUrl}
+                            alt={PROFILE.fullName}
+                            className="w-full h-full object-cover object-top grayscale-[35%] contrast-[1.06] group-hover:grayscale-0 group-hover:contrast-100 transition-all duration-300"
+                          />
+                        ) : (
+                          <div className="flex flex-col items-center text-center p-6">
+                            <div className="w-20 h-20 rounded-xl bg-[var(--accent)] text-white flex items-center justify-center text-2xl font-extrabold mb-3">
+                              {PROFILE.initials}
+                            </div>
+                            <p className="text-sm font-semibold">{PROFILE.fullName}</p>
+                            <p className="text-xs text-secondary mt-1">{PROFILE.location}</p>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="pt-2.5 flex items-center justify-between gap-2 font-mono-code text-[10px] text-muted uppercase tracking-wider">
+                        <span>FIG.01 // {PROFILE.initials}-ID</span>
+                        <span>{tr(profile.availabilityStatus || PROFILE.availabilityStatus)}</span>
+                      </div>
                     </div>
 
-                    {/* Baris Tombol Ikon Cepat Sosial Media */}
-                    <div className="pt-2 flex items-center justify-between gap-2">
-                      <span className="text-xs text-secondary font-medium">{t('hero.connectFollow')}</span>
-                      <div className="flex items-center gap-2">
-                        <a
-                          href={profile.githubUrl || PROFILE.githubUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="w-8 h-8 rounded-lg surface-card border border-subtle hover:border-slate-500 hover:text-[var(--text-primary)] text-secondary flex items-center justify-center transition-all hover:scale-110 shadow-sm"
-                          title="GitHub"
-                        >
-                          <Github className="w-4 h-4" />
-                        </a>
-                        <a
-                          href={profile.linkedinUrl || (profile.socials?.find((s) => s.id === 'linkedin')?.url) || 'https://linkedin.com/in/faris-pratama-putra'}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="w-8 h-8 rounded-lg surface-card border border-subtle hover:border-blue-500 hover:text-blue-500 text-secondary flex items-center justify-center transition-all hover:scale-110 shadow-sm"
-                          title="LinkedIn"
-                        >
-                          <Linkedin className="w-4 h-4" />
-                        </a>
-                        <a
-                          href={profile.instagramUrl || (profile.socials?.find((s) => s.id === 'instagram')?.url) || 'https://instagram.com/fpratamaputra'}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="w-8 h-8 rounded-lg surface-card border border-subtle hover:border-pink-500 hover:text-pink-500 text-secondary flex items-center justify-center transition-all hover:scale-110 shadow-sm"
-                          title="Instagram"
-                        >
-                          <Instagram className="w-4 h-4" />
-                        </a>
-                        <a
-                          href={`https://wa.me/${activeWaNumber}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="w-8 h-8 rounded-lg surface-card border border-subtle hover:border-emerald-500 hover:text-emerald-500 text-secondary flex items-center justify-center transition-all hover:scale-110 shadow-sm"
-                          title="WhatsApp"
-                        >
-                          <MessageCircle className="w-4 h-4" />
-                        </a>
-                        <a
-                          href={`mailto:${activeEmail}`}
-                          className="w-8 h-8 rounded-lg surface-card border border-subtle hover:border-sky-500 hover:text-accent text-secondary flex items-center justify-center transition-all hover:scale-110 shadow-sm"
-                          title={t('hero.sendEmailTitle')}
-                        >
-                          <Mail className="w-4 h-4" />
-                        </a>
+                    {/* 4 Baris Identitas Dinamis dari DB */}
+                    <div className="space-y-2 text-[13px] sm:text-sm">
+                      <div className="flex items-center justify-between gap-3 py-1.5 border-b border-subtle">
+                        <span className="text-secondary flex items-center gap-2 shrink-0">
+                          <GraduationCap className="w-4 h-4 text-accent" /> {t('hero.educationLabel')}
+                        </span>
+                        <span className="font-medium text-right">{tr(profile.educationSummary || PROFILE.educationSummary)}</span>
+                      </div>
+                      <div className="flex items-center justify-between gap-3 py-1.5 border-b border-subtle">
+                        <span className="text-secondary flex items-center gap-2 shrink-0">
+                          <Briefcase className="w-4 h-4 text-accent" /> {t('hero.currentRoleLabel')}
+                        </span>
+                        <span className="font-medium text-right">{tr(profile.currentRole || PROFILE.currentRole)}</span>
+                      </div>
+                      <div className="flex items-center justify-between gap-3 py-1.5 border-b border-subtle">
+                        <span className="text-secondary flex items-center gap-2 shrink-0">
+                          <Cpu className="w-4 h-4 text-accent" /> {t('hero.coreSkillsLabel')}
+                        </span>
+                        <span className="font-medium text-right">{tr(profile.coreSkills || PROFILE.coreSkills)}</span>
+                      </div>
+                      <div className="flex items-center justify-between gap-3 py-1.5 border-b border-subtle">
+                        <span className="text-secondary flex items-center gap-2 shrink-0">
+                          <MapPin className="w-4 h-4 text-accent" /> {t('hero.locationLabel')}
+                        </span>
+                        <span className="font-medium text-right">{tr(profile.cityShort || PROFILE.cityShort)}</span>
+                      </div>
+
+                      {/* 5 Ikon Media Sosial: GitHub, LinkedIn, Instagram, WhatsApp, Email */}
+                      <div className="pt-2 flex items-center justify-between gap-2">
+                        <span className="text-xs text-secondary font-medium">{t('hero.connectFollow')}</span>
+                        <div className="flex items-center gap-1.5">
+                          <a
+                            href={profile.githubUrl || PROFILE.githubUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-8 h-8 rounded-lg surface-panel border border-subtle hover:border-[var(--border-accent)] hover:text-accent text-secondary flex items-center justify-center transition-colors"
+                            title="GitHub"
+                          >
+                            <Github className="w-4 h-4" />
+                          </a>
+                          <a
+                            href={profile.linkedinUrl || (profile.socials?.find((s) => s.id === 'linkedin')?.url) || 'https://linkedin.com/in/faris-pratama-putra'}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-8 h-8 rounded-lg surface-panel border border-subtle hover:border-[var(--border-accent)] hover:text-accent text-secondary flex items-center justify-center transition-colors"
+                            title="LinkedIn"
+                          >
+                            <Linkedin className="w-4 h-4" />
+                          </a>
+                          <a
+                            href={profile.instagramUrl || (profile.socials?.find((s) => s.id === 'instagram')?.url) || 'https://instagram.com/fpratamaputra'}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-8 h-8 rounded-lg surface-panel border border-subtle hover:border-[var(--border-accent)] hover:text-accent text-secondary flex items-center justify-center transition-colors"
+                            title="Instagram"
+                          >
+                            <Instagram className="w-4 h-4" />
+                          </a>
+                          <a
+                            href={`https://wa.me/${activeWaNumber}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-8 h-8 rounded-lg surface-panel border border-subtle hover:border-[var(--border-accent)] hover:text-accent text-secondary flex items-center justify-center transition-colors"
+                            title="WhatsApp"
+                          >
+                            <MessageCircle className="w-4 h-4" />
+                          </a>
+                          <a
+                            href={`mailto:${activeEmail}`}
+                            className="w-8 h-8 rounded-lg surface-panel border border-subtle hover:border-[var(--border-accent)] hover:text-accent text-secondary flex items-center justify-center transition-colors"
+                            title={t('hero.sendEmailTitle')}
+                          >
+                            <Mail className="w-4 h-4" />
+                          </a>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -597,28 +699,28 @@ export default function PortfolioHome({ onNavigate }) {
               </div>
             </div>
 
-            {/* Baris Tech Stack Strip di Bagian Bawah Hero */}
-            <div className="mt-12 pt-8 border-t border-subtle flex flex-col md:flex-row items-center justify-between gap-4">
-              <span className="text-xs font-semibold text-secondary uppercase tracking-wider shrink-0 flex items-center gap-2">
+            {/* Tech Stack Strip di Bawah Hero */}
+            <div className="mt-12 pt-6 border-t border-subtle flex flex-col md:flex-row items-center justify-between gap-4">
+              <span className="font-mono-code text-xs font-semibold text-secondary uppercase tracking-wider shrink-0 flex items-center gap-2">
                 <Code2 className="w-4 h-4 text-accent" />
                 {t('hero.coreTechFocus')}
               </span>
               <div className="flex flex-wrap items-center justify-center md:justify-end gap-2">
                 {[
-                  { name: 'React', hover: 'hover:border-cyan-500 hover:text-cyan-500' },
-                  { name: 'Vite', hover: 'hover:border-purple-500 hover:text-purple-500' },
-                  { name: 'Tailwind CSS', hover: 'hover:border-sky-500 hover:text-sky-500' },
-                  { name: 'Node.js / Express', hover: 'hover:border-emerald-500 hover:text-emerald-500' },
-                  { name: 'MySQL', hover: 'hover:border-blue-500 hover:text-blue-500' },
-                  { name: 'Python', hover: 'hover:border-amber-500 hover:text-amber-500' },
-                  { name: 'XGBoost', hover: 'hover:border-orange-500 hover:text-orange-500' },
-                  { name: 'ESP32 / IoT', hover: 'hover:border-teal-500 hover:text-teal-500' },
+                  'React',
+                  'Vite',
+                  'Tailwind CSS',
+                  'Node.js / Express',
+                  'MySQL',
+                  'Python',
+                  'XGBoost',
+                  'ESP32 / IoT',
                 ].map((tech) => (
                   <span
-                    key={tech.name}
-                    className={`px-3 py-1 rounded-lg text-xs font-medium surface-card border border-subtle text-secondary transition-all cursor-default shadow-sm ${tech.hover}`}
+                    key={tech}
+                    className="px-3 py-1 rounded-md font-mono-code text-xs font-medium surface-card text-secondary hover:text-[var(--text-primary)] hover:border-[var(--border-accent)] transition-colors cursor-default"
                   >
-                    {tech.name}
+                    {tech}
                   </span>
                 ))}
               </div>
@@ -626,143 +728,133 @@ export default function PortfolioHome({ onNavigate }) {
           </div>
         </section>
 
+        {/* ============================================================
+            SEKSI 2 — PENGALAMAN (KRONOLOGI BENANG MERAH)
+           ============================================================ */}
         <section id="pengalaman" className="py-16 sm:py-24 border-b border-subtle relative overflow-hidden">
-          <PengalamanDecor />
-          {/* Subtle ambient lighting */}
-          <div className="absolute top-1/4 left-5 w-72 h-72 bg-sky-500/5 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-10 right-5 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
+          <SectionBackdrop imagePath="/images/bg-corridor-noir.jpg" motif="eye" />
 
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-[6]">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-12">
               <div>
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold tone-sky border mb-3">
+                <p className="font-mono-code text-xs font-bold uppercase tracking-widest text-accent mb-2 flex items-center gap-2">
                   <Briefcase className="w-3.5 h-3.5" />
-                  {t('experience.badge')}
-                </span>
-                <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">{t('experience.title')}</h2>
-                <p className="mt-2 text-sm sm:text-base text-secondary max-w-2xl text-justify">
+                  <span>{t('experience.badge')}</span>
+                </p>
+                <h2 className="font-serif-editorial text-4xl sm:text-5xl font-normal tracking-tight">
+                  {t('experience.title')}
+                </h2>
+                <p className="mt-2 text-sm sm:text-base text-secondary max-w-2xl text-left">
                   {t('experience.subtitle')}
                 </p>
               </div>
 
-              <div className="flex items-center gap-2 self-start md:self-end">
-                <span className="text-xs font-semibold px-3.5 py-1.5 rounded-xl surface-card border border-subtle text-secondary flex items-center gap-1.5 shadow-sm">
-                  <Sparkles className="w-3.5 h-3.5 text-accent" />
-                  {t('experience.verifiedCount', { count: experiences.length })}
-                </span>
-              </div>
+              <span className="font-mono-code text-xs font-semibold px-3.5 py-1.5 rounded-lg surface-card text-secondary self-start md:self-end">
+                {t('experience.verifiedCount', { count: experiences.length })}
+              </span>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
-              {experiences.map((exp) => {
+            {/* Timeline Vertikal dengan Garis Benang Merah 2px + Pin di Kiri */}
+            <div className="relative pl-6 sm:pl-9 space-y-10">
+              {/* Garis Benang Merah 2px */}
+              <div className="absolute left-2 sm:left-3 top-2 bottom-2 w-[2px] bg-[var(--accent)] opacity-75" aria-hidden="true" />
+
+              {experiences.map((exp, idx) => {
                 const bStyle = getBadgeStyle(exp.badge);
-                const isTech = /technician|hardware|speed|jaringan|komputer/i.test(`${exp.role} ${exp.company}`);
-                const ExpIcon = isTech ? Cpu : Code2;
+                const linked = certificates.filter(
+                  (c) => c.experienceId && String(c.experienceId) === String(exp.id)
+                );
+                const linkedCert =
+                  linked.find((c) => c.category && c.category.toLowerCase().includes('magang')) ||
+                  linked[0] ||
+                  null;
 
                 return (
-                  <article
-                    key={exp.id}
-                    className="surface-card rounded-2xl p-6 sm:p-7 flex flex-col justify-between border border-subtle hover:border-sky-500/40 transition-all duration-300 shadow-md hover:shadow-xl hover:shadow-sky-500/5 group"
-                  >
-                    <div className="space-y-6">
-                      {/* Header Pengalaman dengan Icon & Status */}
-                      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-5 border-b border-subtle">
-                        <div className="flex items-start gap-3.5">
-                          <div className="w-12 h-12 rounded-2xl tone-sky border flex items-center justify-center shrink-0 group-hover:scale-105 transition-all shadow-sm">
-                            <ExpIcon className="w-6 h-6" />
-                          </div>
-                          <div>
-                            <span className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-0.5 rounded-full mb-1.5 ${bStyle.chipClass}`}>
-                              <span className={`w-1.5 h-1.5 rounded-full ${bStyle.dotClass} animate-pulse`} />
-                              {tr(exp.badge)}
-                            </span>
-                            <h3 className="text-lg sm:text-xl font-bold group-hover:text-accent transition-colors">
-                              {tr(exp.role)}
-                            </h3>
-                            <p className="text-sm font-semibold text-accent mt-0.5">{exp.company}</p>
-                          </div>
-                        </div>
+                  <article key={exp.id} className="relative surface-card rounded-xl p-6 sm:p-8 shadow-md">
+                    {/* Pin Merah/Kuningan di sisi kiri */}
+                    <span
+                      className="absolute -left-[23px] sm:-left-[31px] top-8 w-3.5 h-3.5 rounded-full bg-[var(--accent)] border-2 border-[var(--bg-page)] ring-2 ring-[var(--pin-brass)] shadow-md"
+                      aria-hidden="true"
+                    />
 
-                        <div className="text-left sm:text-right text-xs text-secondary shrink-0 pl-1 sm:pl-0">
-                          <div className="font-semibold text-[var(--text-primary)] flex items-center sm:justify-end gap-1.5">
+                    {/* Header Kronologi + Stempel Status di Pojok Kanan */}
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-5 border-b border-subtle">
+                      <div className="space-y-1">
+                        <div className="font-mono-code text-[11px] text-muted uppercase tracking-widest">
+                          LOG // 0{idx + 1} · {exp.location}
+                        </div>
+                        <h3 className="font-serif-editorial text-2xl sm:text-3xl text-[var(--text-primary)] leading-tight">
+                          {tr(exp.role)}
+                        </h3>
+                        <p className="text-sm font-semibold text-accent">{exp.company}</p>
+                        <div className="pt-1 flex flex-wrap items-center gap-3 font-mono-code text-xs text-secondary">
+                          <span className="inline-flex items-center gap-1.5">
                             <Calendar className="w-3.5 h-3.5 text-accent" />
-                            <span>{tr(exp.period)}</span>
-                          </div>
-                          <div className="mt-1 flex items-center sm:justify-end gap-1.5 text-muted">
-                            <MapPin className="w-3.5 h-3.5" />
-                            <span>{exp.location}</span>
-                          </div>
+                            {tr(exp.period)}
+                          </span>
                         </div>
                       </div>
 
-                      {/* Sub-bab & Poin-poin Capaian yang Hidup & Berstruktur */}
-                      <div className="space-y-4">
-                        {(exp.sections || []).map((sec, sIdx) => (
-                          <div
-                            key={sIdx}
-                            className="bg-elevated/70 rounded-xl p-4 border border-subtle/80 hover:border-subtle transition-colors space-y-2.5 shadow-sm"
-                          >
-                            <div className="flex items-center gap-2">
-                              <span className="text-[10px] font-bold px-2 py-0.5 rounded tone-sky border">
-                                0{sIdx + 1}
-                              </span>
-                              <h4 className="text-xs sm:text-sm font-bold uppercase tracking-wider text-accent">
-                                {tr(sec.heading)}
-                              </h4>
-                            </div>
-
-                            <ul className="space-y-2 text-xs sm:text-sm text-secondary leading-relaxed pt-1">
-                              {(sec.bullets || []).map((b, bIdx) => (
-                                <li key={bIdx} className="flex items-start gap-2.5">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-sky-400 mt-2 shrink-0 group-hover:bg-cyan-300 transition-colors shadow-sm shadow-sky-400/50" />
-                                  <span className="flex-1 text-justify">{tr(b)}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        ))}
+                      {/* Stempel Status di Pojok Kanan */}
+                      <div className="shrink-0 self-start">
+                        <span
+                          className={`rubber-stamp inline-flex items-center gap-1.5 px-3 py-1 rounded-sm text-[11px] font-bold rotate-1 ${bStyle.chipClass}`}
+                        >
+                          <span className={`w-1.5 h-1.5 rounded-full ${bStyle.dotClass}`} />
+                          <span>{tr(exp.badge)}</span>
+                        </span>
                       </div>
                     </div>
 
-                    {/* Tombol Popup Sertifikat Terkait (Interaktif & Glowing) */}
-                    {(() => {
-                      // Langkah 1: kumpulkan semua sertifikat yang terhubung lewat experienceId
-                      const linked = certificates.filter(
-                        (c) => c.experienceId && String(c.experienceId) === String(exp.id)
-                      );
-
-                      // Langkah 2: pilih yang paling relevan —
-                      //   utamakan kategori 'Magang', fallback ke entri pertama yang ada
-                      const linkedCert =
-                        linked.find((c) => c.category && c.category.toLowerCase().includes('magang')) ||
-                        linked[0] ||
-                        null;
-
-                      if (!linkedCert) return null;
-                      return (
-                        <div className="pt-4 mt-5 border-t border-subtle flex flex-wrap items-center justify-between gap-2">
-                          <button
-                            type="button"
-                            onClick={() => setSelectedCertificate(linkedCert)}
-                            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl tone-amber border text-xs font-semibold transition-all shadow-sm hover:brightness-105 hover:scale-[1.02] cursor-pointer group/btn"
-                          >
-                            <Award className="w-4 h-4 tone-amber-text group-hover/btn:scale-110 group-hover/btn:rotate-6 transition-all" />
-                            <span>
-                              {t('experience.viewOfficialCert', {
-                                category: tr(linkedCert.category || 'Magang'),
-                              })}
+                    {/* Sub-bab & Poin Capaian Tanpa Sub-Kartu Bersarang */}
+                    <div className="pt-5 space-y-5 divide-y divide-[var(--border-subtle)]">
+                      {(exp.sections || []).map((sec, sIdx) => (
+                        <div key={sIdx} className={sIdx > 0 ? 'pt-5 space-y-2.5' : 'space-y-2.5'}>
+                          <div className="flex items-center gap-2.5">
+                            <span className="font-mono-code text-[11px] font-bold text-accent">
+                              [0{sIdx + 1}]
                             </span>
-                            <ExternalLink className="w-3.5 h-3.5 opacity-80 group-hover/btn:translate-x-0.5 transition-transform" />
-                          </button>
-                          <a
-                            href="#sertifikat"
-                            className="text-xs text-secondary hover:text-accent font-medium transition-colors"
-                          >
-                            {t('experience.allCertificates')} &rarr;
-                          </a>
+                            <h4 className="font-mono-code text-xs sm:text-sm font-bold uppercase tracking-wider text-[var(--text-primary)]">
+                              {tr(sec.heading)}
+                            </h4>
+                          </div>
+
+                          <ul className="space-y-2 text-sm text-secondary leading-relaxed pl-1">
+                            {(sec.bullets || []).map((b, bIdx) => (
+                              <li key={bIdx} className="flex items-start gap-2.5 text-left">
+                                <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] mt-2 shrink-0" />
+                                <span className="flex-1 text-left">{tr(b)}</span>
+                              </li>
+                            ))}
+                          </ul>
                         </div>
-                      );
-                    })()}
+                      ))}
+                    </div>
+
+                    {/* Tombol Popup Sertifikat Terkait */}
+                    {linkedCert && (
+                      <div className="pt-5 mt-5 border-t border-subtle flex flex-wrap items-center justify-between gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedCertificate(linkedCert)}
+                          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg tone-amber border text-xs font-semibold transition-all hover:brightness-105 cursor-pointer"
+                        >
+                          <Award className="w-4 h-4 tone-amber-text" />
+                          <span>
+                            {t('experience.viewOfficialCert', {
+                              category: tr(linkedCert.category || 'Magang'),
+                            })}
+                          </span>
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </button>
+                        <a
+                          href="#sertifikat"
+                          className="font-mono-code text-xs text-secondary hover:text-accent transition-colors"
+                        >
+                          {t('experience.allCertificates')} &rarr;
+                        </a>
+                      </div>
+                    )}
                   </article>
                 );
               })}
@@ -770,17 +862,28 @@ export default function PortfolioHome({ onNavigate }) {
           </div>
         </section>
 
-        <section id="proyek" className="py-16 sm:py-20 border-b border-subtle relative overflow-hidden">
-          <ProyekDecor />
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        {/* ============================================================
+            SEKSI 3 — PROYEK (LACI BERKAS KASUS: 2 KOLOM SPLIT)
+           ============================================================ */}
+        <section id="proyek" className="py-16 sm:py-24 border-b border-subtle relative overflow-hidden">
+          <SectionBackdrop imagePath="/images/bg-corridor-noir.jpg" />
+
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-[6]">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
               <div>
-                <p className="text-xs font-bold uppercase tracking-widest text-accent mb-2">{t('projects.eyebrow')}</p>
-                <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">{t('projects.title')}</h2>
+                <p className="font-mono-code text-xs font-bold uppercase tracking-widest text-accent mb-2 flex items-center gap-2">
+                  <FolderOpen className="w-3.5 h-3.5" />
+                  <span>{t('projects.eyebrow')}</span>
+                </p>
+                <h2 className="font-serif-editorial text-4xl sm:text-5xl font-normal tracking-tight">
+                  {t('projects.title')}
+                </h2>
                 {dataSource === 'api' && (
-                  <p className="text-xs tone-emerald-text mt-1">{t('projects.syncedCloud')}</p>
+                  <p className="font-mono-code text-xs tone-emerald-text mt-1">{t('projects.syncedCloud')}</p>
                 )}
               </div>
+
+              {/* Filter Kategori Proyek */}
               <div className="flex flex-wrap gap-2">
                 {[
                   { id: 'all', label: t('projects.filterAll', { count: counts.all }) },
@@ -792,9 +895,9 @@ export default function PortfolioHome({ onNavigate }) {
                     key={tab.id}
                     type="button"
                     onClick={() => setFilter(tab.id)}
-                    className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold border transition-all ${
+                    className={`px-3.5 py-2 rounded-lg font-mono-code text-xs font-semibold border transition-colors ${
                       filter === tab.id
-                        ? 'bg-sky-500 text-white border-sky-500'
+                        ? 'bg-[var(--accent)] text-white border-[var(--accent)]'
                         : 'surface-card text-secondary hover:text-[var(--text-primary)]'
                     }`}
                   >
@@ -804,192 +907,266 @@ export default function PortfolioHome({ onNavigate }) {
               </div>
             </div>
 
-            {featuredProject && (
-              <article
-                onClick={() => setSelectedProject(featuredProject)}
-                className="project-card surface-card rounded-2xl overflow-hidden cursor-pointer grid grid-cols-1 lg:grid-cols-12 mb-6"
-              >
-                <div className="lg:col-span-6 aspect-video lg:aspect-auto bg-elevated border-b lg:border-b-0 lg:border-r border-subtle">
-                  <ProjectMockup project={featuredProject} />
-                </div>
-                <div className="lg:col-span-6 p-6 sm:p-8 flex flex-col justify-between space-y-5">
-                  <div className="space-y-3">
-                    <span className="chip-tag text-xs font-semibold px-3 py-1 rounded-full">
-                      {t('projects.featuredBadge')} · {getProjectCategoryBadge(featuredProject, tr)}
-                    </span>
-                    <h3 className="text-xl sm:text-2xl font-extrabold">{tr(featuredProject.title)}</h3>
-                    <p className="text-sm sm:text-base text-secondary leading-relaxed text-justify">{tr(featuredProject.summary)}</p>
-                    <div className="flex flex-wrap gap-2">
-                      {(featuredProject.tags || []).map((t) => (
-                        <span key={t} className="chip-tag text-xs font-medium px-2.5 py-1 rounded-lg">
-                          {t}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap gap-3">
-                    {featuredProject.liveUrl && (
-                      <a
-                        href={featuredProject.liveUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-white text-sm font-semibold transition-all hover:scale-[1.02]"
+            {activeCase ? (
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                {/* Kolom Kiri: Daftar Tab Berkas Kasus (CASE-01, CASE-02, ...) */}
+                <div className="lg:col-span-5 space-y-2.5">
+                  {filteredProjects.map((project, idx) => {
+                    const caseCode = `${t('projects.casePrefix')}-${String(idx + 1).padStart(2, '0')}`;
+                    const isActive = String(project.id) === String(activeCase.id);
+                    return (
+                      <button
+                        key={project.id}
+                        type="button"
+                        onClick={() => setActiveProjectId(project.id)}
+                        className={`w-full text-left rounded-xl p-4 border transition-all flex items-start justify-between gap-3 ${
+                          isActive
+                            ? 'bg-[var(--bg-elevated)] border-[var(--accent)] shadow-md border-l-4'
+                            : 'surface-card hover:bg-[var(--bg-surface)]'
+                        }`}
                       >
-                        <span>{getProjectLinkInfo(featuredProject, t)?.text || t('projects.liveDemo')}</span>
-                        <ExternalLink className="w-3.5 h-3.5" />
-                      </a>
-                    )}
-                    <button
-                      type="button"
-                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl border border-subtle text-sm font-semibold"
-                    >
-                      <span>{t('projects.viewDetails')}</span>
-                      <ArrowRight className="w-3.5 h-3.5 text-accent" />
-                    </button>
-                  </div>
+                        <div className="min-w-0 space-y-1">
+                          <div className="flex flex-wrap items-center gap-2 font-mono-code text-[11px]">
+                            <span className={isActive ? 'text-accent font-bold' : 'text-muted font-semibold'}>
+                              {caseCode}
+                            </span>
+                            <span className="text-muted">·</span>
+                            <span className="text-secondary">{getProjectCategoryBadge(project, tr)}</span>
+                            {project.featured && (
+                              <span className="px-1.5 py-0.5 rounded bg-[var(--accent-soft)] text-accent text-[10px] font-bold">
+                                ★
+                              </span>
+                            )}
+                          </div>
+                          <h3 className={`font-bold text-sm sm:text-base leading-snug line-clamp-2 ${isActive ? 'text-[var(--text-primary)]' : 'text-secondary'}`}>
+                            {tr(project.title)}
+                          </h3>
+                        </div>
+                        <span className="font-mono-code text-xs text-muted shrink-0 pt-0.5">{project.year}</span>
+                      </button>
+                    );
+                  })}
                 </div>
-              </article>
-            )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {gridProjects.map((project) => (
-                <article
-                  key={project.id}
-                  onClick={() => setSelectedProject(project)}
-                  className="project-card surface-card rounded-2xl overflow-hidden cursor-pointer flex flex-col justify-between"
-                >
-                  <div>
-                    <div className="aspect-video bg-elevated border-b border-subtle">
-                      <ProjectMockup project={project} />
-                    </div>
-                    <div className="p-5 space-y-3">
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="chip-tag text-[11px] font-semibold px-2.5 py-0.5 rounded-full">
-                          {getProjectCategoryBadge(project, tr)}
+                {/* Kolom Kanan: Panel Viewer Detail Berkas Aktif */}
+                <article className="lg:col-span-7 surface-card rounded-xl overflow-hidden shadow-xl">
+                  {/* Top Bar File Header */}
+                  <div className="px-5 py-3 bg-[var(--bg-surface)] border-b border-subtle flex flex-wrap items-center justify-between gap-2 font-mono-code text-xs">
+                    <span className="font-bold text-accent">
+                      {t('projects.casePrefix')}-
+                      {String(
+                        Math.max(
+                          1,
+                          filteredProjects.findIndex((p) => String(p.id) === String(activeCase.id)) + 1
+                        )
+                      ).padStart(2, '0')}{' '}
+                      // {getProjectCategoryBadge(activeCase, tr)}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      {activeCase.featured && (
+                        <span className="rubber-stamp px-2 py-0.5 text-[10px] font-bold rounded-sm">
+                          {t('projects.featuredBadge')}
                         </span>
-                        <span className="text-xs text-muted">{project.year}</span>
-                      </div>
-                      <h3 className="font-bold text-base leading-snug">{tr(project.title)}</h3>
-                      <p className="text-xs sm:text-sm text-secondary leading-relaxed text-justify">{tr(project.summary)}</p>
+                      )}
+                      <span className="text-muted">{activeCase.year}</span>
                     </div>
                   </div>
-                  <div className="px-5 pb-5 pt-2 space-y-3">
-                    <div className="flex flex-wrap gap-1.5">
-                      {(project.tags || []).map((tag) => (
-                        <span key={tag} className="text-[11px] font-medium px-2 py-0.5 rounded-md bg-elevated text-secondary border border-subtle">
+
+                  {/* Preview Gambar 16:9 Penuh */}
+                  <div
+                    onClick={() => setSelectedProject(activeCase)}
+                    className="aspect-video bg-[#0d0c0b] border-b border-subtle cursor-pointer"
+                  >
+                    <ProjectMockup project={activeCase} />
+                  </div>
+
+                  {/* Detail Berkas */}
+                  <div className="p-5 sm:p-6 space-y-4">
+                    <h3 className="font-serif-editorial text-2xl sm:text-3xl leading-snug text-[var(--text-primary)]">
+                      {tr(activeCase.title)}
+                    </h3>
+                    <p className="text-sm sm:text-base text-secondary leading-relaxed text-left">
+                      {tr(activeCase.summary)}
+                    </p>
+
+                    {/* Maksimal 4-5 Tag Inti */}
+                    <div className="flex flex-wrap gap-2">
+                      {(activeCase.tags || []).slice(0, 5).map((tag) => (
+                        <span
+                          key={tag}
+                          className="chip-tag font-mono-code text-xs font-medium px-2.5 py-1 rounded-md"
+                        >
                           {tag}
                         </span>
                       ))}
                     </div>
-                    <div className="flex items-center justify-between pt-2 border-t border-subtle text-xs font-semibold">
-                      <span className="text-accent inline-flex items-center gap-1">
-                        {t('projects.projectDetails')} <ArrowUpRight className="w-3.5 h-3.5" />
-                      </span>
-                      {project.liveUrl ? (
+
+                    {/* Tombol Aksi */}
+                    <div className="pt-4 border-t border-subtle flex flex-wrap items-center gap-3">
+                      {activeCase.liveUrl && (
                         <a
-                          href={project.liveUrl}
+                          href={activeCase.liveUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          onClick={(e) => e.stopPropagation()}
-                          className="tone-emerald-text hover:underline inline-flex items-center gap-1"
+                          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[var(--accent)] hover:bg-[var(--accent-strong)] text-white text-sm font-semibold transition-colors"
                         >
-                          <span>{getProjectLinkInfo(project, t)?.text || t('projects.liveDemo')}</span>
-                          <ExternalLink className="w-3 h-3" />
+                          <span>{getProjectLinkInfo(activeCase, t)?.text || t('projects.liveDemo')}</span>
+                          <ExternalLink className="w-3.5 h-3.5" />
                         </a>
-                      ) : (
-                        <span className="text-muted">{t('projects.caseStudy')}</span>
                       )}
+                      {activeCase.repoUrl && (
+                        <a
+                          href={activeCase.repoUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg border border-subtle hover:border-[var(--border-accent)] text-sm font-semibold transition-colors"
+                        >
+                          <Github className="w-4 h-4 text-accent" />
+                          <span>GitHub</span>
+                        </a>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => setSelectedProject(activeCase)}
+                        className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg border border-subtle hover:border-[var(--border-accent)] text-sm font-semibold transition-colors ml-auto"
+                      >
+                        <span>{t('projects.viewDetails')}</span>
+                        <ArrowRight className="w-3.5 h-3.5 text-accent" />
+                      </button>
                     </div>
                   </div>
                 </article>
-              ))}
-            </div>
+              </div>
+            ) : (
+              <div className="surface-card rounded-xl p-8 text-center text-secondary font-mono-code text-sm">
+                {t('projects.emptyState')}
+              </div>
+            )}
           </div>
         </section>
 
-        {/* SECTION SERTIFIKAT (Di atas Keahlian Teknis) */}
-        <section id="sertifikat" className="py-16 sm:py-20 border-b border-subtle relative overflow-hidden">
-          <SertifikatDecor />
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+        {/* ============================================================
+            SEKSI 4 — SERTIFIKAT (BARANG BUKTI TERVERIFIKASI: GRID 2 KOLOM)
+           ============================================================ */}
+        <section id="sertifikat" className="py-16 sm:py-24 border-b border-subtle relative overflow-hidden">
+          <SectionBackdrop imagePath="/images/bg-archive-crt.jpg" />
+
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-[6]">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
               <div>
-                <p className="text-xs font-bold uppercase tracking-widest text-accent mb-2">{t('certificates.eyebrow')}</p>
-                <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">{t('certificates.title')}</h2>
-                <p className="text-sm text-secondary mt-1 text-justify">
+                <p className="font-mono-code text-xs font-bold uppercase tracking-widest text-accent mb-2 flex items-center gap-2">
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  <span>{t('certificates.eyebrow')}</span>
+                </p>
+                <h2 className="font-serif-editorial text-4xl sm:text-5xl font-normal tracking-tight">
+                  {t('certificates.title')}
+                </h2>
+                <p className="text-sm sm:text-base text-secondary mt-2 text-left max-w-2xl">
                   {t('certificates.subtitle')}
                 </p>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-semibold px-3 py-1.5 rounded-full flex items-center gap-1.5 tone-amber border">
-                  <Award className="w-3.5 h-3.5 tone-amber-text" />
-                  <span>{t('certificates.countBadge', { count: certificates.length })}</span>
-                </span>
-              </div>
+              <span className="font-mono-code text-xs font-semibold px-3.5 py-1.5 rounded-lg tone-amber border inline-flex items-center gap-1.5 self-start md:self-end shrink-0">
+                <Award className="w-3.5 h-3.5 tone-amber-text" />
+                <span>{t('certificates.countBadge', { count: certificates.length })}</span>
+              </span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {certificates.map((cert) => {
+            {/* Filter Kategori Sertifikat */}
+            <div className="flex flex-wrap gap-2 mb-8">
+              <button
+                type="button"
+                onClick={() => setCertFilter('all')}
+                className={`px-3.5 py-1.5 rounded-lg font-mono-code text-xs font-semibold border transition-colors ${
+                  certFilter === 'all'
+                    ? 'bg-[var(--accent)] text-white border-[var(--accent)]'
+                    : 'surface-card text-secondary hover:text-[var(--text-primary)]'
+                }`}
+              >
+                {t('certificates.filterAll', { count: certificates.length })}
+              </button>
+              {certCategories.map((cat) => (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => setCertFilter(cat.id)}
+                  className={`px-3.5 py-1.5 rounded-lg font-mono-code text-xs font-semibold border transition-colors ${
+                    certFilter === cat.id
+                      ? 'bg-[var(--accent)] text-white border-[var(--accent)]'
+                      : 'surface-card text-secondary hover:text-[var(--text-primary)]'
+                  }`}
+                >
+                  {tr(cat.id)} ({cat.count})
+                </button>
+              ))}
+            </div>
+
+            {/* Grid 2 Kolom Rapi Barang Bukti */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {filteredCertificates.map((cert, idx) => {
                 const certTitle = formatCertificateTitle(tr(cert.title));
                 const certCategory = tr(cert.category || t('certificates.fallbackChip'));
                 const certDate = cert.issueDate ? tr(cert.issueDate) : t('certificates.fallbackChip');
+                const evidenceCode = `${t('certificates.evidencePrefix')}-${String(idx + 1).padStart(2, '0')}`;
+
                 return (
                   <article
                     key={cert.id}
                     onClick={() => setSelectedCertificate(cert)}
-                    className="surface-card rounded-2xl overflow-hidden border border-subtle hover:border-sky-500/50 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 cursor-pointer flex flex-col justify-between group"
+                    className="surface-card rounded-xl overflow-hidden cursor-pointer flex flex-col justify-between group shadow-md hover:shadow-xl"
                   >
                     <div>
-                      {/* Thumbnail / Mockup Preview (Utuh & Tidak Terpotong) */}
-                      <div className="aspect-[16/10] bg-slate-950/60 border-b border-subtle overflow-hidden relative flex items-center justify-center p-2 sm:p-2.5">
+                      {/* Preview Utuh (object-contain) + Stempel Merah TERVERIFIKASI */}
+                      <div className="aspect-[16/10] bg-[#0d0c0b] border-b border-subtle overflow-hidden relative flex items-center justify-center p-2.5">
                         {cert.imageUrl ? (
                           <img
                             src={cert.imageUrl}
                             alt={certTitle}
-                            className="w-full h-full object-contain group-hover:scale-[1.02] transition-transform duration-300 rounded-lg"
+                            className="w-full h-full object-contain group-hover:scale-[1.02] transition-transform duration-300 rounded"
                           />
                         ) : (
-                          <div className="w-full h-full border-2 border-dashed border-amber-500/30 rounded-xl bg-gradient-to-br from-slate-950 to-[#0e1626] flex flex-col items-center justify-center p-3 text-center">
-                            <div className="w-10 h-10 rounded-full bg-amber-500/15 border border-amber-500/40 text-amber-400 flex items-center justify-center mb-1.5 shadow-md">
-                              <Award className="w-5 h-5" />
-                            </div>
-                            <span className="text-xs font-bold text-slate-200 line-clamp-1">{cert.issuer}</span>
-                            <span className="text-[10px] text-amber-400 font-semibold mt-0.5">{certCategory}</span>
+                          <div className="w-full h-full border border-dashed border-amber-500/35 rounded-lg bg-[#14110f] flex flex-col items-center justify-center p-4 text-center">
+                            <Award className="w-8 h-8 text-amber-400 mb-2" />
+                            <span className="text-xs font-bold text-[#EDE6D6] line-clamp-1">{cert.issuer}</span>
+                            <span className="text-[11px] text-amber-400 font-semibold mt-0.5">{certCategory}</span>
                           </div>
                         )}
-                        <span className="absolute top-2.5 right-2.5 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-900/90 text-sky-300 backdrop-blur border border-slate-700/80">
-                          {certDate}
+
+                        {/* Kode Barang Bukti & Tanggal */}
+                        <span className="absolute top-2.5 left-2.5 font-mono-code text-[10px] font-bold px-2 py-0.5 rounded bg-black/80 text-[#EDE6D6] border border-white/15">
+                          {evidenceCode} · {certDate}
+                        </span>
+
+                        {/* Stempel Merah TERVERIFIKASI */}
+                        <span className="rubber-stamp absolute bottom-2.5 right-2.5 px-2.5 py-0.5 text-[10px] font-bold rounded-sm -rotate-3 bg-black/75">
+                          {cert.credentialUrl ? t('certificates.stampVerified') : t('certificates.stampArchived')}
                         </span>
                       </div>
 
-                      {/* Card Content */}
-                      <div className="p-5 space-y-2.5">
-                        <div className="flex items-center gap-2">
-                          <span className={`text-[10px] font-semibold px-2.5 py-0.5 rounded-full ${getCertificateCategoryStyle(cert.category).badgeClass}`}>
-                            {certCategory}
-                          </span>
-                        </div>
+                      <div className="p-5 space-y-2">
+                        <span className={`inline-block text-[10px] font-semibold px-2.5 py-0.5 rounded-full border ${getCertificateCategoryStyle(cert.category).badgeClass}`}>
+                          {certCategory}
+                        </span>
                         <h3
-                          className="font-bold text-base leading-snug group-hover:text-accent transition-colors line-clamp-2"
+                          className="font-bold text-base sm:text-lg leading-snug group-hover:text-accent transition-colors line-clamp-2"
                           title={certTitle}
                         >
                           {certTitle}
                         </h3>
                         <p className="text-xs text-accent font-semibold">{cert.issuer}</p>
                         {cert.description && (
-                          <p className="text-xs text-secondary line-clamp-2 leading-relaxed text-justify">
+                          <p className="text-xs sm:text-sm text-secondary line-clamp-2 leading-relaxed text-left">
                             {tr(cert.description)}
                           </p>
                         )}
                       </div>
                     </div>
 
-                    <div className="p-5 pt-0 border-t border-subtle/50 mt-2 flex items-center justify-between text-xs font-semibold">
+                    <div className="px-5 py-3.5 border-t border-subtle flex items-center justify-between text-xs font-semibold">
                       <span className="text-accent inline-flex items-center gap-1 group-hover:underline">
                         {t('certificates.viewCertificate')} <ArrowUpRight className="w-3.5 h-3.5" />
                       </span>
                       {cert.credentialUrl && (
-                        <span className="tone-emerald-text text-[11px]">{t('certificates.verified')}</span>
+                        <span className="font-mono-code tone-emerald-text text-[11px]">{t('certificates.verified')}</span>
                       )}
                     </div>
                   </article>
@@ -999,72 +1176,79 @@ export default function PortfolioHome({ onNavigate }) {
           </div>
         </section>
 
-        <section id="keahlian" className="py-16 sm:py-20 border-b border-subtle relative overflow-hidden">
-          <KeahlianDecor />
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        {/* ============================================================
+            SEKSI 5 — KEAHLIAN (CATATAN LAPANGAN: TANPA PROGRESS BAR)
+           ============================================================ */}
+        <section id="keahlian" className="py-16 sm:py-24 border-b border-subtle relative overflow-hidden">
+          <SectionBackdrop imagePath="/images/bg-archive-crt.jpg" motif="silhouette" />
+
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-[6]">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
               <div>
-                <p className="text-xs font-bold uppercase tracking-widest text-accent mb-2">{t('skills.eyebrow')}</p>
-                <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">{t('skills.title')}</h2>
-                <p className="text-sm text-secondary mt-1 max-w-xl text-justify">
+                <p className="font-mono-code text-xs font-bold uppercase tracking-widest text-accent mb-2 flex items-center gap-2">
+                  <FileText className="w-3.5 h-3.5" />
+                  <span>{t('skills.eyebrow')}</span>
+                </p>
+                <h2 className="font-serif-editorial text-4xl sm:text-5xl font-normal tracking-tight">
+                  {t('skills.title')}
+                </h2>
+                <p className="text-sm sm:text-base text-secondary mt-2 max-w-xl text-left">
                   {t('skills.subtitle')}
                 </p>
               </div>
 
-              {/* 2 Menu Pilihan: Hard Skill vs Soft Skill */}
-              <div className="inline-flex p-1.5 rounded-2xl bg-elevated border border-subtle gap-1.5 shrink-0">
+              {/* Tab Hard Skills vs Soft Skills */}
+              <div className="inline-flex p-1 rounded-xl bg-elevated border border-subtle gap-1 shrink-0">
                 <button
                   type="button"
                   onClick={() => setSkillTab('hard')}
-                  className={`inline-flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-colors ${
                     skillTab === 'hard'
-                      ? 'bg-sky-500 text-white shadow-lg shadow-sky-500/20'
+                      ? 'bg-[var(--accent)] text-white'
                       : 'text-secondary hover:text-[var(--text-primary)]'
                   }`}
                 >
                   <Code2 className="w-4 h-4" />
                   <span>{t('skills.hardTab')}</span>
-                  <span className={`text-[11px] px-2 py-0.5 rounded-full font-bold ${skillTab === 'hard' ? 'bg-white/20 text-white' : 'bg-[var(--bg-surface)] border border-subtle text-secondary'}`}>
+                  <span className={`font-mono-code text-[11px] px-2 py-0.5 rounded font-bold ${skillTab === 'hard' ? 'bg-black/25 text-white' : 'bg-[var(--bg-surface)] text-secondary'}`}>
                     {hardSkills.length}
                   </span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setSkillTab('soft')}
-                  className={`inline-flex items-center gap-2 px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-colors ${
                     skillTab === 'soft'
-                      ? 'bg-purple-500 text-white shadow-lg shadow-purple-500/20'
+                      ? 'bg-[var(--accent)] text-white'
                       : 'text-secondary hover:text-[var(--text-primary)]'
                   }`}
                 >
                   <Brain className="w-4 h-4" />
                   <span>{t('skills.softTab')}</span>
-                  <span className={`text-[11px] px-2 py-0.5 rounded-full font-bold ${skillTab === 'soft' ? 'bg-white/20 text-white' : 'bg-[var(--bg-surface)] border border-subtle text-secondary'}`}>
+                  <span className={`font-mono-code text-[11px] px-2 py-0.5 rounded font-bold ${skillTab === 'soft' ? 'bg-black/25 text-white' : 'bg-[var(--bg-surface)] text-secondary'}`}>
                     {softSkills.length}
                   </span>
                 </button>
               </div>
             </div>
 
-            {/* Grid Kartu Kelompok Keahlian */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {Object.entries(skillGroups).map(([groupTitle, items]) => (
-                <div key={groupTitle} className="surface-card rounded-2xl p-6 sm:p-7 space-y-5 border border-subtle">
-                  <div className="flex items-center justify-between pb-3 border-b border-subtle">
-                    <div className="flex items-center gap-2.5">
-                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center border ${
-                        skillTab === 'hard' ? 'tone-sky' : 'tone-purple'
-                      }`}>
-                        {skillTab === 'hard' ? <Code2 className="w-4 h-4" /> : <Brain className="w-4 h-4" />}
-                      </div>
-                      <h3 className="font-bold text-base sm:text-lg">{tr(groupTitle)}</h3>
+            {/* 3 Kolom Daftar Keahlian Bersih Berbasis Teks (Tanpa Progress Bar Persentase) */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {Object.entries(skillGroups).map(([groupTitle, items], gIdx) => (
+                <div key={groupTitle} className="surface-card rounded-xl p-5 sm:p-6 space-y-4">
+                  <div className="flex items-start justify-between gap-2 pb-3 border-b border-subtle">
+                    <div>
+                      <span className="font-mono-code text-[10px] font-bold text-accent uppercase tracking-widest block">
+                        SEC // 0{gIdx + 1}
+                      </span>
+                      <h3 className="font-bold text-base text-[var(--text-primary)] mt-0.5">{tr(groupTitle)}</h3>
                     </div>
-                    <span className="text-xs text-secondary font-medium">
+                    <span className="font-mono-code text-[11px] text-muted shrink-0">
                       {t('skills.countLabel', { count: items.length })}
                     </span>
                   </div>
 
-                  <div className="space-y-4">
+                  <ul className="divide-y divide-[var(--border-subtle)]">
                     {items.map((skill) => {
                       const ratingInfo = getSkillRatingLabel(skill.ratePoint);
                       const rVal = Number(skill.ratePoint) || 0;
@@ -1076,118 +1260,133 @@ export default function PortfolioHome({ onNavigate }) {
                           : rVal >= 75
                           ? t('skills.ratings.proficient')
                           : t('skills.ratings.intermediate');
+
                       return (
-                        <div key={skill.id || skill.name} className="space-y-1.5">
-                          <div className="flex items-center justify-between text-xs sm:text-sm gap-2">
-                            <span className="font-semibold text-[var(--text-primary)]">{tr(skill.name)}</span>
-                            <div className="flex items-center gap-1.5 shrink-0">
-                              <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full border ${ratingInfo.badgeClass}`}>
-                                {ratingText}
-                              </span>
-                              <span className="font-bold text-xs text-[var(--text-primary)] min-w-[36px] text-right">
-                                {skill.ratePoint}%
-                              </span>
-                            </div>
-                          </div>
-                          {/* Progress Rate Point Bar */}
-                          <div className="w-full bg-elevated rounded-full h-2.5 overflow-hidden border border-subtle p-0.5">
-                            <div
-                              className={`h-full rounded-full transition-all duration-700 ${
-                                skillTab === 'hard'
-                                  ? 'bg-gradient-to-r from-sky-500 via-cyan-400 to-emerald-400'
-                                  : 'bg-gradient-to-r from-purple-500 via-fuchsia-400 to-indigo-400'
-                              }`}
-                              style={{ width: `${Math.min(100, Math.max(5, skill.ratePoint))}%` }}
-                            />
-                          </div>
-                        </div>
+                        <li
+                          key={skill.id || skill.name}
+                          className="py-2.5 first:pt-0 last:pb-0 flex items-center justify-between gap-3 text-xs sm:text-sm"
+                        >
+                          <span className="font-medium text-[var(--text-primary)] text-left">{tr(skill.name)}</span>
+                          <span className={`font-mono-code text-[10px] font-bold uppercase px-2 py-0.5 rounded border shrink-0 ${ratingInfo.badgeClass}`}>
+                            {ratingText}
+                          </span>
+                        </li>
                       );
                     })}
-                  </div>
+                  </ul>
                 </div>
               ))}
+            </div>
+
+            {/* Catatan Arsip Efek Sensor (Redacted Hover / Click Reveal) */}
+            <div className="mt-8 surface-card rounded-xl p-5 border-l-4 border-l-[var(--accent)] space-y-2">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span className="font-mono-code text-[11px] font-bold tracking-widest text-accent flex items-center gap-1.5">
+                  <Eye className="w-3.5 h-3.5" />
+                  {t('skills.fieldNoteLabel')}
+                </span>
+                <span className="font-mono-code text-[11px] text-muted">{t('skills.fieldNoteHint')}</span>
+              </div>
+              <p className="text-sm text-secondary leading-relaxed text-left">
+                {t('skills.fieldNoteLead')}{' '}
+                <span
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => setNoteRevealed((prev) => !prev)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      setNoteRevealed((prev) => !prev);
+                    }
+                  }}
+                  className={`redacted-bar font-mono-code text-xs sm:text-sm ${noteRevealed ? 'revealed' : ''}`}
+                >
+                  {t('skills.fieldNoteRedacted')}
+                </span>
+              </p>
             </div>
           </div>
         </section>
 
+        {/* ============================================================
+            SEKSI 6 — KONTAK & FOOTER (SALURAN TERENKRIPSI)
+           ============================================================ */}
         <section id="kontak" className="py-16 sm:py-24 relative overflow-hidden">
-          <KontakDecor />
-          {/* Subtle background glow decoration */}
-          <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 bg-sky-500/5 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-10 right-10 w-80 h-80 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
+          <SectionBackdrop imagePath="/images/bg-corridor-noir.jpg" />
 
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div className="text-center max-w-2xl mx-auto mb-12">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold tone-sky border mb-3">
-                <Sparkles className="w-3.5 h-3.5" />
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-[6]">
+            <div className="max-w-2xl mb-10">
+              <p className="font-mono-code text-xs font-bold uppercase tracking-widest text-accent mb-2">
                 {t('contact.badge')}
-              </span>
-              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">{t('contact.title')}</h2>
-              <p className="mt-2 text-sm sm:text-base text-secondary text-justify">
+              </p>
+              <h2 className="font-serif-editorial text-4xl sm:text-5xl font-normal tracking-tight">
+                {t('contact.title')}
+              </h2>
+              <p className="mt-2 text-sm sm:text-base text-secondary text-left">
                 {t('contact.subtitle')}
               </p>
             </div>
 
-            {/* Quick Social Popup Launcher Banner */}
-            <div className="surface-card rounded-2xl p-5 sm:p-6 mb-8 border border-sky-500/30 bg-gradient-to-r from-sky-500/10 via-indigo-500/5 to-cyan-500/10 flex flex-col md:flex-row items-center justify-between gap-5 shadow-lg">
-              <div className="flex items-center gap-4 text-center sm:text-left">
-                <div className="w-12 h-12 rounded-2xl tone-sky border flex items-center justify-center shrink-0">
-                  <Share2 className="w-6 h-6" />
+            {/* Banner Hub Media Sosial */}
+            <div className="surface-card rounded-xl p-5 sm:p-6 mb-8 border border-[var(--border-accent)] flex flex-col md:flex-row items-start md:items-center justify-between gap-5 shadow-md">
+              <div className="flex items-center gap-4">
+                <div className="w-11 h-11 rounded-lg chip-tag flex items-center justify-center shrink-0">
+                  <Share2 className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-base sm:text-lg font-bold flex items-center gap-2 justify-center sm:justify-start">
+                  <h3 className="text-base sm:text-lg font-bold flex items-center gap-2">
                     {t('contact.hubTitle')}
-                    <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full tone-emerald border">
+                    <span className="font-mono-code text-[10px] font-bold px-2 py-0.5 rounded tone-emerald border">
                       {t('contact.hubActive')}
                     </span>
                   </h3>
-                  <p className="text-xs sm:text-sm text-secondary mt-0.5 text-justify">
+                  <p className="text-xs sm:text-sm text-secondary mt-0.5 text-left">
                     {t('contact.hubDesc')}
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 shrink-0 w-full sm:w-auto justify-center">
-                <button
-                  type="button"
-                  onClick={() => setSocialModalOpen(true)}
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-semibold text-sm shadow-md hover:shadow-sky-500/20 transition-all duration-200"
-                >
-                  <Sparkles className="w-4 h-4" />
-                  <span>{t('contact.hubButton')}</span>
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={() => setSocialModalOpen(true)}
+                className="w-full md:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-[var(--accent)] hover:bg-[var(--accent-strong)] text-white font-semibold text-sm transition-colors shrink-0"
+              >
+                <Share2 className="w-4 h-4" />
+                <span>{t('contact.hubButton')}</span>
+              </button>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-              {/* Kolom Kiri: Kartu Media Sosial & Kontak */}
-              <div className="lg:col-span-5 space-y-3.5">
+              {/* Kolom Kiri: Daftar Kontak Langsung */}
+              <div className="lg:col-span-5 space-y-3">
                 <div className="flex items-center justify-between pb-1">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-muted">{t('contact.directTitle')}</h4>
+                  <h4 className="font-mono-code text-xs font-bold uppercase tracking-wider text-muted">
+                    {t('contact.directTitle')}
+                  </h4>
                   <button
                     type="button"
                     onClick={() => setSocialModalOpen(true)}
-                    className="text-xs text-accent hover:opacity-80 font-medium inline-flex items-center gap-1"
+                    className="text-xs text-accent hover:underline font-medium inline-flex items-center gap-1"
                   >
                     {t('contact.openModal')} <ExternalLink className="w-3 h-3" />
                   </button>
                 </div>
 
                 {/* Email Card with Copy */}
-                <div className="surface-card rounded-xl p-3.5 sm:p-4 flex items-center justify-between gap-3 border border-subtle hover:border-sky-500/40 transition-all group">
-                  <a href={`mailto:${profile.email || PROFILE.email}`} className="flex items-center gap-3 min-w-0">
-                    <div className="w-10 h-10 rounded-xl tone-sky border flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                <div className="surface-card rounded-xl p-3.5 sm:p-4 flex items-center justify-between gap-3">
+                  <a href={`mailto:${activeEmail}`} className="flex items-center gap-3 min-w-0">
+                    <div className="w-10 h-10 rounded-lg chip-tag flex items-center justify-center shrink-0">
                       <Mail className="w-5 h-5" />
                     </div>
                     <div className="min-w-0">
-                      <div className="text-[11px] font-medium text-secondary">{t('contact.emailLabel')}</div>
-                      <div className="text-sm font-semibold truncate text-[var(--text-primary)]">{profile.email || PROFILE.email}</div>
+                      <div className="font-mono-code text-[11px] text-secondary">{t('contact.emailLabel')}</div>
+                      <div className="text-sm font-semibold truncate text-[var(--text-primary)]">{activeEmail}</div>
                     </div>
                   </a>
                   <button
                     type="button"
                     onClick={copyEmail}
-                    className="px-3 py-1.5 rounded-lg text-xs font-semibold chip-tag hover:border-sky-500/50 shrink-0"
+                    className="px-3 py-1.5 rounded-lg font-mono-code text-xs font-semibold chip-tag shrink-0 hover:brightness-110"
                     title={t('contact.copyTitle')}
                   >
                     {t('contact.copy')}
@@ -1196,21 +1395,21 @@ export default function PortfolioHome({ onNavigate }) {
 
                 {/* WhatsApp Card */}
                 <a
-                  href={`https://wa.me/${profile.whatsappNumber || PROFILE.whatsappNumber}`}
+                  href={`https://wa.me/${activeWaNumber}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="surface-card rounded-xl p-3.5 sm:p-4 flex items-center justify-between gap-3 border border-subtle hover:border-emerald-500/40 transition-all group block"
+                  className="surface-card rounded-xl p-3.5 sm:p-4 flex items-center justify-between gap-3 group block"
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-10 h-10 rounded-xl tone-emerald border flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                    <div className="w-10 h-10 rounded-lg tone-emerald border flex items-center justify-center shrink-0">
                       <MessageCircle className="w-5 h-5" />
                     </div>
                     <div className="min-w-0">
-                      <div className="text-[11px] font-medium text-secondary">{t('contact.whatsappLabel')}</div>
+                      <div className="font-mono-code text-[11px] text-secondary">{t('contact.whatsappLabel')}</div>
                       <div className="text-sm font-semibold text-[var(--text-primary)]">{profile.whatsappDisplay || PROFILE.whatsappDisplay}</div>
                     </div>
                   </div>
-                  <ArrowUpRight className="w-4 h-4 text-secondary group-hover:text-emerald-500 transition-colors shrink-0" />
+                  <ArrowUpRight className="w-4 h-4 text-secondary group-hover:text-accent transition-colors shrink-0" />
                 </a>
 
                 {/* GitHub Card */}
@@ -1218,20 +1417,20 @@ export default function PortfolioHome({ onNavigate }) {
                   href={profile.githubUrl || PROFILE.githubUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="surface-card rounded-xl p-3.5 sm:p-4 flex items-center justify-between gap-3 border border-subtle hover:border-slate-400/50 transition-all group block"
+                  className="surface-card rounded-xl p-3.5 sm:p-4 flex items-center justify-between gap-3 group block"
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-10 h-10 rounded-xl bg-elevated text-[var(--text-primary)] border border-subtle flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                    <div className="w-10 h-10 rounded-lg bg-elevated text-[var(--text-primary)] border border-subtle flex items-center justify-center shrink-0">
                       <Github className="w-5 h-5" />
                     </div>
                     <div className="min-w-0">
-                      <div className="text-[11px] font-medium text-secondary">{t('contact.githubLabel')}</div>
+                      <div className="font-mono-code text-[11px] text-secondary">{t('contact.githubLabel')}</div>
                       <div className="text-sm font-semibold truncate text-[var(--text-primary)]">
                         {(profile.githubUrl || PROFILE.githubUrl).replace(/^https?:\/\//, '')}
                       </div>
                     </div>
                   </div>
-                  <ArrowUpRight className="w-4 h-4 text-secondary group-hover:text-[var(--text-primary)] transition-colors shrink-0" />
+                  <ArrowUpRight className="w-4 h-4 text-secondary group-hover:text-accent transition-colors shrink-0" />
                 </a>
 
                 {/* LinkedIn Card */}
@@ -1239,97 +1438,101 @@ export default function PortfolioHome({ onNavigate }) {
                   href={profile.linkedinUrl || (profile.socials?.find((s) => s.id === 'linkedin')?.url) || 'https://linkedin.com/in/faris-pratama-putra'}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="surface-card rounded-xl p-3.5 sm:p-4 flex items-center justify-between gap-3 border border-subtle hover:border-blue-500/50 transition-all group block"
+                  className="surface-card rounded-xl p-3.5 sm:p-4 flex items-center justify-between gap-3 group block"
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-10 h-10 rounded-xl tone-blue border flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                    <div className="w-10 h-10 rounded-lg chip-tag flex items-center justify-center shrink-0">
                       <Linkedin className="w-5 h-5" />
                     </div>
                     <div className="min-w-0">
-                      <div className="text-[11px] font-medium text-secondary">{t('contact.linkedinLabel')}</div>
+                      <div className="font-mono-code text-[11px] text-secondary">{t('contact.linkedinLabel')}</div>
                       <div className="text-sm font-semibold truncate text-[var(--text-primary)]">
                         {(profile.linkedinUrl || (profile.socials?.find((s) => s.id === 'linkedin')?.url) || 'linkedin.com/in/faris-pratama-putra').replace(/^https?:\/\//, '')}
                       </div>
                     </div>
                   </div>
-                  <ArrowUpRight className="w-4 h-4 text-secondary group-hover:text-blue-500 transition-colors shrink-0" />
+                  <ArrowUpRight className="w-4 h-4 text-secondary group-hover:text-accent transition-colors shrink-0" />
                 </a>
 
-                {/* Instagram & TikTok Grid */}
+                {/* Instagram & TikTok */}
                 <div className="grid grid-cols-2 gap-3">
                   <a
                     href={profile.instagramUrl || (profile.socials?.find((s) => s.id === 'instagram')?.url) || 'https://instagram.com/fpratamaputra'}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="surface-card rounded-xl p-3.5 flex items-center justify-between gap-2 border border-subtle hover:border-pink-500/50 transition-all group"
+                    className="surface-card rounded-xl p-3.5 flex items-center justify-between gap-2 group"
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="w-9 h-9 rounded-lg tone-rose border flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                      <div className="w-9 h-9 rounded-lg chip-tag flex items-center justify-center shrink-0">
                         <Instagram className="w-4 h-4" />
                       </div>
                       <div className="min-w-0">
-                        <div className="text-[10px] text-secondary">Instagram</div>
+                        <div className="font-mono-code text-[10px] text-secondary">Instagram</div>
                         <div className="text-xs font-semibold truncate text-[var(--text-primary)]">
                           {(profile.instagramUrl || 'fpratamaputra').replace(/^https?:\/\/(www\.)?instagram\.com\//, '@')}
                         </div>
                       </div>
                     </div>
-                    <ArrowUpRight className="w-3.5 h-3.5 text-secondary group-hover:text-pink-500 shrink-0" />
+                    <ArrowUpRight className="w-3.5 h-3.5 text-secondary group-hover:text-accent shrink-0" />
                   </a>
 
                   <a
                     href={profile.tiktokUrl || (profile.socials?.find((s) => s.id === 'tiktok')?.url) || 'https://tiktok.com/@fpratamaputra'}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="surface-card rounded-xl p-3.5 flex items-center justify-between gap-2 border border-subtle hover:border-cyan-400/50 transition-all group"
+                    className="surface-card rounded-xl p-3.5 flex items-center justify-between gap-2 group"
                   >
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="w-9 h-9 rounded-lg tone-cyan border flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                      <div className="w-9 h-9 rounded-lg chip-tag flex items-center justify-center shrink-0">
                         <TikTokIcon className="w-4 h-4" />
                       </div>
                       <div className="min-w-0">
-                        <div className="text-[10px] text-secondary">TikTok</div>
+                        <div className="font-mono-code text-[10px] text-secondary">TikTok</div>
                         <div className="text-xs font-semibold truncate text-[var(--text-primary)]">
                           {(profile.tiktokUrl || 'fpratamaputra').replace(/^https?:\/\/(www\.)?tiktok\.com\/@?/, '@')}
                         </div>
                       </div>
                     </div>
-                    <ArrowUpRight className="w-3.5 h-3.5 text-secondary group-hover:text-cyan-500 shrink-0" />
+                    <ArrowUpRight className="w-3.5 h-3.5 text-secondary group-hover:text-accent shrink-0" />
                   </a>
                 </div>
               </div>
 
-              {/* Kolom Kanan: Form Kirim Pesan Cepat */}
+              {/* Kolom Kanan: Formulir Kirim Pesan Cepat */}
               <div className="lg:col-span-7">
-                <form onSubmit={handleWhatsAppSubmit} className="surface-card rounded-2xl p-6 sm:p-7 space-y-4 border border-subtle shadow-md">
-                  <div className="flex items-center justify-between border-b border-subtle/60 pb-3">
+                <form onSubmit={handleWhatsAppSubmit} className="surface-card rounded-xl p-6 sm:p-7 space-y-4 shadow-md">
+                  <div className="flex items-center justify-between border-b border-subtle pb-3">
                     <div>
                       <h3 className="text-lg font-bold">{t('contact.formTitle')}</h3>
-                      <p className="text-xs text-secondary mt-0.5">{t('contact.formSubtitle')}</p>
+                      <p className="text-xs text-secondary mt-0.5 text-left">{t('contact.formSubtitle')}</p>
                     </div>
-                    <div className="w-8 h-8 rounded-lg tone-sky border flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-lg chip-tag flex items-center justify-center shrink-0">
                       <Send className="w-4 h-4" />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-semibold text-secondary mb-1.5">{t('contact.nameLabel')}</label>
+                      <label className="block font-mono-code text-xs font-semibold text-secondary mb-1.5">
+                        {t('contact.nameLabel')}
+                      </label>
                       <input
                         type="text"
                         required
                         value={formState.name}
                         onChange={(e) => setFormState({ ...formState, name: e.target.value })}
                         placeholder={t('contact.namePlaceholder')}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-elevated border border-subtle text-sm focus:border-sky-500 focus:outline-none"
+                        className="w-full px-3.5 py-2.5 rounded-lg bg-elevated border border-subtle text-sm focus:border-[var(--accent)] focus:outline-none"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-secondary mb-1.5">{t('contact.topicLabel')}</label>
+                      <label className="block font-mono-code text-xs font-semibold text-secondary mb-1.5">
+                        {t('contact.topicLabel')}
+                      </label>
                       <select
                         value={formState.topicIdx}
                         onChange={(e) => setFormState({ ...formState, topicIdx: Number(e.target.value) })}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-elevated border border-subtle text-sm focus:border-sky-500 focus:outline-none"
+                        className="w-full px-3.5 py-2.5 rounded-lg bg-elevated border border-subtle text-sm focus:border-[var(--accent)] focus:outline-none"
                       >
                         {(Array.isArray(topicOptions) ? topicOptions : []).map((opt, idx) => (
                           <option key={opt.value} value={idx}>
@@ -1341,14 +1544,16 @@ export default function PortfolioHome({ onNavigate }) {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-secondary mb-1.5">{t('contact.messageLabel')}</label>
+                    <label className="block font-mono-code text-xs font-semibold text-secondary mb-1.5">
+                      {t('contact.messageLabel')}
+                    </label>
                     <textarea
                       rows="4"
                       required
                       value={formState.message}
                       onChange={(e) => setFormState({ ...formState, message: e.target.value })}
                       placeholder={t('contact.messagePlaceholder')}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-elevated border border-subtle text-sm resize-none focus:border-sky-500 focus:outline-none"
+                      className="w-full px-3.5 py-2.5 rounded-lg bg-elevated border border-subtle text-sm resize-none focus:border-[var(--accent)] focus:outline-none"
                     />
                   </div>
 
@@ -1356,7 +1561,7 @@ export default function PortfolioHome({ onNavigate }) {
                     <div className="flex flex-wrap gap-2.5">
                       <button
                         type="submit"
-                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm shadow-md transition-colors"
+                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-emerald-700 hover:bg-emerald-600 text-white font-semibold text-sm transition-colors"
                       >
                         <MessageCircle className="w-4 h-4" />
                         <span>{t('contact.sendWhatsapp')}</span>
@@ -1364,7 +1569,7 @@ export default function PortfolioHome({ onNavigate }) {
                       <button
                         type="button"
                         onClick={handleEmailClick}
-                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-semibold text-sm shadow-md transition-colors"
+                        className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[var(--accent)] hover:bg-[var(--accent-strong)] text-white font-semibold text-sm transition-colors"
                       >
                         <Mail className="w-4 h-4" />
                         <span>{t('contact.sendEmail')}</span>
@@ -1387,16 +1592,16 @@ export default function PortfolioHome({ onNavigate }) {
         </section>
       </main>
 
-      <footer className="border-t border-subtle py-8 bg-elevated">
+      <footer className="border-t border-subtle py-8 bg-[var(--bg-surface)] relative z-[6]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4 text-sm">
-          <div className="text-secondary text-center md:text-left">
-            © {new Date().getFullYear()} <strong className="font-semibold text-[var(--text-primary)]">{PROFILE.fullName}</strong> · {t('footer.rights')}
+          <div className="text-secondary text-center md:text-left font-mono-code text-xs sm:text-sm">
+            © {new Date().getFullYear()} <strong className="font-semibold text-[var(--text-primary)]">{PROFILE.fullName}</strong> · {t('footer.roleTag')}
           </div>
           <div className="flex flex-wrap items-center justify-center gap-4 font-medium">
             <button
               type="button"
               onClick={() => setSocialModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg tone-sky border hover:brightness-105 text-xs font-semibold transition-all"
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg chip-tag hover:brightness-110 text-xs font-semibold transition-all"
             >
               <Share2 className="w-3.5 h-3.5" />
               <span>{t('footer.socialMedia')}</span>
@@ -1426,7 +1631,7 @@ export default function PortfolioHome({ onNavigate }) {
               <Instagram className="w-3.5 h-3.5" /> Instagram
             </a>
             <a
-              href={`https://wa.me/${profile.whatsappNumber || PROFILE.whatsappNumber}`}
+              href={`https://wa.me/${activeWaNumber}`}
               target="_blank"
               rel="noopener noreferrer"
               className="text-secondary hover:text-accent inline-flex items-center gap-1 text-xs"
@@ -1436,7 +1641,7 @@ export default function PortfolioHome({ onNavigate }) {
             <button
               type="button"
               onClick={() => onNavigate('/admin')}
-              className="inline-flex items-center gap-1 text-xs text-muted hover:text-accent ml-2"
+              className="inline-flex items-center gap-1 font-mono-code text-xs text-muted hover:text-accent ml-2"
             >
               <Lock className="w-3 h-3" /> {t('footer.admin')}
             </button>
@@ -1453,7 +1658,7 @@ export default function PortfolioHome({ onNavigate }) {
       <SocialModal open={socialModalOpen} onClose={() => setSocialModalOpen(false)} profile={profile} />
 
       {toast && (
-        <div className="fixed bottom-5 right-5 z-50 flex items-center gap-2 px-4 py-3 rounded-xl bg-slate-900 text-white text-sm font-medium shadow-xl border border-sky-500/40">
+        <div className="fixed bottom-5 right-5 z-50 flex items-center gap-2 px-4 py-3 rounded-xl bg-[var(--bg-card)] text-[var(--text-primary)] text-sm font-medium shadow-xl border border-[var(--border-accent)]">
           <CheckCircle2 className="w-4 h-4 text-emerald-400" />
           <span>{toast}</span>
         </div>

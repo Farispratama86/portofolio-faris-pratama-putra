@@ -4,15 +4,22 @@ export const UI_TRANSLATIONS = {
   id: {
     // Navbar & Language Switcher
     nav: {
+      brandCode: 'DOSSIER // FPP-26',
       beranda: 'Beranda',
       pengalaman: 'Pengalaman',
       proyek: 'Proyek',
       sertifikat: 'Sertifikat',
       keahlian: 'Keahlian',
       kontak: 'Kontak',
-      cv: 'CV',
-      viewCvMobile: 'Lihat Ringkasan CV',
-      toggleThemeLabel: 'Ubah tema gelap atau terang',
+      vhsOn: 'VHS: ON',
+      vhsOff: 'VHS: OFF',
+      mapOn: 'PETA: ON',
+      mapOff: 'PETA: OFF',
+      themeNoir: 'NOIR',
+      themeArsip: 'ARSIP',
+      cv: 'CV ATS',
+      viewCvMobile: 'Lihat Ringkasan CV ATS',
+      toggleThemeLabel: 'Ubah tema Noir atau Arsip Kertas Manila',
       toggleMenuLabel: 'Buka menu navigasi',
       langButtonLabel: 'Pilih bahasa',
       langMenuTitle: 'Pilih Bahasa',
@@ -20,8 +27,18 @@ export const UI_TRANSLATIONS = {
       langEn: 'English (EN)',
       translatingNote: 'Menerjemahkan konten...',
     },
+    // Crime Map Pins
+    map: {
+      pin1: 'SUBJEK',
+      pin2: 'KRONOLOGI',
+      pin3: 'BERKAS KASUS',
+      pin4: 'BARANG BUKTI',
+      pin5: 'CATATAN LAPANGAN',
+      pin6: 'TRANSMISI',
+    },
     // Hero Section (#beranda)
     hero: {
+      dossierTab: 'SUBJEK // IDENTITAS',
       campusBadge: 'Mahasiswa S1 Teknik Informatika · Universitas Duta Bangsa Surakarta',
       viewProjects: 'Lihat Proyek',
       cvSummary: 'Ringkasan CV',
@@ -42,7 +59,7 @@ export const UI_TRANSLATIONS = {
     },
     // Experience Section (#pengalaman)
     experience: {
-      badge: 'Rekam Jejak Profesional',
+      badge: 'Kronologi Benang Merah',
       title: 'Pengalaman Kerja & Magang',
       subtitle:
         'Perjalanan karier, kontribusi nyata dalam pengembangan aplikasi web modern, riset Machine Learning, hingga troubleshooting infrastruktur TI & perangkat keras.',
@@ -52,39 +69,49 @@ export const UI_TRANSLATIONS = {
     },
     // Projects Section (#proyek)
     projects: {
-      eyebrow: 'Karya & Implementasi',
+      eyebrow: 'Laci Berkas Kasus',
       title: 'Proyek Utama',
       syncedCloud: 'Tersinkronisasi langsung dengan Database Cloud',
+      casePrefix: 'CASE',
+      emptyState: 'Belum ada berkas proyek pada kategori ini.',
       filterAll: 'Semua ({count})',
       filterWebMl: 'Web & ML ({count})',
       filterIot: 'IoT ({count})',
       filterDesktop: 'Desktop ({count})',
-      featuredBadge: 'Proyek Unggulan',
+      featuredBadge: 'Kasus Prioritas',
       liveDemo: 'Live Demo',
       publicationJournal: 'Publikasi / Jurnal',
-      viewDetails: 'Lihat Detail',
+      viewDetails: 'Buka Berkas Lengkap',
       projectDetails: 'Detail Proyek',
       caseStudy: 'Studi Kasus',
     },
     // Certificates Section (#sertifikat)
     certificates: {
-      eyebrow: 'Pengakuan & Kompetensi',
+      eyebrow: 'Barang Bukti Terverifikasi',
       title: 'Sertifikasi & Lisensi',
       subtitle: 'Dokumentasi resmi sertifikat magang industri, lisensi keahlian, dan pelatihan teknologi.',
-      countBadge: '{count} Sertifikat Terdaftar',
+      countBadge: '{count} Barang Bukti',
+      filterAll: 'Semua ({count})',
+      evidencePrefix: 'BUKTI',
+      stampVerified: 'TERVERIFIKASI',
+      stampArchived: 'TERARSIP',
       fallbackChip: 'Sertifikat',
-      viewCertificate: 'Lihat Sertifikat',
+      viewCertificate: 'Periksa Bukti & Zoom',
       verified: 'Terverifikasi',
     },
     // Skills Section (#keahlian)
     skills: {
-      eyebrow: 'Kompetensi & Penguasaan',
+      eyebrow: 'Catatan Lapangan',
       title: 'Keahlian & Kemampuan',
       subtitle:
-        'Peta tingkat kemahiran teknis (Hard Skills) dan kecakapan interpersonal (Soft Skills) berdasarkan pengalaman dan implementasi proyek nyata.',
+        'Inventaris tingkat kemahiran teknis (Hard Skills) dan kecakapan interpersonal (Soft Skills) berdasarkan catatan implementasi proyek nyata.',
       hardTab: 'Hard Skills',
       softTab: 'Soft Skills',
-      countLabel: '{count} kemampuan',
+      countLabel: '{count} entri',
+      fieldNoteLabel: 'CATATAN ARSIPARIS // RINGKASAN KONFIDENTIAL',
+      fieldNoteLead: 'Evaluasi lapangan menunjukkan subjek mampu menjembatani',
+      fieldNoteRedacted: 'antarmuka web produksi, pemodelan Machine Learning (XGBoost), serta integrasi hardware & jaringan IoT secara mandiri dari prototipe hingga rilis.',
+      fieldNoteHint: 'Arahkan kursor atau klik bagian tersensor untuk membuka isi catatan.',
       ratings: {
         expert: 'Expert',
         advanced: 'Advanced',
@@ -137,9 +164,10 @@ export const UI_TRANSLATIONS = {
     },
     // Footer
     footer: {
+      roleTag: 'Web, ML & IoT Developer',
       rights: 'All rights reserved.',
       socialMedia: 'Media Sosial',
-      admin: 'Admin',
+      admin: 'Akses Arsiparis (/admin)',
     },
     // Modals
     projectModal: {
@@ -252,15 +280,22 @@ export const UI_TRANSLATIONS = {
   en: {
     // Navbar & Language Switcher
     nav: {
+      brandCode: 'DOSSIER // FPP-26',
       beranda: 'Home',
       pengalaman: 'Experience',
       proyek: 'Projects',
       sertifikat: 'Certifications',
       keahlian: 'Skills',
       kontak: 'Contact',
-      cv: 'CV',
-      viewCvMobile: 'View CV Summary',
-      toggleThemeLabel: 'Toggle light or dark theme',
+      vhsOn: 'VHS: ON',
+      vhsOff: 'VHS: OFF',
+      mapOn: 'MAP: ON',
+      mapOff: 'MAP: OFF',
+      themeNoir: 'NOIR',
+      themeArsip: 'ARSIP',
+      cv: 'CV ATS',
+      viewCvMobile: 'View ATS CV Summary',
+      toggleThemeLabel: 'Toggle Noir or Manila Archive theme',
       toggleMenuLabel: 'Toggle navigation menu',
       langButtonLabel: 'Select language',
       langMenuTitle: 'Select Language',
@@ -268,8 +303,18 @@ export const UI_TRANSLATIONS = {
       langEn: 'English (EN)',
       translatingNote: 'Translating content...',
     },
+    // Crime Map Pins
+    map: {
+      pin1: 'SUBJECT',
+      pin2: 'CHRONOLOGY',
+      pin3: 'CASE FILES',
+      pin4: 'EVIDENCE',
+      pin5: 'FIELD NOTES',
+      pin6: 'TRANSMISSION',
+    },
     // Hero Section (#beranda)
     hero: {
+      dossierTab: 'SUBJECT // IDENTITY',
       campusBadge: 'Informatics Engineering Undergraduate · Universitas Duta Bangsa Surakarta',
       viewProjects: 'View Projects',
       cvSummary: 'CV Summary',
@@ -290,7 +335,7 @@ export const UI_TRANSLATIONS = {
     },
     // Experience Section (#pengalaman)
     experience: {
-      badge: 'Professional Track Record',
+      badge: 'Red Thread Chronology',
       title: 'Work & Internship Experience',
       subtitle:
         'Career journey and hands-on contributions across modern web UI/UX engineering, Machine Learning research, and IT infrastructure & hardware troubleshooting.',
@@ -300,39 +345,49 @@ export const UI_TRANSLATIONS = {
     },
     // Projects Section (#proyek)
     projects: {
-      eyebrow: 'Works & Implementations',
+      eyebrow: 'Case File Drawer',
       title: 'Featured Projects',
       syncedCloud: 'Live synced with Cloud Database',
+      casePrefix: 'CASE',
+      emptyState: 'No project case files found in this category.',
       filterAll: 'All ({count})',
       filterWebMl: 'Web & ML ({count})',
       filterIot: 'IoT ({count})',
       filterDesktop: 'Desktop ({count})',
-      featuredBadge: 'Featured Project',
+      featuredBadge: 'Priority Case',
       liveDemo: 'Live Demo',
       publicationJournal: 'Publication / Journal',
-      viewDetails: 'View Details',
+      viewDetails: 'Open Full Dossier',
       projectDetails: 'Project Details',
       caseStudy: 'Case Study',
     },
     // Certificates Section (#sertifikat)
     certificates: {
-      eyebrow: 'Recognition & Credentials',
+      eyebrow: 'Verified Evidence',
       title: 'Certifications & Licenses',
       subtitle: 'Official documentation of industry internships, competency licenses, and technology training.',
-      countBadge: '{count} Registered Certificates',
+      countBadge: '{count} Evidence Records',
+      filterAll: 'All ({count})',
+      evidencePrefix: 'EXHIBIT',
+      stampVerified: 'VERIFIED',
+      stampArchived: 'ARCHIVED',
       fallbackChip: 'Certificate',
-      viewCertificate: 'View Certificate',
+      viewCertificate: 'Inspect Evidence & Zoom',
       verified: 'Verified',
     },
     // Skills Section (#keahlian)
     skills: {
-      eyebrow: 'Competencies & Proficiency',
+      eyebrow: 'Field Notes',
       title: 'Skills & Capabilities',
       subtitle:
-        'Proficiency overview of technical abilities (Hard Skills) and interpersonal strengths (Soft Skills) built through real-world projects and experience.',
+        'Inventory of technical proficiency (Hard Skills) and interpersonal strengths (Soft Skills) grounded in real project execution logs.',
       hardTab: 'Hard Skills',
       softTab: 'Soft Skills',
-      countLabel: '{count} skills',
+      countLabel: '{count} entries',
+      fieldNoteLabel: 'ARCHIVIST NOTE // CLASSIFIED SUMMARY',
+      fieldNoteLead: 'Field assessment confirms the subject consistently bridges',
+      fieldNoteRedacted: 'production web interfaces, Machine Learning modeling (XGBoost), and IoT hardware/network integration independently from prototype to deployment.',
+      fieldNoteHint: 'Hover or click the redacted bar to reveal the classified note.',
       ratings: {
         expert: 'Expert',
         advanced: 'Advanced',
@@ -385,9 +440,10 @@ export const UI_TRANSLATIONS = {
     },
     // Footer
     footer: {
+      roleTag: 'Web, ML & IoT Developer',
       rights: 'All rights reserved.',
       socialMedia: 'Social Media',
-      admin: 'Admin',
+      admin: 'Archivist Access (/admin)',
     },
     // Modals
     projectModal: {
