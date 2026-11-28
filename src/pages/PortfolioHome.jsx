@@ -107,6 +107,13 @@ function getProjectLinkInfo(project, t = (k) => k) {
   };
 }
 
+// Helper normalisasi nomor WhatsApp menjadi digit internasional (62...)
+function normalizeWaDigits(raw = '') {
+  const digits = String(raw || '').replace(/\D/g, '');
+  if (!digits) return '';
+  return digits.startsWith('0') ? `62${digits.slice(1)}` : digits;
+}
+
 // Helper merapikan tanda kutip sertifikat
 function formatCertificateTitle(title = '') {
   let t = (title || '').trim();
@@ -163,22 +170,38 @@ export default function PortfolioHome({ onNavigate }) {
         if (liveCertificates.length > 0) setCertificates(liveCertificates);
         if (liveSkills.length > 0) setSkills(liveSkills);
         if (liveProfile) {
-          setProfile((prev) => ({
-            ...prev,
-            photoUrl: liveProfile.photoUrl || prev.photoUrl,
-            role: liveProfile.role || prev.role,
-            bio: liveProfile.bio || prev.bio,
-            githubUrl: liveProfile.githubUrl || prev.githubUrl || 'https://github.com/Farispratama86',
-            linkedinUrl: liveProfile.linkedinUrl || prev.linkedinUrl || '',
-            instagramUrl: liveProfile.instagramUrl || prev.instagramUrl || '',
-            tiktokUrl: liveProfile.tiktokUrl || prev.tiktokUrl || '',
-            socials: [
-              { id: 'github', label: 'GitHub', url: liveProfile.githubUrl || prev.githubUrl || 'https://github.com/Farispratama86' },
-              { id: 'linkedin', label: 'LinkedIn', url: liveProfile.linkedinUrl || prev.linkedinUrl || '' },
-              { id: 'instagram', label: 'Instagram', url: liveProfile.instagramUrl || prev.instagramUrl || '' },
-              { id: 'tiktok', label: 'TikTok', url: liveProfile.tiktokUrl || prev.tiktokUrl || '' },
-            ],
-          }));
+          setProfile((prev) => {
+            const nextWaDisplay = liveProfile.whatsapp || prev.whatsappDisplay || PROFILE.whatsappDisplay;
+            const nextWaDigits = normalizeWaDigits(liveProfile.whatsapp) || prev.whatsappNumber || PROFILE.whatsappNumber;
+            const nextGithub = liveProfile.githubUrl || prev.githubUrl || 'https://github.com/Farispratama86';
+            const nextLinkedin = liveProfile.linkedinUrl || prev.linkedinUrl || '';
+            const nextInstagram = liveProfile.instagramUrl || prev.instagramUrl || '';
+            const nextTiktok = liveProfile.tiktokUrl || prev.tiktokUrl || '';
+            return {
+              ...prev,
+              photoUrl: liveProfile.photoUrl || prev.photoUrl,
+              role: liveProfile.role || prev.role,
+              bio: liveProfile.bio || prev.bio,
+              availabilityStatus: liveProfile.availabilityStatus || prev.availabilityStatus || PROFILE.availabilityStatus,
+              educationSummary: liveProfile.education || prev.educationSummary || PROFILE.educationSummary,
+              currentRole: liveProfile.currentRole || prev.currentRole || PROFILE.currentRole,
+              coreSkills: liveProfile.coreSkills || prev.coreSkills || PROFILE.coreSkills,
+              cityShort: liveProfile.location || prev.cityShort || PROFILE.cityShort,
+              whatsappDisplay: nextWaDisplay,
+              whatsappNumber: nextWaDigits,
+              email: liveProfile.email || prev.email || PROFILE.email,
+              githubUrl: nextGithub,
+              linkedinUrl: nextLinkedin,
+              instagramUrl: nextInstagram,
+              tiktokUrl: nextTiktok,
+              socials: [
+                { id: 'github', label: 'GitHub', url: nextGithub },
+                { id: 'linkedin', label: 'LinkedIn', url: nextLinkedin },
+                { id: 'instagram', label: 'Instagram', url: nextInstagram },
+                { id: 'tiktok', label: 'TikTok', url: nextTiktok },
+              ],
+            };
+          });
         }
         setDataSource('api');
       } catch {
@@ -199,6 +222,11 @@ export default function PortfolioHome({ onNavigate }) {
     const batch = [];
     if (profile?.role) batch.push(profile.role);
     if (profile?.bio) batch.push(profile.bio);
+    if (profile?.availabilityStatus) batch.push(profile.availabilityStatus);
+    if (profile?.educationSummary) batch.push(profile.educationSummary);
+    if (profile?.currentRole) batch.push(profile.currentRole);
+    if (profile?.coreSkills) batch.push(profile.coreSkills);
+    if (profile?.cityShort) batch.push(profile.cityShort);
 
     experiences.forEach((exp) => {
       if (exp.badge) batch.push(exp.badge);
@@ -309,12 +337,15 @@ export default function PortfolioHome({ onNavigate }) {
     (Array.isArray(topicOptions) && topicOptions[0]?.label) ||
     'Web UI/UX Collaboration';
 
+  const activeEmail = profile.email || PROFILE.email;
+  const activeWaNumber = profile.whatsappNumber || PROFILE.whatsappNumber;
+
   const copyEmail = async () => {
     try {
-      await navigator.clipboard.writeText(PROFILE.email);
-      showToast(t('contact.toastCopied', { email: PROFILE.email }));
+      await navigator.clipboard.writeText(activeEmail);
+      showToast(t('contact.toastCopied', { email: activeEmail }));
     } catch {
-      showToast(t('contact.toastCopyManual', { email: PROFILE.email }));
+      showToast(t('contact.toastCopyManual', { email: activeEmail }));
     }
   };
 
@@ -325,7 +356,7 @@ export default function PortfolioHome({ onNavigate }) {
       topic: activeTopicLabel,
       message: formState.message,
     });
-    window.open(`https://wa.me/${PROFILE.whatsappNumber}?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
+    window.open(`https://wa.me/${activeWaNumber}?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
     showToast(t('contact.toastOpeningWa'));
   };
 
@@ -342,7 +373,7 @@ export default function PortfolioHome({ onNavigate }) {
       name: formState.name,
       message: formState.message,
     });
-    window.location.href = `mailto:${PROFILE.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = `mailto:${activeEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
 
   const counts = {
@@ -468,32 +499,38 @@ export default function PortfolioHome({ onNavigate }) {
                     {/* Floating status badge di sudut foto */}
                     <div className="absolute bottom-3 left-3 z-10 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/90 backdrop-blur-md border border-emerald-500/40 text-emerald-300 text-xs font-semibold shadow-lg">
                       <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                      <span>{t('hero.openToWork')}</span>
+                      <span>{tr(profile.availabilityStatus || PROFILE.availabilityStatus)}</span>
                     </div>
                   </div>
 
-                  <div className="space-y-2.5 text-sm">
-                    <div className="flex items-center justify-between py-1.5 border-b border-subtle">
-                      <span className="text-secondary flex items-center gap-2">
+                  <div className="space-y-2 text-[13px] sm:text-sm">
+                    <div className="flex items-center justify-between gap-3 py-1.5 border-b border-subtle">
+                      <span className="text-secondary flex items-center gap-2 shrink-0">
                         <GraduationCap className="w-4 h-4 text-accent" /> {t('hero.educationLabel')}
                       </span>
-                      <span className="font-medium">{t('hero.educationValue')}</span>
+                      <span className="font-medium text-right">{tr(profile.educationSummary || PROFILE.educationSummary)}</span>
                     </div>
-                    <div className="flex items-center justify-between py-1.5 border-b border-subtle">
-                      <span className="text-secondary flex items-center gap-2">
-                        <Briefcase className="w-4 h-4 text-accent" /> {t('hero.latestInternLabel')}
+                    <div className="flex items-center justify-between gap-3 py-1.5 border-b border-subtle">
+                      <span className="text-secondary flex items-center gap-2 shrink-0">
+                        <Briefcase className="w-4 h-4 text-accent" /> {t('hero.currentRoleLabel')}
                       </span>
-                      <span className="font-medium">PT Vinix Seven Aurum</span>
+                      <span className="font-medium text-right">{tr(profile.currentRole || PROFILE.currentRole)}</span>
                     </div>
-                    <div className="flex items-center justify-between py-1.5 border-b border-subtle">
-                      <span className="text-secondary flex items-center gap-2">
+                    <div className="flex items-center justify-between gap-3 py-1.5 border-b border-subtle">
+                      <span className="text-secondary flex items-center gap-2 shrink-0">
+                        <Cpu className="w-4 h-4 text-accent" /> {t('hero.coreSkillsLabel')}
+                      </span>
+                      <span className="font-medium text-right">{tr(profile.coreSkills || PROFILE.coreSkills)}</span>
+                    </div>
+                    <div className="flex items-center justify-between gap-3 py-1.5 border-b border-subtle">
+                      <span className="text-secondary flex items-center gap-2 shrink-0">
                         <MapPin className="w-4 h-4 text-accent" /> {t('hero.locationLabel')}
                       </span>
-                      <span className="font-medium">{PROFILE.cityShort}</span>
+                      <span className="font-medium text-right">{tr(profile.cityShort || PROFILE.cityShort)}</span>
                     </div>
 
                     {/* Baris Tombol Ikon Cepat Sosial Media */}
-                    <div className="pt-2.5 flex items-center justify-between gap-2">
+                    <div className="pt-2 flex items-center justify-between gap-2">
                       <span className="text-xs text-secondary font-medium">{t('hero.connectFollow')}</span>
                       <div className="flex items-center gap-2">
                         <a
@@ -506,6 +543,15 @@ export default function PortfolioHome({ onNavigate }) {
                           <Github className="w-4 h-4" />
                         </a>
                         <a
+                          href={profile.linkedinUrl || (profile.socials?.find((s) => s.id === 'linkedin')?.url) || 'https://linkedin.com/in/faris-pratama-putra'}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-8 h-8 rounded-lg surface-card border border-subtle hover:border-blue-500 hover:text-blue-500 text-secondary flex items-center justify-center transition-all hover:scale-110 shadow-sm"
+                          title="LinkedIn"
+                        >
+                          <Linkedin className="w-4 h-4" />
+                        </a>
+                        <a
                           href={profile.instagramUrl || (profile.socials?.find((s) => s.id === 'instagram')?.url) || 'https://instagram.com/fpratamaputra'}
                           target="_blank"
                           rel="noopener noreferrer"
@@ -515,7 +561,7 @@ export default function PortfolioHome({ onNavigate }) {
                           <Instagram className="w-4 h-4" />
                         </a>
                         <a
-                          href={`https://wa.me/${profile.whatsappNumber || PROFILE.whatsappNumber}`}
+                          href={`https://wa.me/${activeWaNumber}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="w-8 h-8 rounded-lg surface-card border border-subtle hover:border-emerald-500 hover:text-emerald-500 text-secondary flex items-center justify-center transition-all hover:scale-110 shadow-sm"
@@ -524,7 +570,7 @@ export default function PortfolioHome({ onNavigate }) {
                           <MessageCircle className="w-4 h-4" />
                         </a>
                         <a
-                          href={`mailto:${profile.email || PROFILE.email}`}
+                          href={`mailto:${activeEmail}`}
                           className="w-8 h-8 rounded-lg surface-card border border-subtle hover:border-sky-500 hover:text-accent text-secondary flex items-center justify-center transition-all hover:scale-110 shadow-sm"
                           title={t('hero.sendEmailTitle')}
                         >

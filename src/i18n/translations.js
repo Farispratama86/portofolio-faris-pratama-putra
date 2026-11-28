@@ -32,6 +32,8 @@ export const UI_TRANSLATIONS = {
       openToWork: 'Terbuka untuk Peluang',
       educationLabel: 'Pendidikan',
       educationValue: 'S1 Teknik Informatika (UDB)',
+      currentRoleLabel: 'Profesi',
+      coreSkillsLabel: 'Keahlian Utama',
       latestInternLabel: 'Magang Terbaru',
       locationLabel: 'Domisili',
       connectFollow: 'Hubungi / Ikuti:',
@@ -278,6 +280,8 @@ export const UI_TRANSLATIONS = {
       openToWork: 'Open to Opportunities',
       educationLabel: 'Education',
       educationValue: 'B.Sc. Informatics Engineering (UDB)',
+      currentRoleLabel: 'Role',
+      coreSkillsLabel: 'Core Skills',
       latestInternLabel: 'Latest Internship',
       locationLabel: 'Location',
       connectFollow: 'Connect / Follow:',
@@ -496,6 +500,13 @@ export const UI_TRANSLATIONS = {
 
 // Glosarium deterministik lokal (ID -> EN) untuk bulan, badge, kategori, grup skill & label pendek
 const LOCAL_EN_GLOSSARY = {
+  // Kartu Identitas Hero
+  'Terbuka untuk Peluang': 'Open to Opportunities',
+  'S1 Teknik Informatika (UDB)': 'B.Sc. Informatics Engineering (UDB)',
+  'Web UI/UX & IT Developer': 'Web UI/UX & IT Developer',
+  'Ex-Intern Web UI/UX @ VINIX7': 'Ex-Intern Web UI/UX @ VINIX7',
+  'Web UI/UX · Machine Learning · IoT': 'Web UI/UX · Machine Learning · IoT',
+
   // Badges pengalaman
   'Magang · Hybrid': 'Internship · Hybrid',
   'Magang · On-site': 'Internship · On-site',

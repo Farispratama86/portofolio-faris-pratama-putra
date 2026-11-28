@@ -11,6 +11,10 @@ export const PROFILE = {
   // Simpan foto asli Anda di public/images/profil.jpg lalu isi '/images/profil.jpg'
   photoUrl: '',
   role: 'Web UI/UX Developer · Machine Learning Enthusiast · IoT & IT Technician',
+  availabilityStatus: 'Terbuka untuk Peluang',
+  educationSummary: 'S1 Teknik Informatika (UDB)',
+  currentRole: 'Web UI/UX & IT Developer',
+  coreSkills: 'Web UI/UX · Machine Learning · IoT',
   campusBadge: 'Mahasiswa S1 Teknik Informatika · Universitas Duta Bangsa Surakarta',
   location: 'Karanganyar / Surakarta, Jawa Tengah',
   cityShort: 'Surakarta, Indonesia',

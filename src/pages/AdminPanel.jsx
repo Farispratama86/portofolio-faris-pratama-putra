@@ -94,6 +94,13 @@ export default function AdminPanel({ onNavigate }) {
     photoMeta: '',
     role: PROFILE.role,
     bio: PROFILE.bio,
+    availabilityStatus: PROFILE.availabilityStatus || 'Terbuka untuk Peluang',
+    education: PROFILE.educationSummary || 'S1 Teknik Informatika (UDB)',
+    currentRole: PROFILE.currentRole || 'Web UI/UX & IT Developer',
+    coreSkills: PROFILE.coreSkills || 'Web UI/UX · Machine Learning · IoT',
+    location: PROFILE.cityShort || 'Surakarta, Indonesia',
+    email: PROFILE.email || 'farispakez1209@gmail.com',
+    whatsapp: PROFILE.whatsappDisplay || '+62 812-1953-4692',
     githubUrl: PROFILE.githubUrl || 'https://github.com/Farispratama86',
     linkedinUrl: '',
     instagramUrl: '',
@@ -178,6 +185,13 @@ export default function AdminPanel({ onNavigate }) {
           photoMeta: prof.photoUrl ? 'Tersimpan di Cloudinary' : '',
           role: prof.role || PROFILE.role,
           bio: prof.bio || PROFILE.bio,
+          availabilityStatus: prof.availabilityStatus || PROFILE.availabilityStatus || 'Terbuka untuk Peluang',
+          education: prof.education || PROFILE.educationSummary || 'S1 Teknik Informatika (UDB)',
+          currentRole: prof.currentRole || PROFILE.currentRole || 'Web UI/UX & IT Developer',
+          coreSkills: prof.coreSkills || PROFILE.coreSkills || 'Web UI/UX · Machine Learning · IoT',
+          location: prof.location || PROFILE.cityShort || 'Surakarta, Indonesia',
+          email: prof.email || PROFILE.email || '',
+          whatsapp: prof.whatsapp || PROFILE.whatsappDisplay || '',
           githubUrl: prof.githubUrl || PROFILE.githubUrl || '',
           linkedinUrl: prof.linkedinUrl || '',
           instagramUrl: prof.instagramUrl || '',
@@ -240,6 +254,13 @@ export default function AdminPanel({ onNavigate }) {
           photoPublicId,
           role: profileForm.role,
           bio: profileForm.bio,
+          availabilityStatus: profileForm.availabilityStatus,
+          education: profileForm.education,
+          currentRole: profileForm.currentRole,
+          coreSkills: profileForm.coreSkills,
+          location: profileForm.location,
+          email: profileForm.email,
+          whatsapp: profileForm.whatsapp,
           githubUrl: profileForm.githubUrl,
           linkedinUrl: profileForm.linkedinUrl,
           instagramUrl: profileForm.instagramUrl,
@@ -253,6 +274,13 @@ export default function AdminPanel({ onNavigate }) {
         photoUrl: saved.photoUrl || prev.photoUrl,
         photoBlob: null,
         photoMeta: saved.photoUrl ? 'Tersimpan di Cloudinary & TiDB' : '',
+        availabilityStatus: saved.availabilityStatus || prev.availabilityStatus,
+        education: saved.education || prev.education,
+        currentRole: saved.currentRole || prev.currentRole,
+        coreSkills: saved.coreSkills || prev.coreSkills,
+        location: saved.location || prev.location,
+        email: saved.email || prev.email,
+        whatsapp: saved.whatsapp || prev.whatsapp,
       }));
       notify('Profil & foto berhasil disimpan ke Cloudinary dan TiDB Cloud!');
     } catch (err) {
@@ -852,14 +880,14 @@ export default function AdminPanel({ onNavigate }) {
             </div>
 
             <div className="lg:col-span-7 bg-[#111a2e] border border-slate-800 rounded-2xl p-5 space-y-4">
-              <h2 className="font-bold text-base">Bio &amp; Tautan Media Sosial</h2>
+              <h2 className="font-bold text-base">Identitas Kartu Hero, Bio &amp; Tautan Sosial</h2>
               <div>
                 <label className="block text-xs font-semibold text-slate-400 mb-1">Peran / Tagline Hero</label>
                 <input
                   type="text"
                   value={profileForm.role}
                   onChange={(e) => setProfileForm({ ...profileForm, role: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
                 />
               </div>
               <div>
@@ -868,49 +896,131 @@ export default function AdminPanel({ onNavigate }) {
                   rows="3"
                   value={profileForm.bio}
                   onChange={(e) => setProfileForm({ ...profileForm, bio: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm resize-none"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm resize-none focus:border-sky-500 outline-none"
                 />
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+              {/* Detail Kartu Identitas Hero */}
+              <div className="pt-2 border-t border-slate-800 space-y-3">
+                <p className="text-xs font-bold uppercase tracking-wider text-sky-400">Detail Kartu Identitas (Hero Kanan)</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-400 mb-1">Status Ketersediaan / Badge Foto</label>
+                    <input
+                      type="text"
+                      value={profileForm.availabilityStatus}
+                      onChange={(e) => setProfileForm({ ...profileForm, availabilityStatus: e.target.value })}
+                      placeholder="Terbuka untuk Peluang"
+                      className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-400 mb-1">Pendidikan</label>
+                    <input
+                      type="text"
+                      value={profileForm.education}
+                      onChange={(e) => setProfileForm({ ...profileForm, education: e.target.value })}
+                      placeholder="S1 Teknik Informatika (UDB)"
+                      className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-400 mb-1">Profesi / Peran Saat Ini atau Sebelumnya</label>
+                    <input
+                      type="text"
+                      value={profileForm.currentRole}
+                      onChange={(e) => setProfileForm({ ...profileForm, currentRole: e.target.value })}
+                      placeholder="Web UI/UX & IT Developer"
+                      className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-400 mb-1">Domisili</label>
+                    <input
+                      type="text"
+                      value={profileForm.location}
+                      onChange={(e) => setProfileForm({ ...profileForm, location: e.target.value })}
+                      placeholder="Surakarta, Indonesia"
+                      className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                    />
+                  </div>
+                </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-400 mb-1">GitHub URL</label>
+                  <label className="block text-xs font-semibold text-slate-400 mb-1">Keahlian Utama (Ringkasan Kartu)</label>
                   <input
-                    type="url"
-                    value={profileForm.githubUrl}
-                    onChange={(e) => setProfileForm({ ...profileForm, githubUrl: e.target.value })}
-                    placeholder="https://github.com/..."
+                    type="text"
+                    value={profileForm.coreSkills}
+                    onChange={(e) => setProfileForm({ ...profileForm, coreSkills: e.target.value })}
+                    placeholder="Web UI/UX · Machine Learning · IoT"
                     className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
                   />
                 </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-400 mb-1">LinkedIn URL</label>
-                  <input
-                    type="url"
-                    value={profileForm.linkedinUrl}
-                    onChange={(e) => setProfileForm({ ...profileForm, linkedinUrl: e.target.value })}
-                    placeholder="https://linkedin.com/in/..."
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-400 mb-1">Instagram URL</label>
-                  <input
-                    type="url"
-                    value={profileForm.instagramUrl}
-                    onChange={(e) => setProfileForm({ ...profileForm, instagramUrl: e.target.value })}
-                    placeholder="https://instagram.com/..."
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-400 mb-1">TikTok URL</label>
-                  <input
-                    type="url"
-                    value={profileForm.tiktokUrl}
-                    onChange={(e) => setProfileForm({ ...profileForm, tiktokUrl: e.target.value })}
-                    placeholder="https://tiktok.com/@..."
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
-                  />
+              </div>
+
+              {/* Tautan Kontak & Media Sosial */}
+              <div className="pt-2 border-t border-slate-800 space-y-3">
+                <p className="text-xs font-bold uppercase tracking-wider text-sky-400">Tautan Kontak &amp; Media Sosial</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-400 mb-1">Email Resmi</label>
+                    <input
+                      type="email"
+                      value={profileForm.email}
+                      onChange={(e) => setProfileForm({ ...profileForm, email: e.target.value })}
+                      placeholder="farispakez1209@gmail.com"
+                      className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-400 mb-1">WhatsApp</label>
+                    <input
+                      type="text"
+                      value={profileForm.whatsapp}
+                      onChange={(e) => setProfileForm({ ...profileForm, whatsapp: e.target.value })}
+                      placeholder="+62 812-1953-4692"
+                      className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-400 mb-1">GitHub URL</label>
+                    <input
+                      type="url"
+                      value={profileForm.githubUrl}
+                      onChange={(e) => setProfileForm({ ...profileForm, githubUrl: e.target.value })}
+                      placeholder="https://github.com/..."
+                      className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-400 mb-1">LinkedIn URL</label>
+                    <input
+                      type="url"
+                      value={profileForm.linkedinUrl}
+                      onChange={(e) => setProfileForm({ ...profileForm, linkedinUrl: e.target.value })}
+                      placeholder="https://linkedin.com/in/..."
+                      className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-400 mb-1">Instagram URL</label>
+                    <input
+                      type="url"
+                      value={profileForm.instagramUrl}
+                      onChange={(e) => setProfileForm({ ...profileForm, instagramUrl: e.target.value })}
+                      placeholder="https://instagram.com/..."
+                      className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-400 mb-1">TikTok URL</label>
+                    <input
+                      type="url"
+                      value={profileForm.tiktokUrl}
+                      onChange={(e) => setProfileForm({ ...profileForm, tiktokUrl: e.target.value })}
+                      placeholder="https://tiktok.com/@..."
+                      className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                    />
+                  </div>
                 </div>
               </div>
               <button
@@ -2093,8 +2203,10 @@ export default function AdminPanel({ onNavigate }) {
           photoUrl: profileForm.photoUrl,
           role: profileForm.role,
           bio: profileForm.bio,
+          email: profileForm.email || PROFILE.email,
+          whatsappDisplay: profileForm.whatsapp || PROFILE.whatsappDisplay,
           socials: [
-            { id: 'github', label: 'GitHub', url: PROFILE.githubUrl },
+            { id: 'github', label: 'GitHub', url: profileForm.githubUrl || PROFILE.githubUrl },
             { id: 'linkedin', label: 'LinkedIn', url: profileForm.linkedinUrl },
             { id: 'instagram', label: 'Instagram', url: profileForm.instagramUrl || 'https://instagram.com/fpratamaputra' },
             { id: 'tiktok', label: 'TikTok', url: profileForm.tiktokUrl },

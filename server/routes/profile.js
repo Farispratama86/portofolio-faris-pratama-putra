@@ -15,18 +15,44 @@ async function ensureProfileTable() {
       photo_public_id VARCHAR(255) DEFAULT '',
       role VARCHAR(255) DEFAULT '',
       bio TEXT,
+      availability_status VARCHAR(255) DEFAULT '',
+      education VARCHAR(255) DEFAULT '',
+      \`current_role\` VARCHAR(255) DEFAULT '',
+      core_skills VARCHAR(255) DEFAULT '',
+      location VARCHAR(255) DEFAULT '',
       github_url VARCHAR(500) DEFAULT '',
       linkedin_url VARCHAR(500) DEFAULT '',
       instagram_url VARCHAR(500) DEFAULT '',
       tiktok_url VARCHAR(500) DEFAULT '',
+      whatsapp VARCHAR(100) DEFAULT '',
+      email VARCHAR(255) DEFAULT '',
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     )
   `);
-  try {
-    await pool.query(`ALTER TABLE profile_settings ADD COLUMN github_url VARCHAR(500) DEFAULT ''`);
-  } catch {
-    // column already exists
+
+  const requiredColumns = [
+    ['availability_status', "VARCHAR(255) DEFAULT ''"],
+    ['education', "VARCHAR(255) DEFAULT ''"],
+    ['current_role', "VARCHAR(255) DEFAULT ''"],
+    ['core_skills', "VARCHAR(255) DEFAULT ''"],
+    ['location', "VARCHAR(255) DEFAULT ''"],
+    ['github_url', "VARCHAR(500) DEFAULT ''"],
+    ['linkedin_url', "VARCHAR(500) DEFAULT ''"],
+    ['instagram_url', "VARCHAR(500) DEFAULT ''"],
+    ['tiktok_url', "VARCHAR(500) DEFAULT ''"],
+    ['whatsapp', "VARCHAR(100) DEFAULT ''"],
+    ['email', "VARCHAR(255) DEFAULT ''"],
+  ];
+
+  const [existingCols] = await pool.query(`SHOW COLUMNS FROM profile_settings`);
+  const existingSet = new Set(existingCols.map((c) => c.Field));
+
+  for (const [colName, colDef] of requiredColumns) {
+    if (!existingSet.has(colName)) {
+      await pool.query(`ALTER TABLE profile_settings ADD COLUMN \`${colName}\` ${colDef}`);
+    }
   }
+
   await pool.query(`INSERT IGNORE INTO profile_settings (id) VALUES (1)`);
   tableReady = true;
 }
@@ -38,10 +64,17 @@ function normalizeProfile(row) {
       photoPublicId: '',
       role: '',
       bio: '',
+      availabilityStatus: '',
+      education: '',
+      currentRole: '',
+      coreSkills: '',
+      location: '',
       githubUrl: '',
       linkedinUrl: '',
       instagramUrl: '',
       tiktokUrl: '',
+      whatsapp: '',
+      email: '',
     };
   }
   return {
@@ -49,10 +82,17 @@ function normalizeProfile(row) {
     photoPublicId: row.photo_public_id || '',
     role: row.role || '',
     bio: row.bio || '',
+    availabilityStatus: row.availability_status || '',
+    education: row.education || '',
+    currentRole: row.current_role || '',
+    coreSkills: row.core_skills || '',
+    location: row.location || '',
     githubUrl: row.github_url || '',
     linkedinUrl: row.linkedin_url || '',
     instagramUrl: row.instagram_url || '',
     tiktokUrl: row.tiktok_url || '',
+    whatsapp: row.whatsapp || '',
+    email: row.email || '',
   };
 }
 
@@ -80,17 +120,26 @@ router.put('/', requireAdmin, async (req, res) => {
     await pool.query(
       `UPDATE profile_settings SET
         photo_url = ?, photo_public_id = ?, role = ?, bio = ?,
-        github_url = ?, linkedin_url = ?, instagram_url = ?, tiktok_url = ?
+        availability_status = ?, education = ?, \`current_role\` = ?, core_skills = ?, location = ?,
+        github_url = ?, linkedin_url = ?, instagram_url = ?, tiktok_url = ?,
+        whatsapp = ?, email = ?
        WHERE id = 1`,
       [
         nextPhotoUrl,
         nextPhotoPublicId,
         body.role !== undefined ? body.role : (prev.role || ''),
         body.bio !== undefined ? body.bio : (prev.bio || ''),
+        body.availabilityStatus !== undefined ? body.availabilityStatus : (prev.availability_status || ''),
+        body.education !== undefined ? body.education : (prev.education || ''),
+        body.currentRole !== undefined ? body.currentRole : (prev.current_role || ''),
+        body.coreSkills !== undefined ? body.coreSkills : (prev.core_skills || ''),
+        body.location !== undefined ? body.location : (prev.location || ''),
         body.githubUrl !== undefined ? body.githubUrl : (prev.github_url || ''),
         body.linkedinUrl !== undefined ? body.linkedinUrl : (prev.linkedin_url || ''),
         body.instagramUrl !== undefined ? body.instagramUrl : (prev.instagram_url || ''),
         body.tiktokUrl !== undefined ? body.tiktokUrl : (prev.tiktok_url || ''),
+        body.whatsapp !== undefined ? body.whatsapp : (prev.whatsapp || ''),
+        body.email !== undefined ? body.email : (prev.email || ''),
       ]
     );
 
