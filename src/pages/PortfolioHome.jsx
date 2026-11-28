@@ -1251,7 +1251,7 @@ export default function PortfolioHome({ onNavigate }) {
                   <ul className="divide-y divide-[var(--border-subtle)]">
                     {items.map((skill) => {
                       const ratingInfo = getSkillRatingLabel(skill.ratePoint);
-                      const rVal = Number(skill.ratePoint) || 0;
+                      const rVal = Math.min(100, Math.max(1, Number(skill.ratePoint) || 85));
                       const ratingText =
                         rVal >= 92
                           ? t('skills.ratings.expert')
@@ -1260,16 +1260,37 @@ export default function PortfolioHome({ onNavigate }) {
                           : rVal >= 75
                           ? t('skills.ratings.proficient')
                           : t('skills.ratings.intermediate');
+                      const barColor =
+                        rVal >= 92
+                          ? 'bg-emerald-500'
+                          : rVal >= 85
+                          ? 'bg-[var(--accent)]'
+                          : rVal >= 75
+                          ? 'bg-amber-500'
+                          : 'bg-[#938878]';
 
                       return (
                         <li
                           key={skill.id || skill.name}
-                          className="py-2.5 first:pt-0 last:pb-0 flex items-center justify-between gap-3 text-xs sm:text-sm"
+                          className="py-3 first:pt-0 last:pb-0 space-y-1.5"
                         >
-                          <span className="font-medium text-[var(--text-primary)] text-left">{tr(skill.name)}</span>
-                          <span className={`font-mono-code text-[10px] font-bold uppercase px-2 py-0.5 rounded border shrink-0 ${ratingInfo.badgeClass}`}>
-                            {ratingText}
-                          </span>
+                          <div className="flex items-center justify-between gap-2 text-xs sm:text-sm">
+                            <span className="font-medium text-[var(--text-primary)] text-left">{tr(skill.name)}</span>
+                            <div className="flex items-center gap-1.5 shrink-0">
+                              <span className={`font-mono-code text-[10px] font-bold uppercase px-2 py-0.5 rounded border ${ratingInfo.badgeClass}`}>
+                                {ratingText}
+                              </span>
+                              <span className="font-mono-code text-xs font-bold text-[var(--text-primary)] min-w-[34px] text-right">
+                                {rVal}%
+                              </span>
+                            </div>
+                          </div>
+                          <div className="w-full h-1.5 rounded-sm bg-elevated border border-subtle overflow-hidden">
+                            <div
+                              className={`h-full transition-all duration-500 ${barColor}`}
+                              style={{ width: `${rVal}%` }}
+                            />
+                          </div>
                         </li>
                       );
                     })}

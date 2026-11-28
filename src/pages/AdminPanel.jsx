@@ -895,7 +895,7 @@ export default function AdminPanel({ onNavigate }) {
             }`}
           >
             <Brain className="w-4 h-4" />
-            <span>Keahlian &amp; Tingkat ({skills.length})</span>
+            <span>Keahlian &amp; Rate ({skills.length})</span>
           </button>
         </div>
 
@@ -2020,18 +2020,24 @@ export default function AdminPanel({ onNavigate }) {
                 />
               </div>
 
-              {/* Tingkat Penguasaan (Disimpan ke ratePoint tanpa progress bar persen) */}
+              {/* Tingkat Kemahiran / Rate Point (1 - 100%) */}
               <div className="p-4 rounded-xl bg-[#100F0E] border border-[#302A26] space-y-3">
                 <div className="flex items-center justify-between gap-2">
                   <label className="font-mono-code text-xs font-semibold text-[#C2B8A7] flex items-center gap-1.5">
                     <Sliders className="w-3.5 h-3.5 text-[#EF4444]" />
-                    <span>Tingkat Penguasaan</span>
+                    <span>Rate Point Kemampuan (1 - 100%)</span>
                   </label>
-                  <span className={`font-mono-code text-[11px] font-semibold px-2.5 py-0.5 rounded border ${getSkillRatingLabel(skillForm.ratePoint).badgeClass}`}>
-                    {getSkillRatingLabel(skillForm.ratePoint).label.split('/')[0].trim()}
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className={`font-mono-code text-[11px] font-semibold px-2 py-0.5 rounded border ${getSkillRatingLabel(skillForm.ratePoint).badgeClass}`}>
+                      {getSkillRatingLabel(skillForm.ratePoint).label.split('/')[0].trim()}
+                    </span>
+                    <span className="font-mono-code text-sm font-extrabold text-[#EF4444] min-w-[40px] text-right">
+                      {skillForm.ratePoint}%
+                    </span>
+                  </div>
                 </div>
 
+                {/* Preset cepat + slider + input angka */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   {[
                     { label: 'Intermediate', val: 70 },
@@ -2046,7 +2052,7 @@ export default function AdminPanel({ onNavigate }) {
                         key={tier.label}
                         type="button"
                         onClick={() => setSkillForm({ ...skillForm, ratePoint: tier.val })}
-                        className={`py-2 px-2.5 rounded-lg font-mono-code text-[11px] font-semibold border transition-colors ${
+                        className={`py-1.5 px-2 rounded-lg font-mono-code text-[11px] font-semibold border transition-colors ${
                           active
                             ? 'bg-[#DC2626] text-white border-[#DC2626]'
                             : 'bg-[#1C1917] border-[#302A26] text-[#C2B8A7] hover:text-[#EDE6D6]'
@@ -2058,18 +2064,39 @@ export default function AdminPanel({ onNavigate }) {
                   })}
                 </div>
 
-                <div className="flex items-center justify-between gap-3 pt-1">
-                  <span className="font-mono-code text-[11px] text-[#938878]">
-                    Skor Internal Database (1–100):
-                  </span>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="range"
+                    min="1"
+                    max="100"
+                    value={skillForm.ratePoint}
+                    onChange={(e) => setSkillForm({ ...skillForm, ratePoint: Number(e.target.value) })}
+                    className="w-full h-2 bg-[#231F1C] rounded-lg appearance-none cursor-pointer accent-[#DC2626]"
+                  />
                   <input
                     type="number"
                     min="1"
                     max="100"
                     value={skillForm.ratePoint}
                     onChange={(e) => setSkillForm({ ...skillForm, ratePoint: Math.min(100, Math.max(1, Number(e.target.value))) })}
-                    className="w-20 px-2.5 py-1 rounded-lg bg-[#1C1917] border border-[#302A26] font-mono-code text-xs font-bold text-center text-[#EDE6D6] focus:border-[#DC2626] outline-none"
+                    className="w-16 px-2 py-1 rounded-lg bg-[#1C1917] border border-[#302A26] font-mono-code text-sm font-bold text-center text-[#EDE6D6] focus:border-[#DC2626] outline-none"
                   />
+                </div>
+
+                {/* Live Preview Bar */}
+                <div className="space-y-1">
+                  <div className="w-full bg-[#1C1917] rounded-sm h-2 overflow-hidden border border-[#302A26]">
+                    <div
+                      className="h-full bg-[#DC2626] transition-all duration-300"
+                      style={{ width: `${skillForm.ratePoint}%` }}
+                    />
+                  </div>
+                  <div className="flex justify-between font-mono-code text-[10px] text-[#938878]">
+                    <span>Pemula (60%)</span>
+                    <span>Menengah (75%)</span>
+                    <span>Mahir (85%)</span>
+                    <span>Expert (95%+)</span>
+                  </div>
                 </div>
               </div>
 
@@ -2173,12 +2200,18 @@ export default function AdminPanel({ onNavigate }) {
                           </div>
                         </div>
 
-                        {/* Ringkasan Tingkat Penguasaan berbasis teks (selaras tampilan baru) */}
-                        <div className="pt-2 border-t border-[#302A26] flex items-center justify-between text-xs font-mono-code">
-                          <span className="text-[#C2B8A7]">Tingkat Penguasaan</span>
-                          <span className="font-semibold text-[#EDE6D6]">
-                            {ratingInfo.label.split('/')[0].trim()} (Skor {skill.ratePoint})
-                          </span>
+                        {/* Rate Point Bar */}
+                        <div className="space-y-1.5 pt-1">
+                          <div className="flex items-center justify-between text-xs font-mono-code">
+                            <span className="text-[#C2B8A7] text-[11px]">Tingkat Penguasaan</span>
+                            <span className="font-extrabold text-[#EF4444] text-xs">{skill.ratePoint}%</span>
+                          </div>
+                          <div className="w-full bg-[#100F0E] rounded-sm h-2 overflow-hidden border border-[#302A26]">
+                            <div
+                              className="h-full bg-[#DC2626]"
+                              style={{ width: `${skill.ratePoint}%` }}
+                            />
+                          </div>
                         </div>
                       </article>
                     );
