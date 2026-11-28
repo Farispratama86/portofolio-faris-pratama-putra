@@ -197,7 +197,7 @@ export default function SocialModal({ open, onClose, profile }) {
                     </span>
                   </div>
 
-                  <p className="text-[11px] text-secondary line-clamp-2 leading-relaxed">
+                  <p className="text-[11px] text-secondary line-clamp-2 leading-relaxed text-justify">
                     {item.desc}
                   </p>
 

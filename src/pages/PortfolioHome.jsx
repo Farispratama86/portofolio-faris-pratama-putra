@@ -516,7 +516,7 @@ export default function PortfolioHome({ onNavigate }) {
                   </p>
                 </div>
 
-                <p className="text-sm sm:text-base text-secondary leading-relaxed max-w-2xl text-left">
+                <p className="text-sm sm:text-base text-secondary leading-relaxed max-w-2xl text-justify">
                   {tr(profile.bio)}
                 </p>
 
@@ -744,7 +744,7 @@ export default function PortfolioHome({ onNavigate }) {
                 <h2 className="font-serif-editorial text-4xl sm:text-5xl font-normal tracking-tight">
                   {t('experience.title')}
                 </h2>
-                <p className="mt-2 text-sm sm:text-base text-secondary max-w-2xl text-left">
+                <p className="mt-2 text-sm sm:text-base text-secondary max-w-2xl text-justify">
                   {t('experience.subtitle')}
                 </p>
               </div>
@@ -821,9 +821,9 @@ export default function PortfolioHome({ onNavigate }) {
 
                           <ul className="space-y-2 text-sm text-secondary leading-relaxed pl-1">
                             {(sec.bullets || []).map((b, bIdx) => (
-                              <li key={bIdx} className="flex items-start gap-2.5 text-left">
+                              <li key={bIdx} className="flex items-start gap-2.5">
                                 <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] mt-2 shrink-0" />
-                                <span className="flex-1 text-left">{tr(b)}</span>
+                                <span className="flex-1 text-justify">{tr(b)}</span>
                               </li>
                             ))}
                           </ul>
@@ -985,7 +985,7 @@ export default function PortfolioHome({ onNavigate }) {
                     <h3 className="font-serif-editorial text-2xl sm:text-3xl leading-snug text-[var(--text-primary)]">
                       {tr(activeCase.title)}
                     </h3>
-                    <p className="text-sm sm:text-base text-secondary leading-relaxed text-left">
+                    <p className="text-sm sm:text-base text-secondary leading-relaxed text-justify">
                       {tr(activeCase.summary)}
                     </p>
 
@@ -1061,7 +1061,7 @@ export default function PortfolioHome({ onNavigate }) {
                 <h2 className="font-serif-editorial text-4xl sm:text-5xl font-normal tracking-tight">
                   {t('certificates.title')}
                 </h2>
-                <p className="text-sm sm:text-base text-secondary mt-2 text-left max-w-2xl">
+                <p className="text-sm sm:text-base text-secondary mt-2 text-justify max-w-2xl">
                   {t('certificates.subtitle')}
                 </p>
               </div>
@@ -1154,7 +1154,7 @@ export default function PortfolioHome({ onNavigate }) {
                         </h3>
                         <p className="text-xs text-accent font-semibold">{cert.issuer}</p>
                         {cert.description && (
-                          <p className="text-xs sm:text-sm text-secondary line-clamp-2 leading-relaxed text-left">
+                          <p className="text-xs sm:text-sm text-secondary line-clamp-2 leading-relaxed text-justify">
                             {tr(cert.description)}
                           </p>
                         )}
@@ -1192,7 +1192,7 @@ export default function PortfolioHome({ onNavigate }) {
                 <h2 className="font-serif-editorial text-4xl sm:text-5xl font-normal tracking-tight">
                   {t('skills.title')}
                 </h2>
-                <p className="text-sm sm:text-base text-secondary mt-2 max-w-xl text-left">
+                <p className="text-sm sm:text-base text-secondary mt-2 max-w-xl text-justify">
                   {t('skills.subtitle')}
                 </p>
               </div>
@@ -1287,7 +1287,7 @@ export default function PortfolioHome({ onNavigate }) {
                 </span>
                 <span className="font-mono-code text-[11px] text-muted">{t('skills.fieldNoteHint')}</span>
               </div>
-              <p className="text-sm text-secondary leading-relaxed text-left">
+              <p className="text-sm text-secondary leading-relaxed text-justify">
                 {t('skills.fieldNoteLead')}{' '}
                 <span
                   role="button"
@@ -1322,7 +1322,7 @@ export default function PortfolioHome({ onNavigate }) {
               <h2 className="font-serif-editorial text-4xl sm:text-5xl font-normal tracking-tight">
                 {t('contact.title')}
               </h2>
-              <p className="mt-2 text-sm sm:text-base text-secondary text-left">
+              <p className="mt-2 text-sm sm:text-base text-secondary text-justify">
                 {t('contact.subtitle')}
               </p>
             </div>
@@ -1340,7 +1340,7 @@ export default function PortfolioHome({ onNavigate }) {
                       {t('contact.hubActive')}
                     </span>
                   </h3>
-                  <p className="text-xs sm:text-sm text-secondary mt-0.5 text-left">
+                  <p className="text-xs sm:text-sm text-secondary mt-0.5 text-justify">
                     {t('contact.hubDesc')}
                   </p>
                 </div>
@@ -1504,7 +1504,7 @@ export default function PortfolioHome({ onNavigate }) {
                   <div className="flex items-center justify-between border-b border-subtle pb-3">
                     <div>
                       <h3 className="text-lg font-bold">{t('contact.formTitle')}</h3>
-                      <p className="text-xs text-secondary mt-0.5 text-left">{t('contact.formSubtitle')}</p>
+                      <p className="text-xs text-secondary mt-0.5 text-justify">{t('contact.formSubtitle')}</p>
                     </div>
                     <div className="w-8 h-8 rounded-lg chip-tag flex items-center justify-center shrink-0">
                       <Send className="w-4 h-4" />

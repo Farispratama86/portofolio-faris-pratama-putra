@@ -116,6 +116,11 @@ body {
   border-color: var(--border-subtle);
 }
 
+.text-justify {
+  text-align: justify;
+  text-justify: inter-word;
+}
+
 /* ============================================================
    DOSSIER RUBBER STAMPS, POLAROID TAPE & REDACTED CENSOR
    ============================================================ */
