@@ -689,22 +689,39 @@ export default function AdminPanel({ onNavigate }) {
 
   if (!token) {
     return (
-      <div className="min-h-screen bg-[#090f1d] text-slate-100 flex items-center justify-center p-4">
-        <div className="w-full max-w-md bg-[#111a2e] border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-2xl space-y-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-xl bg-sky-500/15 text-sky-400 flex items-center justify-center">
+      <div className="min-h-screen bg-[#100F0E] text-[#EDE6D6] flex items-center justify-center p-4 relative overflow-hidden">
+        {/* Latar belakang halus /images/bg-archive-crt.jpg (opacity 0.10) */}
+        <div
+          className="absolute inset-0 bg-cover bg-center pointer-events-none select-none"
+          style={{ backgroundImage: "url('/images/bg-archive-crt.jpg')", opacity: 0.1 }}
+          aria-hidden="true"
+        />
+        <div
+          className="absolute inset-0 pointer-events-none select-none"
+          style={{ background: 'radial-gradient(circle at center, transparent 15%, rgba(16,15,14,0.88) 90%)' }}
+          aria-hidden="true"
+        />
+
+        <div className="w-full max-w-md bg-[#181615] border border-[#302A26] rounded-xl p-6 sm:p-8 shadow-2xl space-y-6 relative z-10">
+          <div className="flex items-start justify-between gap-3 pb-4 border-b border-[#302A26]">
+            <div className="flex items-start gap-3">
+              <div className="w-11 h-11 rounded-lg bg-[#DC2626]/15 border border-[#DC2626]/40 text-[#EF4444] flex items-center justify-center shrink-0">
                 <ShieldCheck className="w-6 h-6" />
               </div>
               <div>
-                <h1 className="text-xl font-extrabold">Admin Portofolio</h1>
-                <p className="text-xs text-slate-400">API: {getApiBaseUrl()}</p>
+                <p className="font-mono-code text-[10px] font-bold uppercase tracking-widest text-[#EF4444]">
+                  GERBANG ARSIPARIS // ADMIN DOSSIER
+                </p>
+                <h1 className="font-serif-editorial text-2xl sm:text-3xl text-[#EDE6D6] leading-tight mt-0.5">
+                  Akses Arsiparis
+                </h1>
+                <p className="font-mono-code text-[11px] text-[#C2B8A7] mt-0.5">API: {getApiBaseUrl()}</p>
               </div>
             </div>
             <button
               type="button"
               onClick={() => onNavigate('/')}
-              className="text-xs text-slate-400 hover:text-sky-400 inline-flex items-center gap-1"
+              className="font-mono-code text-xs text-[#C2B8A7] hover:text-[#EF4444] inline-flex items-center gap-1 shrink-0 pt-1"
             >
               <ArrowLeft className="w-3.5 h-3.5" /> Web
             </button>
@@ -712,38 +729,38 @@ export default function AdminPanel({ onNavigate }) {
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-400 mb-1.5">Email Admin</label>
+              <label className="block font-mono-code text-xs font-semibold text-[#C2B8A7] mb-1.5">Email Admin</label>
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-sm"
+                className="w-full px-3.5 py-2.5 rounded-lg bg-[#100F0E] border border-[#302A26] text-sm text-[#EDE6D6] focus:border-[#DC2626] outline-none"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-slate-400 mb-1.5">Password Admin</label>
+              <label className="block font-mono-code text-xs font-semibold text-[#C2B8A7] mb-1.5">Password Admin</label>
               <input
                 type="password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Password admin Anda"
-                className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-sm"
+                className="w-full px-3.5 py-2.5 rounded-lg bg-[#100F0E] border border-[#302A26] text-sm text-[#EDE6D6] focus:border-[#DC2626] outline-none"
               />
             </div>
             {loginError && (
-              <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs">
+              <div className="p-3 rounded-lg bg-[#DC2626]/15 border border-[#DC2626]/40 text-[#FCA5A5] text-xs font-mono-code">
                 {loginError}
               </div>
             )}
             <button
               type="submit"
               disabled={loading}
-              className="w-full inline-flex items-center justify-center gap-2 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-semibold text-sm disabled:opacity-50"
+              className="w-full inline-flex items-center justify-center gap-2 py-2.5 rounded-lg bg-[#DC2626] hover:bg-[#B91C1C] text-white font-semibold text-sm disabled:opacity-50 transition-colors"
             >
               <LogIn className="w-4 h-4" />
-              <span>{loading ? 'Masuk...' : 'Login JWT'}</span>
+              <span>{loading ? 'Memverifikasi...' : 'Masuk ke Dossier (JWT)'}</span>
             </button>
           </form>
         </div>
@@ -752,18 +769,25 @@ export default function AdminPanel({ onNavigate }) {
   }
 
   return (
-    <div className="min-h-screen bg-[#090f1d] text-slate-100">
-      <header className="sticky top-0 z-30 bg-[#090f1d]/90 backdrop-blur border-b border-slate-800">
+    <div className="min-h-screen bg-[#100F0E] text-[#EDE6D6]">
+      <header className="sticky top-0 z-30 bg-[#100F0E]/92 backdrop-blur border-b border-[#302A26]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
-            <span className="w-9 h-9 rounded-xl bg-sky-500 text-white flex items-center justify-center font-extrabold text-sm">
+            <span className="w-9 h-9 rounded-lg bg-[#DC2626] text-white flex items-center justify-center font-mono-code font-extrabold text-sm shrink-0">
               FP
             </span>
             <div className="min-w-0">
-              <h1 className="font-bold text-sm sm:text-base truncate">Admin CMS Portofolio</h1>
-              <div className="flex items-center gap-1.5 text-[11px] text-slate-400">
+              <div className="flex items-center gap-2">
+                <h1 className="font-serif-editorial text-xl sm:text-2xl text-[#EDE6D6] truncate leading-none">
+                  Panel Arsiparis
+                </h1>
+                <span className="hidden md:inline-block font-mono-code text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded bg-[#DC2626]/15 text-[#EF4444] border border-[#DC2626]/40">
+                  ADMIN DOSSIER
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5 font-mono-code text-[11px] text-[#C2B8A7] mt-0.5">
                 <Server className="w-3 h-3 text-emerald-400" />
-                <span>Terhubung: {getApiBaseUrl()}</span>
+                <span className="truncate">Terhubung: {getApiBaseUrl()}</span>
               </div>
             </div>
           </div>
@@ -772,23 +796,23 @@ export default function AdminPanel({ onNavigate }) {
             <button
               type="button"
               onClick={() => setCvPreviewOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-sky-500/15 hover:bg-sky-500/25 border border-sky-500/30 text-sky-300 text-xs font-semibold"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#1C1917] hover:bg-[#24201D] border border-[#302A26] hover:border-[#DC2626]/60 text-[#EDE6D6] font-mono-code text-xs font-semibold transition-colors"
             >
-              <Printer className="w-3.5 h-3.5" />
+              <Printer className="w-3.5 h-3.5 text-[#EF4444]" />
               <span className="hidden sm:inline">Cetak CV PDF</span>
             </button>
             <button
               type="button"
               onClick={() => onNavigate('/')}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-semibold"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#1C1917] hover:bg-[#24201D] border border-[#302A26] text-[#EDE6D6] font-mono-code text-xs font-semibold transition-colors"
             >
-              <ArrowLeft className="w-3.5 h-3.5 text-sky-400" />
+              <ArrowLeft className="w-3.5 h-3.5 text-[#EF4444]" />
               <span>Lihat Portofolio</span>
             </button>
             <button
               type="button"
               onClick={handleLogout}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-rose-500/30 text-rose-300 hover:bg-rose-500/10 text-xs font-semibold"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#DC2626]/40 text-[#FCA5A5] hover:bg-[#DC2626]/15 font-mono-code text-xs font-semibold transition-colors"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span>Keluar</span>
@@ -798,12 +822,12 @@ export default function AdminPanel({ onNavigate }) {
       </header>
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-6">
-        <div className="inline-flex flex-wrap p-1 rounded-xl bg-[#111a2e] border border-slate-800 gap-1">
+        <div className="inline-flex flex-wrap p-1 rounded-xl bg-[#181615] border border-[#302A26] gap-1 font-mono-code">
           <button
             type="button"
             onClick={() => setActiveTab('profile')}
-            className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold ${
-              activeTab === 'profile' ? 'bg-sky-500 text-white' : 'text-slate-400 hover:text-slate-200'
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-colors ${
+              activeTab === 'profile' ? 'bg-[#DC2626] text-white' : 'text-[#C2B8A7] hover:text-[#EDE6D6]'
             }`}
           >
             <User className="w-4 h-4" />
@@ -812,8 +836,8 @@ export default function AdminPanel({ onNavigate }) {
           <button
             type="button"
             onClick={() => setActiveTab('projects')}
-            className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold ${
-              activeTab === 'projects' ? 'bg-sky-500 text-white' : 'text-slate-400 hover:text-slate-200'
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-colors ${
+              activeTab === 'projects' ? 'bg-[#DC2626] text-white' : 'text-[#C2B8A7] hover:text-[#EDE6D6]'
             }`}
           >
             <FolderKanban className="w-4 h-4" />
@@ -822,8 +846,8 @@ export default function AdminPanel({ onNavigate }) {
           <button
             type="button"
             onClick={() => setActiveTab('experiences')}
-            className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold ${
-              activeTab === 'experiences' ? 'bg-sky-500 text-white' : 'text-slate-400 hover:text-slate-200'
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-colors ${
+              activeTab === 'experiences' ? 'bg-[#DC2626] text-white' : 'text-[#C2B8A7] hover:text-[#EDE6D6]'
             }`}
           >
             <Briefcase className="w-4 h-4" />
@@ -832,8 +856,8 @@ export default function AdminPanel({ onNavigate }) {
           <button
             type="button"
             onClick={() => setActiveTab('certificates')}
-            className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold ${
-              activeTab === 'certificates' ? 'bg-sky-500 text-white' : 'text-slate-400 hover:text-slate-200'
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-colors ${
+              activeTab === 'certificates' ? 'bg-[#DC2626] text-white' : 'text-[#C2B8A7] hover:text-[#EDE6D6]'
             }`}
           >
             <Award className="w-4 h-4" />
@@ -842,27 +866,27 @@ export default function AdminPanel({ onNavigate }) {
           <button
             type="button"
             onClick={() => setActiveTab('skills')}
-            className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold ${
-              activeTab === 'skills' ? 'bg-sky-500 text-white' : 'text-slate-400 hover:text-slate-200'
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-colors ${
+              activeTab === 'skills' ? 'bg-[#DC2626] text-white' : 'text-[#C2B8A7] hover:text-[#EDE6D6]'
             }`}
           >
             <Brain className="w-4 h-4" />
-            <span>Keahlian &amp; Rate ({skills.length})</span>
+            <span>Keahlian &amp; Tingkat ({skills.length})</span>
           </button>
         </div>
 
         {/* PROFILE TAB */}
         {activeTab === 'profile' && (
           <form onSubmit={handleSaveProfile} className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            <div className="lg:col-span-5 bg-[#111a2e] border border-slate-800 rounded-2xl p-5 space-y-4">
-              <h2 className="font-bold text-base">Foto Profil (Rasio 4:3 → Cloudinary)</h2>
-              <div className="aspect-[4/3] rounded-xl overflow-hidden bg-slate-950 border border-dashed border-slate-700 flex items-center justify-center">
+            <div className="lg:col-span-5 bg-[#181615] border border-[#302A26] rounded-2xl p-5 space-y-4">
+              <h2 className="font-serif-editorial text-xl text-[#EDE6D6]">Foto Profil (Rasio 4:3 → Cloudinary)</h2>
+              <div className="aspect-[4/3] rounded-xl overflow-hidden bg-[#100F0E] border border-dashed border-[#302A26] flex items-center justify-center">
                 {profileForm.photoUrl ? (
                   <img src={profileForm.photoUrl} alt="Foto Profil" className="w-full h-full object-cover object-top" />
                 ) : (
                   <div className="text-center p-4">
-                    <User className="w-10 h-10 text-slate-600 mx-auto mb-1.5" />
-                    <p className="text-xs text-slate-500">Belum ada foto profil tersimpan</p>
+                    <User className="w-10 h-10 text-[#786E60] mx-auto mb-1.5" />
+                    <p className="text-xs text-[#938878]">Belum ada foto profil tersimpan</p>
                   </div>
                 )}
               </div>
@@ -870,7 +894,7 @@ export default function AdminPanel({ onNavigate }) {
                 <button
                   type="button"
                   onClick={() => setCropperTarget('profile')}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 text-sky-400 border border-sky-500/30 text-xs font-semibold"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#DC2626]/15 hover:bg-[#DC2626]/25 text-[#EF4444] border border-[#DC2626]/35 text-xs font-semibold"
                 >
                   <Crop className="w-3.5 h-3.5" />
                   <span>{profileForm.photoUrl ? 'Ganti / Crop Foto Profil' : 'Pilih & Crop Foto Profil'}</span>
@@ -879,146 +903,146 @@ export default function AdminPanel({ onNavigate }) {
               </div>
             </div>
 
-            <div className="lg:col-span-7 bg-[#111a2e] border border-slate-800 rounded-2xl p-5 space-y-4">
-              <h2 className="font-bold text-base">Bio &amp; Tautan Media Sosial</h2>
+            <div className="lg:col-span-7 bg-[#181615] border border-[#302A26] rounded-2xl p-5 space-y-4">
+              <h2 className="font-serif-editorial text-xl text-[#EDE6D6]">Bio &amp; Tautan Media Sosial</h2>
               <div>
-                <label className="block text-xs font-semibold text-slate-400 mb-1">Peran / Tagline Hero</label>
+                <label className="block font-mono-code text-xs font-semibold text-[#C2B8A7] mb-1">Peran / Tagline Hero</label>
                 <input
                   type="text"
                   value={profileForm.role}
                   onChange={(e) => setProfileForm({ ...profileForm, role: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                  className="w-full px-3 py-2 rounded-xl bg-[#100F0E] border border-[#302A26] text-sm focus:border-[#DC2626] outline-none"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-slate-400 mb-1">Deskripsi Singkat (Hero)</label>
+                <label className="block font-mono-code text-xs font-semibold text-[#C2B8A7] mb-1">Deskripsi Singkat (Hero)</label>
                 <textarea
                   rows="3"
                   value={profileForm.bio}
                   onChange={(e) => setProfileForm({ ...profileForm, bio: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm resize-none focus:border-sky-500 outline-none"
+                  className="w-full px-3 py-2 rounded-xl bg-[#100F0E] border border-[#302A26] text-sm resize-none focus:border-[#DC2626] outline-none"
                 />
               </div>
 
               {/* Detail Kartu Identitas */}
-              <div className="pt-2 border-t border-slate-800 space-y-3">
-                <p className="text-xs font-bold uppercase tracking-wider text-sky-400">Detail Kartu Identitas</p>
+              <div className="pt-2 border-t border-[#302A26] space-y-3">
+                <p className="font-mono-code text-xs font-bold uppercase tracking-wider text-[#EF4444]">Detail Kartu Identitas</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-400 mb-1">Status Ketersediaan / Badge Foto</label>
+                    <label className="block font-mono-code text-xs font-semibold text-[#C2B8A7] mb-1">Status Ketersediaan / Badge Foto</label>
                     <input
                       type="text"
                       value={profileForm.availabilityStatus}
                       onChange={(e) => setProfileForm({ ...profileForm, availabilityStatus: e.target.value })}
                       placeholder="Terbuka untuk Peluang"
-                      className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                      className="w-full px-3 py-2 rounded-xl bg-[#100F0E] border border-[#302A26] text-sm focus:border-[#DC2626] outline-none"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-400 mb-1">Pendidikan</label>
+                    <label className="block font-mono-code text-xs font-semibold text-[#C2B8A7] mb-1">Pendidikan</label>
                     <input
                       type="text"
                       value={profileForm.education}
                       onChange={(e) => setProfileForm({ ...profileForm, education: e.target.value })}
                       placeholder="S1 Teknik Informatika (UDB)"
-                      className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                      className="w-full px-3 py-2 rounded-xl bg-[#100F0E] border border-[#302A26] text-sm focus:border-[#DC2626] outline-none"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-400 mb-1">Profesi / Peran</label>
+                    <label className="block font-mono-code text-xs font-semibold text-[#C2B8A7] mb-1">Profesi / Peran</label>
                     <input
                       type="text"
                       value={profileForm.profession}
                       onChange={(e) => setProfileForm({ ...profileForm, profession: e.target.value })}
                       placeholder="Web UI/UX & IT Developer"
-                      className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                      className="w-full px-3 py-2 rounded-xl bg-[#100F0E] border border-[#302A26] text-sm focus:border-[#DC2626] outline-none"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-400 mb-1">Keahlian Utama</label>
+                    <label className="block font-mono-code text-xs font-semibold text-[#C2B8A7] mb-1">Keahlian Utama</label>
                     <input
                       type="text"
                       value={profileForm.coreSkills}
                       onChange={(e) => setProfileForm({ ...profileForm, coreSkills: e.target.value })}
                       placeholder="Web UI/UX · Machine Learning · IoT"
-                      className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                      className="w-full px-3 py-2 rounded-xl bg-[#100F0E] border border-[#302A26] text-sm focus:border-[#DC2626] outline-none"
                     />
                   </div>
                   <div className="sm:col-span-2">
-                    <label className="block text-xs font-semibold text-slate-400 mb-1">Domisili</label>
+                    <label className="block font-mono-code text-xs font-semibold text-[#C2B8A7] mb-1">Domisili</label>
                     <input
                       type="text"
                       value={profileForm.location}
                       onChange={(e) => setProfileForm({ ...profileForm, location: e.target.value })}
                       placeholder="Surakarta, Indonesia"
-                      className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                      className="w-full px-3 py-2 rounded-xl bg-[#100F0E] border border-[#302A26] text-sm focus:border-[#DC2626] outline-none"
                     />
                   </div>
                 </div>
               </div>
 
               {/* Tautan Kontak & Media Sosial */}
-              <div className="pt-2 border-t border-slate-800 space-y-3">
-                <p className="text-xs font-bold uppercase tracking-wider text-sky-400">Tautan Kontak &amp; Media Sosial</p>
+              <div className="pt-2 border-t border-[#302A26] space-y-3">
+                <p className="font-mono-code text-xs font-bold uppercase tracking-wider text-[#EF4444]">Tautan Kontak &amp; Media Sosial</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-400 mb-1">Email</label>
+                    <label className="block font-mono-code text-xs font-semibold text-[#C2B8A7] mb-1">Email</label>
                     <input
                       type="email"
                       value={profileForm.email}
                       onChange={(e) => setProfileForm({ ...profileForm, email: e.target.value })}
                       placeholder="farispakez1209@gmail.com"
-                      className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                      className="w-full px-3 py-2 rounded-xl bg-[#100F0E] border border-[#302A26] text-sm focus:border-[#DC2626] outline-none"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-400 mb-1">Nomor WhatsApp</label>
+                    <label className="block font-mono-code text-xs font-semibold text-[#C2B8A7] mb-1">Nomor WhatsApp</label>
                     <input
                       type="text"
                       value={profileForm.whatsapp}
                       onChange={(e) => setProfileForm({ ...profileForm, whatsapp: e.target.value })}
                       placeholder="6281219534692"
-                      className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                      className="w-full px-3 py-2 rounded-xl bg-[#100F0E] border border-[#302A26] text-sm focus:border-[#DC2626] outline-none"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-400 mb-1">GitHub URL</label>
+                    <label className="block font-mono-code text-xs font-semibold text-[#C2B8A7] mb-1">GitHub URL</label>
                     <input
                       type="url"
                       value={profileForm.githubUrl}
                       onChange={(e) => setProfileForm({ ...profileForm, githubUrl: e.target.value })}
                       placeholder="https://github.com/..."
-                      className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                      className="w-full px-3 py-2 rounded-xl bg-[#100F0E] border border-[#302A26] text-sm focus:border-[#DC2626] outline-none"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-400 mb-1">LinkedIn URL</label>
+                    <label className="block font-mono-code text-xs font-semibold text-[#C2B8A7] mb-1">LinkedIn URL</label>
                     <input
                       type="url"
                       value={profileForm.linkedinUrl}
                       onChange={(e) => setProfileForm({ ...profileForm, linkedinUrl: e.target.value })}
                       placeholder="https://linkedin.com/in/..."
-                      className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                      className="w-full px-3 py-2 rounded-xl bg-[#100F0E] border border-[#302A26] text-sm focus:border-[#DC2626] outline-none"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-400 mb-1">Instagram URL</label>
+                    <label className="block font-mono-code text-xs font-semibold text-[#C2B8A7] mb-1">Instagram URL</label>
                     <input
                       type="url"
                       value={profileForm.instagramUrl}
                       onChange={(e) => setProfileForm({ ...profileForm, instagramUrl: e.target.value })}
                       placeholder="https://instagram.com/..."
-                      className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                      className="w-full px-3 py-2 rounded-xl bg-[#100F0E] border border-[#302A26] text-sm focus:border-[#DC2626] outline-none"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-400 mb-1">TikTok URL</label>
+                    <label className="block font-mono-code text-xs font-semibold text-[#C2B8A7] mb-1">TikTok URL</label>
                     <input
                       type="url"
                       value={profileForm.tiktokUrl}
                       onChange={(e) => setProfileForm({ ...profileForm, tiktokUrl: e.target.value })}
                       placeholder="https://tiktok.com/@..."
-                      className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                      className="w-full px-3 py-2 rounded-xl bg-[#100F0E] border border-[#302A26] text-sm focus:border-[#DC2626] outline-none"
                     />
                   </div>
                 </div>
@@ -1026,7 +1050,7 @@ export default function AdminPanel({ onNavigate }) {
               <button
                 type="submit"
                 disabled={loading}
-                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-semibold text-sm disabled:opacity-50"
+                className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-[#DC2626] hover:bg-[#B91C1C] text-white font-semibold text-sm disabled:opacity-50"
               >
                 <Save className="w-4 h-4" />
                 <span>{loading ? 'Menyimpan...' : 'Simpan Profil & Foto'}</span>
@@ -1038,25 +1062,25 @@ export default function AdminPanel({ onNavigate }) {
         {/* PROJECTS TAB */}
         {activeTab === 'projects' && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            <form onSubmit={handleSaveProject} className="lg:col-span-5 bg-[#111a2e] border border-slate-800 rounded-2xl p-5 space-y-4">
+            <form onSubmit={handleSaveProject} className="lg:col-span-5 bg-[#181615] border border-[#302A26] rounded-2xl p-5 space-y-4">
               <div className="flex items-center justify-between">
-                <h2 className="font-bold text-base">{editingProjectId ? 'Edit Proyek' : 'Tambah Proyek Baru'}</h2>
+                <h2 className="font-serif-editorial text-xl text-[#EDE6D6]">{editingProjectId ? 'Edit Proyek' : 'Tambah Proyek Baru'}</h2>
                 {editingProjectId && (
-                  <button type="button" onClick={resetProjectForm} className="text-xs text-slate-400 hover:text-sky-400">
+                  <button type="button" onClick={resetProjectForm} className="text-xs text-[#C2B8A7] hover:text-[#EF4444]">
                     Batal Edit
                   </button>
                 )}
               </div>
 
               <div className="space-y-2">
-                <label className="block text-xs font-semibold text-slate-400">Foto Proyek (Rasio 16:9 → Cloudinary)</label>
-                <div className="aspect-video rounded-xl overflow-hidden bg-slate-950 border border-dashed border-slate-700 flex items-center justify-center">
+                <label className="block font-mono-code text-xs font-semibold text-[#C2B8A7]">Foto Proyek (Rasio 16:9 → Cloudinary)</label>
+                <div className="aspect-video rounded-xl overflow-hidden bg-[#100F0E] border border-dashed border-[#302A26] flex items-center justify-center">
                   {projForm.imageUrl ? (
                     <img src={projForm.imageUrl} alt="Preview crop" className="w-full h-full object-cover" />
                   ) : (
                     <div className="text-center p-4">
-                      <ImageIcon className="w-8 h-8 text-slate-600 mx-auto mb-1" />
-                      <p className="text-xs text-slate-500">Belum ada foto</p>
+                      <ImageIcon className="w-8 h-8 text-[#786E60] mx-auto mb-1" />
+                      <p className="text-xs text-[#938878]">Belum ada foto</p>
                     </div>
                   )}
                 </div>
@@ -1064,7 +1088,7 @@ export default function AdminPanel({ onNavigate }) {
                   <button
                     type="button"
                     onClick={() => setCropperTarget('project')}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-sky-500/15 hover:bg-sky-500/25 text-sky-400 border border-sky-500/30 text-xs font-semibold"
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#DC2626]/15 hover:bg-[#DC2626]/25 text-[#EF4444] border border-[#DC2626]/35 text-xs font-semibold"
                   >
                     <Crop className="w-3.5 h-3.5" />
                     <span>{projForm.imageUrl ? 'Ganti / Crop Foto 16:9' : 'Pilih & Crop Foto 16:9'}</span>
@@ -1079,12 +1103,12 @@ export default function AdminPanel({ onNavigate }) {
                 value={projForm.title}
                 onChange={(e) => setProjForm({ ...projForm, title: e.target.value })}
                 placeholder="Judul Proyek"
-                className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm"
+                className="w-full px-3 py-2 rounded-xl bg-[#100F0E] border border-[#302A26] text-sm"
               />
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-400 mb-1">Kategori Utama *</label>
+                  <label className="block font-mono-code text-[11px] font-semibold text-[#C2B8A7] mb-1">Kategori Utama *</label>
                   <select
                     value={projForm.category}
                     onChange={(e) => {
@@ -1102,7 +1126,7 @@ export default function AdminPanel({ onNavigate }) {
                             : newLabel,
                       }));
                     }}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                    className="w-full px-3 py-2 rounded-xl bg-[#100F0E] border border-[#302A26] text-sm focus:border-[#DC2626] outline-none"
                   >
                     <option value="web-ml">Web &amp; ML</option>
                     <option value="iot">IoT &amp; Embedded</option>
@@ -1110,23 +1134,23 @@ export default function AdminPanel({ onNavigate }) {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-400 mb-1">Label Badge Kategori</label>
+                  <label className="block font-mono-code text-[11px] font-semibold text-[#C2B8A7] mb-1">Label Badge Kategori</label>
                   <input
                     type="text"
                     value={projForm.categoryLabel}
                     onChange={(e) => setProjForm({ ...projForm, categoryLabel: e.target.value })}
                     placeholder="Contoh: Web UI/UX · Production"
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                    className="w-full px-3 py-2 rounded-xl bg-[#100F0E] border border-[#302A26] text-sm focus:border-[#DC2626] outline-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-400 mb-1">Tahun Proyek</label>
+                  <label className="block font-mono-code text-[11px] font-semibold text-[#C2B8A7] mb-1">Tahun Proyek</label>
                   <input
                     type="text"
                     value={projForm.year}
                     onChange={(e) => setProjForm({ ...projForm, year: e.target.value })}
                     placeholder="2026"
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                    className="w-full px-3 py-2 rounded-xl bg-[#100F0E] border border-[#302A26] text-sm focus:border-[#DC2626] outline-none"
                   />
                 </div>
               </div>
@@ -1137,7 +1161,7 @@ export default function AdminPanel({ onNavigate }) {
                 value={projForm.summary}
                 onChange={(e) => setProjForm({ ...projForm, summary: e.target.value })}
                 placeholder="Ringkasan proyek..."
-                className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm resize-none"
+                className="w-full px-3 py-2 rounded-xl bg-[#100F0E] border border-[#302A26] text-sm resize-none"
               />
 
               <textarea
@@ -1145,7 +1169,7 @@ export default function AdminPanel({ onNavigate }) {
                 value={projForm.highlightsText}
                 onChange={(e) => setProjForm({ ...projForm, highlightsText: e.target.value })}
                 placeholder="Poin utama (1 baris = 1 poin)"
-                className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm resize-none"
+                className="w-full px-3 py-2 rounded-xl bg-[#100F0E] border border-[#302A26] text-sm resize-none"
               />
 
               <input
@@ -1153,7 +1177,7 @@ export default function AdminPanel({ onNavigate }) {
                 value={projForm.tagsText}
                 onChange={(e) => setProjForm({ ...projForm, tagsText: e.target.value })}
                 placeholder="Tag teknologi (pisahkan koma)"
-                className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm"
+                className="w-full px-3 py-2 rounded-xl bg-[#100F0E] border border-[#302A26] text-sm"
               />
 
               <div className="grid grid-cols-2 gap-3">
@@ -1162,23 +1186,23 @@ export default function AdminPanel({ onNavigate }) {
                   value={projForm.liveUrl}
                   onChange={(e) => setProjForm({ ...projForm, liveUrl: e.target.value })}
                   placeholder="Live Demo URL (opsional)"
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm"
+                  className="w-full px-3 py-2 rounded-xl bg-[#100F0E] border border-[#302A26] text-sm"
                 />
                 <input
                   type="url"
                   value={projForm.repoUrl}
                   onChange={(e) => setProjForm({ ...projForm, repoUrl: e.target.value })}
                   placeholder="GitHub Repo URL"
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm"
+                  className="w-full px-3 py-2 rounded-xl bg-[#100F0E] border border-[#302A26] text-sm"
                 />
               </div>
 
-              <label className="flex items-center gap-2 text-xs text-slate-300 cursor-pointer">
+              <label className="flex items-center gap-2 text-xs text-[#D6CEBF] cursor-pointer">
                 <input
                   type="checkbox"
                   checked={projForm.featured}
                   onChange={(e) => setProjForm({ ...projForm, featured: e.target.checked })}
-                  className="accent-sky-500"
+                  className="accent-[#DC2626]"
                 />
                 <span>Jadikan Proyek Unggulan (Featured)</span>
               </label>
@@ -1186,7 +1210,7 @@ export default function AdminPanel({ onNavigate }) {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full inline-flex items-center justify-center gap-2 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-semibold text-sm disabled:opacity-50"
+                className="w-full inline-flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[#DC2626] hover:bg-[#B91C1C] text-white font-semibold text-sm disabled:opacity-50"
               >
                 <Save className="w-4 h-4" />
                 <span>{loading ? 'Menyimpan...' : editingProjectId ? 'Simpan Perubahan' : 'Simpan ke Database'}</span>
@@ -1195,22 +1219,22 @@ export default function AdminPanel({ onNavigate }) {
 
             <div className="lg:col-span-7 space-y-3">
               {projects.map((p) => (
-                <article key={p.id} className="bg-[#111a2e] border border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row gap-4">
-                  <div className="w-full sm:w-44 aspect-video rounded-xl overflow-hidden bg-slate-950/80 border border-slate-800 shrink-0 flex items-center justify-center p-1.5">
+                <article key={p.id} className="bg-[#181615] border border-[#302A26] rounded-2xl p-4 flex flex-col sm:flex-row gap-4">
+                  <div className="w-full sm:w-44 aspect-video rounded-xl overflow-hidden bg-[#100F0E]/90 border border-[#302A26] shrink-0 flex items-center justify-center p-1.5">
                     {p.imageUrl ? (
                       <img src={p.imageUrl} alt={p.title} className="w-full h-full object-contain rounded-lg" />
                     ) : (
-                      <span className="text-[11px] text-slate-500">Belum ada foto</span>
+                      <span className="text-[11px] text-[#938878]">Belum ada foto</span>
                     )}
                   </div>
                   <div className="flex-1 min-w-0 space-y-2">
                     <div className="flex items-start justify-between gap-2">
                       <div>
                         <div className="flex flex-wrap items-center gap-1.5 mb-1">
-                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-sky-500/15 text-sky-400 border border-sky-500/30">
+                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#DC2626]/15 text-[#EF4444] border border-[#DC2626]/35">
                             {p.categoryLabel || (p.category === 'iot' ? 'IoT & Embedded' : p.category === 'desktop' ? 'Desktop App' : 'Web & ML')}
                           </span>
-                          <span className="text-xs text-slate-400">· {p.year}</span>
+                          <span className="text-xs text-[#C2B8A7]">· {p.year}</span>
                         </div>
                         <h3 className="font-bold text-sm sm:text-base">{p.title}</h3>
                       </div>
@@ -1236,7 +1260,7 @@ export default function AdminPanel({ onNavigate }) {
                             });
                             setCropperTarget('project');
                           }}
-                          className="inline-flex items-center gap-1 px-2 py-1.5 rounded-lg bg-sky-500/15 hover:bg-sky-500/25 border border-sky-500/30 text-sky-300 text-[11px] font-semibold"
+                          className="inline-flex items-center gap-1 px-2 py-1.5 rounded-lg bg-[#DC2626]/15 hover:bg-[#DC2626]/25 border border-[#DC2626]/35 text-[#FCA5A5] text-[11px] font-semibold"
                           title="Upload atau ganti foto proyek ini"
                         >
                           <Crop className="w-3 h-3" />
@@ -1262,7 +1286,7 @@ export default function AdminPanel({ onNavigate }) {
                               imageMeta: p.imageUrl ? 'Foto dari Cloudinary' : '',
                             });
                           }}
-                          className="p-1.5 rounded-lg border border-slate-700 hover:border-sky-400 text-slate-300"
+                          className="p-1.5 rounded-lg border border-[#302A26] hover:border-[#DC2626] text-[#D6CEBF]"
                         >
                           <Edit3 className="w-3.5 h-3.5" />
                         </button>
@@ -1275,7 +1299,7 @@ export default function AdminPanel({ onNavigate }) {
                         </button>
                       </div>
                     </div>
-                    <p className="text-xs text-slate-400 line-clamp-2">{p.summary}</p>
+                    <p className="text-xs text-[#C2B8A7] line-clamp-2">{p.summary}</p>
                     {p.liveUrl && (
                       <a href={p.liveUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs text-emerald-400 hover:underline">
                         Live Demo <ExternalLink className="w-3 h-3" />
@@ -1291,33 +1315,33 @@ export default function AdminPanel({ onNavigate }) {
         {/* EXPERIENCES TAB */}
         {activeTab === 'experiences' && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            <form onSubmit={handleSaveExperience} className="lg:col-span-5 bg-[#111a2e] border border-slate-800 rounded-2xl p-5 space-y-4">
+            <form onSubmit={handleSaveExperience} className="lg:col-span-5 bg-[#181615] border border-[#302A26] rounded-2xl p-5 space-y-4">
               <div className="flex items-center justify-between">
-                <h2 className="font-bold text-base">{editingExpId ? 'Edit Pengalaman' : 'Tambah Magang / Pengalaman'}</h2>
+                <h2 className="font-serif-editorial text-xl text-[#EDE6D6]">{editingExpId ? 'Edit Pengalaman' : 'Tambah Magang / Pengalaman'}</h2>
                 {editingExpId && (
-                  <button type="button" onClick={resetExpForm} className="text-xs text-slate-400 hover:text-sky-400">
+                  <button type="button" onClick={resetExpForm} className="text-xs text-[#C2B8A7] hover:text-[#EF4444]">
                     Batal Edit
                   </button>
                 )}
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-400 mb-1">Peran / Posisi *</label>
+                <label className="block font-mono-code text-xs font-semibold text-[#C2B8A7] mb-1">Peran / Posisi *</label>
                 <input
                   type="text"
                   required
                   value={expForm.role}
                   onChange={(e) => setExpForm({ ...expForm, role: e.target.value })}
                   placeholder="Contoh: Web UI/UX Developer / Computer Technician"
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                  className="w-full px-3 py-2 rounded-xl bg-[#100F0E] border border-[#302A26] text-sm focus:border-[#DC2626] outline-none"
                 />
               </div>
 
               {/* Status / Kategori Pengalaman (Pilihan Interaktif) */}
-              <div className="bg-slate-950/70 border border-slate-800/80 rounded-xl p-3.5 space-y-3">
+              <div className="bg-[#100F0E]/85 border border-[#302A26] rounded-xl p-3.5 space-y-3">
                 <div className="flex items-center justify-between gap-2">
-                  <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-                    <Briefcase className="w-3.5 h-3.5 text-sky-400" />
+                  <label className="text-xs font-semibold text-[#D6CEBF] flex items-center gap-1.5">
+                    <Briefcase className="w-3.5 h-3.5 text-[#EF4444]" />
                     <span>Status &amp; Kategori Aktivitas</span>
                   </label>
                   {/* Live Preview Badge */}
@@ -1337,7 +1361,7 @@ export default function AdminPanel({ onNavigate }) {
                     className={`px-2 py-1.5 rounded-lg text-xs font-medium border text-left transition-all ${
                       getBadgeStyle(expForm.badge).type === 'aktif'
                         ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-300 font-semibold shadow-sm'
-                        : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                        : 'bg-[#1C1917] border-[#302A26] text-[#C2B8A7] hover:text-[#EDE6D6] hover:bg-[#231F1C]'
                     }`}
                   >
                     <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 mr-1.5"></span>
@@ -1348,11 +1372,11 @@ export default function AdminPanel({ onNavigate }) {
                     onClick={() => setExpForm({ ...expForm, badge: 'Resign (Nonaktif)' })}
                     className={`px-2 py-1.5 rounded-lg text-xs font-medium border text-left transition-all ${
                       getBadgeStyle(expForm.badge).type === 'resign'
-                        ? 'bg-slate-600/30 border-slate-500/50 text-slate-200 font-semibold shadow-sm'
-                        : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                        ? 'bg-[#302A26]/60 border-[#938878]/50 text-[#EDE6D6] font-semibold shadow-sm'
+                        : 'bg-[#1C1917] border-[#302A26] text-[#C2B8A7] hover:text-[#EDE6D6] hover:bg-[#231F1C]'
                     }`}
                   >
-                    <span className="inline-block w-2 h-2 rounded-full bg-slate-400 mr-1.5"></span>
+                    <span className="inline-block w-2 h-2 rounded-full bg-[#938878] mr-1.5"></span>
                     Resign
                   </button>
                   <button
@@ -1360,11 +1384,11 @@ export default function AdminPanel({ onNavigate }) {
                     onClick={() => setExpForm({ ...expForm, badge: 'Magang · Hybrid' })}
                     className={`px-2 py-1.5 rounded-lg text-xs font-medium border text-left transition-all ${
                       getBadgeStyle(expForm.badge).type === 'magang'
-                        ? 'bg-sky-500/20 border-sky-500/50 text-sky-300 font-semibold shadow-sm'
-                        : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                        ? 'bg-[#DC2626]/20 border-[#DC2626]/50 text-[#FCA5A5] font-semibold shadow-sm'
+                        : 'bg-[#1C1917] border-[#302A26] text-[#C2B8A7] hover:text-[#EDE6D6] hover:bg-[#231F1C]'
                     }`}
                   >
-                    <span className="inline-block w-2 h-2 rounded-full bg-sky-400 mr-1.5"></span>
+                    <span className="inline-block w-2 h-2 rounded-full bg-[#EF4444] mr-1.5"></span>
                     Magang
                   </button>
                   <button
@@ -1372,18 +1396,18 @@ export default function AdminPanel({ onNavigate }) {
                     onClick={() => setExpForm({ ...expForm, badge: 'Pelatihan Skill' })}
                     className={`px-2 py-1.5 rounded-lg text-xs font-medium border text-left transition-all ${
                       getBadgeStyle(expForm.badge).type === 'pelatihan'
-                        ? 'bg-purple-500/20 border-purple-500/50 text-purple-300 font-semibold shadow-sm'
-                        : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                        ? 'bg-[#DC2626]/20 border-[#DC2626]/50 text-[#FCA5A5] font-semibold shadow-sm'
+                        : 'bg-[#1C1917] border-[#302A26] text-[#C2B8A7] hover:text-[#EDE6D6] hover:bg-[#231F1C]'
                     }`}
                   >
-                    <span className="inline-block w-2 h-2 rounded-full bg-purple-400 mr-1.5"></span>
+                    <span className="inline-block w-2 h-2 rounded-full bg-amber-400 mr-1.5"></span>
                     Pelatihan
                   </button>
                 </div>
 
                 {/* Dropdown Preset Lengkap */}
                 <div className="space-y-1">
-                  <label className="block text-[11px] text-slate-400">Pilihan Standar (Klik untuk memilih):</label>
+                  <label className="block text-[11px] text-[#C2B8A7]">Pilihan Standar (Klik untuk memilih):</label>
                   <select
                     value={
                       EXPERIENCE_STATUS_OPTIONS.flatMap((g) => g.options).includes(expForm.badge)
@@ -1395,7 +1419,7 @@ export default function AdminPanel({ onNavigate }) {
                         setExpForm({ ...expForm, badge: e.target.value });
                       }
                     }}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-sm text-slate-200 focus:border-sky-500 outline-none"
+                    className="w-full px-3 py-2 rounded-xl bg-[#1C1917] border border-[#302A26] text-sm text-[#EDE6D6] focus:border-[#DC2626] outline-none"
                   >
                     {EXPERIENCE_STATUS_OPTIONS.map((group) => (
                       <optgroup key={group.category} label={group.groupLabel}>
@@ -1412,65 +1436,65 @@ export default function AdminPanel({ onNavigate }) {
 
                 {/* Input Teks Fleksibel (Bisa disesuaikan untuk apapun itu) */}
                 <div className="space-y-1">
-                  <label className="block text-[11px] text-slate-400">Label Badge (Bisa diedit atau kustom bebas):</label>
+                  <label className="block text-[11px] text-[#C2B8A7]">Label Badge (Bisa diedit atau kustom bebas):</label>
                   <input
                     type="text"
                     required
                     value={expForm.badge}
                     onChange={(e) => setExpForm({ ...expForm, badge: e.target.value })}
                     placeholder="Contoh: Aktif · On-site, Magang · Hybrid, Pelatihan Skill AI..."
-                    className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-sm font-medium focus:border-sky-500 outline-none"
+                    className="w-full px-3 py-2 rounded-xl bg-[#1C1917] border border-[#302A26] text-sm font-medium focus:border-[#DC2626] outline-none"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-400 mb-1">Perusahaan / Instansi / Penyelenggara *</label>
+                <label className="block font-mono-code text-xs font-semibold text-[#C2B8A7] mb-1">Perusahaan / Instansi / Penyelenggara *</label>
                 <input
                   type="text"
                   required
                   value={expForm.company}
                   onChange={(e) => setExpForm({ ...expForm, company: e.target.value })}
                   placeholder="Contoh: PT Vinix Seven Aurum / Speed Computer"
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm"
+                  className="w-full px-3 py-2 rounded-xl bg-[#100F0E] border border-[#302A26] text-sm"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-400 mb-1">Periode *</label>
+                  <label className="block font-mono-code text-xs font-semibold text-[#C2B8A7] mb-1">Periode *</label>
                   <input
                     type="text"
                     required
                     value={expForm.period}
                     onChange={(e) => setExpForm({ ...expForm, period: e.target.value })}
                     placeholder="Contoh: Juni 2023 – Sekarang"
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm"
+                    className="w-full px-3 py-2 rounded-xl bg-[#100F0E] border border-[#302A26] text-sm"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-400 mb-1">Lokasi</label>
+                  <label className="block font-mono-code text-xs font-semibold text-[#C2B8A7] mb-1">Lokasi</label>
                   <input
                     type="text"
                     value={expForm.location}
                     onChange={(e) => setExpForm({ ...expForm, location: e.target.value })}
                     placeholder="Contoh: Surakarta, Indonesia"
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm"
+                    className="w-full px-3 py-2 rounded-xl bg-[#100F0E] border border-[#302A26] text-sm"
                   />
                 </div>
               </div>
 
               {/* Multi-Section Sub-bab & Poin Tugas (Bisa 1, 2, atau Lebih) */}
-              <div className="space-y-3 pt-2 border-t border-slate-800">
+              <div className="space-y-3 pt-2 border-t border-[#302A26]">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-                    <FileText className="w-3.5 h-3.5 text-sky-400" />
+                  <label className="text-xs font-semibold text-[#D6CEBF] flex items-center gap-1.5">
+                    <FileText className="w-3.5 h-3.5 text-[#EF4444]" />
                     <span>Sub-bab Tugas &amp; Capaian ({expForm.sections.length})</span>
                   </label>
                   <button
                     type="button"
                     onClick={handleAddExpSection}
-                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-sky-500/15 hover:bg-sky-500/25 text-sky-400 border border-sky-500/30 transition-all"
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-[#DC2626]/15 hover:bg-[#DC2626]/25 text-[#EF4444] border border-[#DC2626]/35 transition-all"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>Tambah Sub-bab</span>
@@ -1481,11 +1505,11 @@ export default function AdminPanel({ onNavigate }) {
                   {expForm.sections.map((sec, idx) => (
                     <div
                       key={idx}
-                      className="bg-slate-950/80 border border-slate-800 rounded-xl p-3.5 space-y-2.5 relative"
+                      className="bg-[#100F0E]/90 border border-[#302A26] rounded-xl p-3.5 space-y-2.5 relative"
                     >
-                      <div className="flex items-center justify-between pb-1 border-b border-slate-800/60">
-                        <span className="text-[11px] font-bold text-sky-400 flex items-center gap-1.5">
-                          <span className="w-5 h-5 rounded-md bg-sky-500/20 text-sky-400 flex items-center justify-center text-[10px]">
+                      <div className="flex items-center justify-between pb-1 border-b border-[#302A26]/70">
+                        <span className="text-[11px] font-bold text-[#EF4444] flex items-center gap-1.5">
+                          <span className="w-5 h-5 rounded-md bg-[#DC2626]/20 text-[#EF4444] flex items-center justify-center text-[10px]">
                             #{idx + 1}
                           </span>
                           Sub-bab {idx + 1}
@@ -1503,7 +1527,7 @@ export default function AdminPanel({ onNavigate }) {
                       </div>
 
                       <div>
-                        <label className="block text-[11px] font-medium text-slate-400 mb-1">
+                        <label className="block text-[11px] font-medium text-[#C2B8A7] mb-1">
                           Judul Sub-bab / Capaian *
                         </label>
                         <input
@@ -1512,12 +1536,12 @@ export default function AdminPanel({ onNavigate }) {
                           value={sec.heading}
                           onChange={(e) => handleExpSectionChange(idx, 'heading', e.target.value)}
                           placeholder="Contoh: Pengembangan Web & UI/UX / Troubleshooting & Instalasi"
-                          className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-sm font-medium focus:border-sky-500 outline-none text-slate-200"
+                          className="w-full px-3 py-2 rounded-xl bg-[#1C1917] border border-[#302A26] text-sm font-medium focus:border-[#DC2626] outline-none text-[#EDE6D6]"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-[11px] font-medium text-slate-400 mb-1">
+                        <label className="block text-[11px] font-medium text-[#C2B8A7] mb-1">
                           Poin Tugas / Materi * (1 baris = 1 poin)
                         </label>
                         <textarea
@@ -1526,7 +1550,7 @@ export default function AdminPanel({ onNavigate }) {
                           value={sec.bulletsText}
                           onChange={(e) => handleExpSectionChange(idx, 'bulletsText', e.target.value)}
                           placeholder="Poin tugas (1 baris = 1 poin)"
-                          className="w-full px-3 py-2 rounded-xl bg-slate-900 border border-slate-800 text-sm text-slate-200 resize-none focus:border-sky-500 outline-none leading-relaxed"
+                          className="w-full px-3 py-2 rounded-xl bg-[#1C1917] border border-[#302A26] text-sm text-[#EDE6D6] resize-none focus:border-[#DC2626] outline-none leading-relaxed"
                         />
                       </div>
                     </div>
@@ -1536,7 +1560,7 @@ export default function AdminPanel({ onNavigate }) {
                 <button
                   type="button"
                   onClick={handleAddExpSection}
-                  className="w-full py-2.5 rounded-xl border border-dashed border-slate-700 hover:border-sky-500/60 text-xs font-semibold text-slate-300 hover:text-sky-400 hover:bg-sky-500/5 transition-all flex items-center justify-center gap-1.5"
+                  className="w-full py-2.5 rounded-xl border border-dashed border-[#302A26] hover:border-[#DC2626]/60 text-xs font-semibold text-[#D6CEBF] hover:text-[#EF4444] hover:bg-[#DC2626]/5 transition-all flex items-center justify-center gap-1.5"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>+ Tambah Sub-bab / Bagian Tugas Lainnya</span>
@@ -1546,7 +1570,7 @@ export default function AdminPanel({ onNavigate }) {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full inline-flex items-center justify-center gap-2 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-semibold text-sm disabled:opacity-50"
+                className="w-full inline-flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[#DC2626] hover:bg-[#B91C1C] text-white font-semibold text-sm disabled:opacity-50"
               >
                 <Plus className="w-4 h-4" />
                 <span>{loading ? 'Menyimpan...' : editingExpId ? 'Simpan Perubahan' : 'Tambahkan Pengalaman'}</span>
@@ -1557,7 +1581,7 @@ export default function AdminPanel({ onNavigate }) {
               {experiences.map((exp) => {
                 const bStyle = getBadgeStyle(exp.badge);
                 return (
-                  <article key={exp.id} className="bg-[#111a2e] border border-slate-800 rounded-2xl p-5 space-y-3">
+                  <article key={exp.id} className="bg-[#181615] border border-[#302A26] rounded-2xl p-5 space-y-3">
                     <div className="flex items-start justify-between gap-2">
                       <div>
                         <span className={`inline-flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-0.5 rounded-full mb-1 ${bStyle.chipClass}`}>
@@ -1565,8 +1589,8 @@ export default function AdminPanel({ onNavigate }) {
                           {exp.badge}
                         </span>
                         <h3 className="font-bold text-base">{exp.role}</h3>
-                        <p className="text-sm text-sky-400">{exp.company}</p>
-                        <p className="text-xs text-slate-400">{exp.period} · {exp.location}</p>
+                        <p className="text-sm text-[#EF4444]">{exp.company}</p>
+                        <p className="text-xs text-[#C2B8A7]">{exp.period} · {exp.location}</p>
                       </div>
                       <div className="flex items-center gap-1.5">
                         <button
@@ -1589,7 +1613,7 @@ export default function AdminPanel({ onNavigate }) {
                               sections: expSections,
                             });
                           }}
-                          className="p-1.5 rounded-lg border border-slate-700 hover:border-sky-400 text-slate-300"
+                          className="p-1.5 rounded-lg border border-[#302A26] hover:border-[#DC2626] text-[#D6CEBF]"
                           title="Edit Pengalaman & Sub-bab"
                         >
                           <Edit3 className="w-3.5 h-3.5" />
@@ -1606,19 +1630,19 @@ export default function AdminPanel({ onNavigate }) {
                     </div>
 
                     {/* Preview Sub-bab di Card Admin */}
-                    <div className="pt-2 border-t border-slate-800/80 space-y-2">
+                    <div className="pt-2 border-t border-[#302A26] space-y-2">
                       {(exp.sections || []).map((sec, sIdx) => (
-                        <div key={sIdx} className="bg-slate-950/60 rounded-xl p-3 border border-slate-800/60 text-xs space-y-1.5">
-                          <div className="flex items-center justify-between text-sky-400 font-semibold">
+                        <div key={sIdx} className="bg-[#100F0E]/80 rounded-xl p-3 border border-[#302A26]/70 text-xs space-y-1.5">
+                          <div className="flex items-center justify-between text-[#EF4444] font-semibold">
                             <span className="flex items-center gap-1.5">
-                              <span className="w-1.5 h-1.5 rounded-full bg-sky-400" />
+                              <span className="w-1.5 h-1.5 rounded-full bg-[#EF4444]" />
                               {sec.heading || `Sub-bab #${sIdx + 1}`}
                             </span>
-                            <span className="text-[10px] text-slate-400 font-normal px-2 py-0.5 rounded bg-slate-900 border border-slate-800">
+                            <span className="text-[10px] text-[#C2B8A7] font-normal px-2 py-0.5 rounded bg-[#1C1917] border border-[#302A26]">
                               {(sec.bullets || []).length} poin
                             </span>
                           </div>
-                          <ul className="list-disc list-inside text-slate-400 space-y-0.5 text-[11px] leading-relaxed">
+                          <ul className="list-disc list-inside text-[#C2B8A7] space-y-0.5 text-[11px] leading-relaxed">
                             {(sec.bullets || []).map((b, bIdx) => (
                               <li key={bIdx}>{b}</li>
                             ))}
@@ -1636,11 +1660,11 @@ export default function AdminPanel({ onNavigate }) {
         {/* CERTIFICATES TAB */}
         {activeTab === 'certificates' && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            <form onSubmit={handleSaveCertificate} className="lg:col-span-5 bg-[#111a2e] border border-slate-800 rounded-2xl p-5 space-y-4">
+            <form onSubmit={handleSaveCertificate} className="lg:col-span-5 bg-[#181615] border border-[#302A26] rounded-2xl p-5 space-y-4">
               <div className="flex items-center justify-between">
-                <h2 className="font-bold text-base">{editingCertId ? 'Edit Sertifikat' : 'Tambah Sertifikat Baru'}</h2>
+                <h2 className="font-serif-editorial text-xl text-[#EDE6D6]">{editingCertId ? 'Edit Sertifikat' : 'Tambah Sertifikat Baru'}</h2>
                 {editingCertId && (
-                  <button type="button" onClick={resetCertForm} className="text-xs text-slate-400 hover:text-sky-400">
+                  <button type="button" onClick={resetCertForm} className="text-xs text-[#C2B8A7] hover:text-[#EF4444]">
                     Batal Edit
                   </button>
                 )}
@@ -1648,14 +1672,14 @@ export default function AdminPanel({ onNavigate }) {
 
               {/* Foto / Scan Sertifikat */}
               <div className="space-y-2">
-                <label className="block text-xs font-semibold text-slate-400">Foto / Scan Sertifikat (Cloudinary)</label>
-                <div className="aspect-[16/10] rounded-xl overflow-hidden bg-slate-950 border border-dashed border-slate-700 flex items-center justify-center relative">
+                <label className="block font-mono-code text-xs font-semibold text-[#C2B8A7]">Foto / Scan Sertifikat (Cloudinary)</label>
+                <div className="aspect-[16/10] rounded-xl overflow-hidden bg-[#100F0E] border border-dashed border-[#302A26] flex items-center justify-center relative">
                   {certForm.imageUrl ? (
                     <img src={certForm.imageUrl} alt="Preview Sertifikat" className="w-full h-full object-cover" />
                   ) : (
                     <div className="text-center p-4">
                       <Award className="w-8 h-8 text-amber-500/50 mx-auto mb-1" />
-                      <p className="text-xs text-slate-500">Belum ada foto sertifikat</p>
+                      <p className="text-xs text-[#938878]">Belum ada foto sertifikat</p>
                     </div>
                   )}
                 </div>
@@ -1673,36 +1697,36 @@ export default function AdminPanel({ onNavigate }) {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-400 mb-1">Judul Sertifikat *</label>
+                <label className="block font-mono-code text-xs font-semibold text-[#C2B8A7] mb-1">Judul Sertifikat *</label>
                 <input
                   type="text"
                   required
                   value={certForm.title}
                   onChange={(e) => setCertForm({ ...certForm, title: e.target.value })}
                   placeholder="Contoh: Sertifikat Magang Web UI/UX Developer"
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                  className="w-full px-3 py-2 rounded-xl bg-[#100F0E] border border-[#302A26] text-sm focus:border-[#DC2626] outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-400 mb-1">Penerbit / Instansi / Penyelenggara *</label>
+                <label className="block font-mono-code text-xs font-semibold text-[#C2B8A7] mb-1">Penerbit / Instansi / Penyelenggara *</label>
                 <input
                   type="text"
                   required
                   value={certForm.issuer}
                   onChange={(e) => setCertForm({ ...certForm, issuer: e.target.value })}
                   placeholder="Contoh: PT Vinix Seven Aurum (VINIX7)"
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                  className="w-full px-3 py-2 rounded-xl bg-[#100F0E] border border-[#302A26] text-sm focus:border-[#DC2626] outline-none"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-400 mb-1">Kategori Sertifikat</label>
+                  <label className="block font-mono-code text-xs font-semibold text-[#C2B8A7] mb-1">Kategori Sertifikat</label>
                   <select
                     value={certForm.category}
                     onChange={(e) => setCertForm({ ...certForm, category: e.target.value })}
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                    className="w-full px-3 py-2 rounded-xl bg-[#100F0E] border border-[#302A26] text-sm focus:border-[#DC2626] outline-none"
                   >
                     <option value="Magang">Magang (Internship)</option>
                     <option value="Seminar / Webinar">Seminar / Webinar</option>
@@ -1717,26 +1741,26 @@ export default function AdminPanel({ onNavigate }) {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-400 mb-1">Bulan &amp; Tahun Terbit</label>
+                  <label className="block font-mono-code text-xs font-semibold text-[#C2B8A7] mb-1">Bulan &amp; Tahun Terbit</label>
                   <input
                     type="text"
                     value={certForm.issueDate}
                     onChange={(e) => setCertForm({ ...certForm, issueDate: e.target.value })}
                     placeholder="Contoh: November 2026"
-                    className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                    className="w-full px-3 py-2 rounded-xl bg-[#100F0E] border border-[#302A26] text-sm focus:border-[#DC2626] outline-none"
                   />
                 </div>
               </div>
 
               {/* Hubungkan ke Pengalaman Kerja / Magang */}
               <div>
-                <label className="block text-xs font-semibold text-slate-400 mb-1">
+                <label className="block font-mono-code text-xs font-semibold text-[#C2B8A7] mb-1">
                   Hubungkan ke Pengalaman Kerja / Magang (Opsional)
                 </label>
                 <select
                   value={certForm.experienceId}
                   onChange={(e) => setCertForm({ ...certForm, experienceId: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                  className="w-full px-3 py-2 rounded-xl bg-[#100F0E] border border-[#302A26] text-sm focus:border-[#DC2626] outline-none"
                 >
                   <option value="">-- Tidak dihubungkan ke pengalaman spesifik --</option>
                   {experiences.map((exp) => (
@@ -1745,37 +1769,37 @@ export default function AdminPanel({ onNavigate }) {
                     </option>
                   ))}
                 </select>
-                <p className="text-[11px] text-slate-500 mt-1">
+                <p className="text-[11px] text-[#938878] mt-1">
                   Jika dihubungkan, tombol "Lihat Sertifikat" otomatis muncul di kartu Rekam Jejak pengalaman tersebut.
                 </p>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-400 mb-1">URL Verifikasi Kredensial (Opsional)</label>
+                <label className="block font-mono-code text-xs font-semibold text-[#C2B8A7] mb-1">URL Verifikasi Kredensial (Opsional)</label>
                 <input
                   type="url"
                   value={certForm.credentialUrl}
                   onChange={(e) => setCertForm({ ...certForm, credentialUrl: e.target.value })}
                   placeholder="https://..."
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                  className="w-full px-3 py-2 rounded-xl bg-[#100F0E] border border-[#302A26] text-sm focus:border-[#DC2626] outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-400 mb-1">Deskripsi / Catatan Capaian (Opsional)</label>
+                <label className="block font-mono-code text-xs font-semibold text-[#C2B8A7] mb-1">Deskripsi / Catatan Capaian (Opsional)</label>
                 <textarea
                   rows="3"
                   value={certForm.description}
                   onChange={(e) => setCertForm({ ...certForm, description: e.target.value })}
                   placeholder="Penjelasan singkat capaian sertifikat ini..."
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm resize-none focus:border-sky-500 outline-none"
+                  className="w-full px-3 py-2 rounded-xl bg-[#100F0E] border border-[#302A26] text-sm resize-none focus:border-[#DC2626] outline-none"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full inline-flex items-center justify-center gap-2 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-semibold text-sm disabled:opacity-50"
+                className="w-full inline-flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[#DC2626] hover:bg-[#B91C1C] text-white font-semibold text-sm disabled:opacity-50"
               >
                 <Save className="w-4 h-4" />
                 <span>{loading ? 'Menyimpan...' : editingCertId ? 'Simpan Perubahan' : 'Tambahkan Sertifikat'}</span>
@@ -1787,14 +1811,14 @@ export default function AdminPanel({ onNavigate }) {
               {certificates.map((cert) => {
                 const linkedExp = experiences.find((x) => String(x.id) === String(cert.experienceId) || x.id === cert.experienceId);
                 return (
-                  <article key={cert.id} className="bg-[#111a2e] border border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row gap-4 items-start">
-                    <div className="w-full sm:w-40 aspect-[16/10] rounded-xl overflow-hidden bg-slate-950/80 border border-slate-800 shrink-0 flex items-center justify-center p-1.5">
+                  <article key={cert.id} className="bg-[#181615] border border-[#302A26] rounded-2xl p-4 flex flex-col sm:flex-row gap-4 items-start">
+                    <div className="w-full sm:w-40 aspect-[16/10] rounded-xl overflow-hidden bg-[#100F0E]/90 border border-[#302A26] shrink-0 flex items-center justify-center p-1.5">
                       {cert.imageUrl ? (
                         <img src={cert.imageUrl} alt={cert.title} className="w-full h-full object-contain rounded-lg" />
                       ) : (
                         <div className="text-center p-2">
                           <Award className="w-6 h-6 text-amber-500/50 mx-auto mb-1" />
-                          <span className="text-[10px] text-slate-500 block">Preview Mockup</span>
+                          <span className="text-[10px] text-[#938878] block">Preview Mockup</span>
                         </div>
                       )}
                     </div>
@@ -1807,21 +1831,21 @@ export default function AdminPanel({ onNavigate }) {
                               {cert.category}
                             </span>
                             {linkedExp && (
-                              <span className="text-[10px] text-sky-400 bg-sky-500/10 border border-sky-500/20 px-2 py-0.5 rounded-full">
+                              <span className="text-[10px] text-[#EF4444] bg-[#DC2626]/10 border border-[#DC2626]/30 px-2 py-0.5 rounded-full font-mono-code">
                                 Terkait: {linkedExp.company}
                               </span>
                             )}
                           </div>
                           <h3 className="font-bold text-base">{cert.title}</h3>
-                          <p className="text-xs text-sky-400">{cert.issuer}</p>
-                          <p className="text-[11px] text-slate-400">{cert.issueDate}</p>
+                          <p className="text-xs text-[#EF4444]">{cert.issuer}</p>
+                          <p className="text-[11px] text-[#C2B8A7]">{cert.issueDate}</p>
                         </div>
 
                         <div className="flex items-center gap-1.5 shrink-0">
                           <button
                             type="button"
                             onClick={() => setPreviewCert(cert)}
-                            className="p-1.5 rounded-lg border border-slate-700 hover:border-amber-400 text-amber-300"
+                            className="p-1.5 rounded-lg border border-[#302A26] hover:border-amber-400 text-amber-300"
                             title="Pratinjau Sertifikat"
                           >
                             <Eye className="w-3.5 h-3.5" />
@@ -1843,7 +1867,7 @@ export default function AdminPanel({ onNavigate }) {
                                 imageMeta: cert.imageUrl ? 'Tersimpan di Cloudinary' : '',
                               });
                             }}
-                            className="p-1.5 rounded-lg border border-slate-700 hover:border-sky-400 text-slate-300"
+                            className="p-1.5 rounded-lg border border-[#302A26] hover:border-[#DC2626] text-[#D6CEBF]"
                             title="Edit Sertifikat"
                           >
                             <Edit3 className="w-3.5 h-3.5" />
@@ -1860,7 +1884,7 @@ export default function AdminPanel({ onNavigate }) {
                       </div>
 
                       {cert.description && (
-                        <p className="text-xs text-slate-400 line-clamp-2">{cert.description}</p>
+                        <p className="text-xs text-[#C2B8A7] line-clamp-2">{cert.description}</p>
                       )}
                     </div>
                   </article>
@@ -1873,11 +1897,11 @@ export default function AdminPanel({ onNavigate }) {
         {/* SKILLS TAB */}
         {activeTab === 'skills' && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            <form onSubmit={handleSaveSkill} className="lg:col-span-5 bg-[#111a2e] border border-slate-800 rounded-2xl p-5 space-y-4">
+            <form onSubmit={handleSaveSkill} className="lg:col-span-5 bg-[#181615] border border-[#302A26] rounded-2xl p-5 space-y-4">
               <div className="flex items-center justify-between">
-                <h2 className="font-bold text-base">{editingSkillId ? 'Edit Keahlian' : 'Tambah Keahlian Baru'}</h2>
+                <h2 className="font-serif-editorial text-xl text-[#EDE6D6]">{editingSkillId ? 'Edit Keahlian' : 'Tambah Keahlian Baru'}</h2>
                 {editingSkillId && (
-                  <button type="button" onClick={resetSkillForm} className="text-xs text-slate-400 hover:text-sky-400">
+                  <button type="button" onClick={resetSkillForm} className="text-xs text-[#C2B8A7] hover:text-[#EF4444]">
                     Batal Edit
                   </button>
                 )}
@@ -1885,7 +1909,7 @@ export default function AdminPanel({ onNavigate }) {
 
               {/* Tipe: Hard Skill vs Soft Skill */}
               <div>
-                <label className="block text-xs font-semibold text-slate-400 mb-1.5">Kategori Utama *</label>
+                <label className="block font-mono-code text-xs font-semibold text-[#C2B8A7] mb-1.5">Kategori Utama *</label>
                 <div className="grid grid-cols-2 gap-2">
                   <button
                     type="button"
@@ -1898,8 +1922,8 @@ export default function AdminPanel({ onNavigate }) {
                     }}
                     className={`py-2 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-2 transition-all ${
                       skillForm.category === 'hard'
-                        ? 'bg-sky-500/20 border-sky-500/60 text-sky-300 shadow-sm'
-                        : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-200'
+                        ? 'bg-[#DC2626]/20 border-[#DC2626]/60 text-[#FCA5A5] shadow-sm'
+                        : 'bg-[#100F0E] border-[#302A26] text-[#C2B8A7] hover:text-[#EDE6D6]'
                     }`}
                   >
                     <Code2 className="w-3.5 h-3.5" />
@@ -1916,8 +1940,8 @@ export default function AdminPanel({ onNavigate }) {
                     }}
                     className={`py-2 px-3 rounded-xl border text-xs font-semibold flex items-center justify-center gap-2 transition-all ${
                       skillForm.category === 'soft'
-                        ? 'bg-purple-500/20 border-purple-500/60 text-purple-300 shadow-sm'
-                        : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-200'
+                        ? 'bg-[#DC2626]/20 border-[#DC2626]/60 text-[#FCA5A5] shadow-sm'
+                        : 'bg-[#100F0E] border-[#302A26] text-[#C2B8A7] hover:text-[#EDE6D6]'
                     }`}
                   >
                     <Brain className="w-3.5 h-3.5" />
@@ -1928,17 +1952,17 @@ export default function AdminPanel({ onNavigate }) {
 
               {/* Grup / Kelompok Keahlian */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-semibold text-slate-400">Grup / Kelompok Keahlian *</label>
+                <label className="block font-mono-code text-xs font-semibold text-[#C2B8A7]">Grup / Kelompok Keahlian *</label>
                 <input
                   type="text"
                   required
                   value={skillForm.groupName}
                   onChange={(e) => setSkillForm({ ...skillForm, groupName: e.target.value })}
                   placeholder="Contoh: Web UI/UX & ML, Programming Languages..."
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                  className="w-full px-3 py-2 rounded-xl bg-[#100F0E] border border-[#302A26] text-sm focus:border-[#DC2626] outline-none"
                 />
                 <div className="flex flex-wrap gap-1.5 pt-1">
-                  <span className="text-[11px] text-slate-500 block w-full">Pilihan Cepat Grup:</span>
+                  <span className="text-[11px] text-[#938878] block w-full">Pilihan Cepat Grup:</span>
                   {(skillForm.category === 'hard'
                     ? ['Web UI/UX & ML', 'Programming Languages', 'IoT & Embedded', 'Database, Cloud & IT']
                     : ['Problem Solving & Analisis', 'Komunikasi & Tim', 'Manajemen & Kerja Profesional']
@@ -1949,8 +1973,8 @@ export default function AdminPanel({ onNavigate }) {
                       onClick={() => setSkillForm({ ...skillForm, groupName: grp })}
                       className={`text-[11px] px-2 py-0.5 rounded-lg border transition-all ${
                         skillForm.groupName === grp
-                          ? 'bg-sky-500/20 border-sky-500/50 text-sky-300'
-                          : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-200'
+                          ? 'bg-[#DC2626]/20 border-[#DC2626]/50 text-[#FCA5A5]'
+                          : 'bg-[#1C1917] border-[#302A26] text-[#C2B8A7] hover:text-[#EDE6D6]'
                       }`}
                     >
                       {grp}
@@ -1961,78 +1985,74 @@ export default function AdminPanel({ onNavigate }) {
 
               {/* Nama Keahlian */}
               <div>
-                <label className="block text-xs font-semibold text-slate-400 mb-1">Nama Keahlian / Kemampuan *</label>
+                <label className="block font-mono-code text-xs font-semibold text-[#C2B8A7] mb-1">Nama Keahlian / Kemampuan *</label>
                 <input
                   type="text"
                   required
                   value={skillForm.name}
                   onChange={(e) => setSkillForm({ ...skillForm, name: e.target.value })}
                   placeholder="Contoh: Python, Web UI/UX, Troubleshooting..."
-                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-800 text-sm focus:border-sky-500 outline-none"
+                  className="w-full px-3 py-2 rounded-xl bg-[#100F0E] border border-[#302A26] text-sm focus:border-[#DC2626] outline-none"
                 />
               </div>
 
-              {/* Tingkat Kemahiran (Rate Point) */}
-              <div className="p-4 rounded-xl bg-slate-950/70 border border-slate-800/80 space-y-3">
-                <div className="flex items-center justify-between">
-                  <label className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-                    <Sliders className="w-3.5 h-3.5 text-sky-400" />
-                    <span>Rate Point Kemampuan (1 - 100%)</span>
+              {/* Tingkat Penguasaan (Disimpan ke ratePoint tanpa progress bar persen) */}
+              <div className="p-4 rounded-xl bg-[#100F0E] border border-[#302A26] space-y-3">
+                <div className="flex items-center justify-between gap-2">
+                  <label className="font-mono-code text-xs font-semibold text-[#C2B8A7] flex items-center gap-1.5">
+                    <Sliders className="w-3.5 h-3.5 text-[#EF4444]" />
+                    <span>Tingkat Penguasaan</span>
                   </label>
-                  <div className="flex items-center gap-1.5">
-                    <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full border ${getSkillRatingLabel(skillForm.ratePoint).badgeClass}`}>
-                      {getSkillRatingLabel(skillForm.ratePoint).label.split('/')[0].trim()}
-                    </span>
-                    <span className="text-sm font-extrabold text-sky-400 min-w-[40px] text-right">
-                      {skillForm.ratePoint}%
-                    </span>
-                  </div>
+                  <span className={`font-mono-code text-[11px] font-semibold px-2.5 py-0.5 rounded border ${getSkillRatingLabel(skillForm.ratePoint).badgeClass}`}>
+                    {getSkillRatingLabel(skillForm.ratePoint).label.split('/')[0].trim()}
+                  </span>
                 </div>
 
-                <div className="flex items-center gap-3">
-                  <input
-                    type="range"
-                    min="1"
-                    max="100"
-                    value={skillForm.ratePoint}
-                    onChange={(e) => setSkillForm({ ...skillForm, ratePoint: Number(e.target.value) })}
-                    className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-sky-500"
-                  />
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {[
+                    { label: 'Intermediate', val: 70 },
+                    { label: 'Proficient', val: 80 },
+                    { label: 'Advanced', val: 88 },
+                    { label: 'Expert', val: 95 },
+                  ].map((tier) => {
+                    const currentTier = getSkillRatingLabel(skillForm.ratePoint).label.split('/')[0].trim();
+                    const active = currentTier === tier.label;
+                    return (
+                      <button
+                        key={tier.label}
+                        type="button"
+                        onClick={() => setSkillForm({ ...skillForm, ratePoint: tier.val })}
+                        className={`py-2 px-2.5 rounded-lg font-mono-code text-[11px] font-semibold border transition-colors ${
+                          active
+                            ? 'bg-[#DC2626] text-white border-[#DC2626]'
+                            : 'bg-[#1C1917] border-[#302A26] text-[#C2B8A7] hover:text-[#EDE6D6]'
+                        }`}
+                      >
+                        {tier.label}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div className="flex items-center justify-between gap-3 pt-1">
+                  <span className="font-mono-code text-[11px] text-[#938878]">
+                    Skor Internal Database (1–100):
+                  </span>
                   <input
                     type="number"
                     min="1"
                     max="100"
                     value={skillForm.ratePoint}
                     onChange={(e) => setSkillForm({ ...skillForm, ratePoint: Math.min(100, Math.max(1, Number(e.target.value))) })}
-                    className="w-16 px-2 py-1 rounded-lg bg-slate-900 border border-slate-700 text-sm font-bold text-center"
+                    className="w-20 px-2.5 py-1 rounded-lg bg-[#1C1917] border border-[#302A26] font-mono-code text-xs font-bold text-center text-[#EDE6D6] focus:border-[#DC2626] outline-none"
                   />
-                </div>
-
-                {/* Live Preview Bar */}
-                <div className="space-y-1">
-                  <div className="w-full bg-slate-900 rounded-full h-2.5 overflow-hidden border border-slate-800 p-0.5">
-                    <div
-                      className={`h-full rounded-full transition-all duration-300 ${
-                        skillForm.category === 'hard'
-                          ? 'bg-gradient-to-r from-sky-500 via-cyan-400 to-emerald-400'
-                          : 'bg-gradient-to-r from-purple-500 via-fuchsia-400 to-indigo-400'
-                      }`}
-                      style={{ width: `${skillForm.ratePoint}%` }}
-                    />
-                  </div>
-                  <div className="flex justify-between text-[10px] text-slate-500">
-                    <span>Pemula (60%)</span>
-                    <span>Menengah (75%)</span>
-                    <span>Mahir (85%)</span>
-                    <span>Expert (95%+)</span>
-                  </div>
                 </div>
               </div>
 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full inline-flex items-center justify-center gap-2 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-white font-semibold text-sm disabled:opacity-50"
+                className="w-full inline-flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[#DC2626] hover:bg-[#B91C1C] text-white font-semibold text-sm disabled:opacity-50"
               >
                 <Save className="w-4 h-4" />
                 <span>{loading ? 'Menyimpan...' : editingSkillId ? 'Simpan Perubahan' : 'Tambahkan Keahlian'}</span>
@@ -2041,13 +2061,13 @@ export default function AdminPanel({ onNavigate }) {
 
             {/* List Keahlian */}
             <div className="lg:col-span-7 space-y-4">
-              <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-2xl bg-[#111a2e] border border-slate-800">
-                <div className="inline-flex gap-1 p-1 bg-slate-950 rounded-xl border border-slate-800">
+              <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-2xl bg-[#181615] border border-[#302A26]">
+                <div className="inline-flex gap-1 p-1 bg-[#100F0E] rounded-xl border border-[#302A26]">
                   <button
                     type="button"
                     onClick={() => setSkillFilterTab('all')}
                     className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                      skillFilterTab === 'all' ? 'bg-sky-500 text-white' : 'text-slate-400 hover:text-slate-200'
+                      skillFilterTab === 'all' ? 'bg-[#DC2626] text-white' : 'text-[#C2B8A7] hover:text-[#EDE6D6]'
                     }`}
                   >
                     Semua ({skills.length})
@@ -2056,7 +2076,7 @@ export default function AdminPanel({ onNavigate }) {
                     type="button"
                     onClick={() => setSkillFilterTab('hard')}
                     className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                      skillFilterTab === 'hard' ? 'bg-sky-500 text-white' : 'text-slate-400 hover:text-slate-200'
+                      skillFilterTab === 'hard' ? 'bg-[#DC2626] text-white' : 'text-[#C2B8A7] hover:text-[#EDE6D6]'
                     }`}
                   >
                     Hard Skills ({skills.filter((s) => s.category === 'hard').length})
@@ -2065,7 +2085,7 @@ export default function AdminPanel({ onNavigate }) {
                     type="button"
                     onClick={() => setSkillFilterTab('soft')}
                     className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                      skillFilterTab === 'soft' ? 'bg-purple-500 text-white' : 'text-slate-400 hover:text-slate-200'
+                      skillFilterTab === 'soft' ? 'bg-[#DC2626] text-white' : 'text-[#C2B8A7] hover:text-[#EDE6D6]'
                     }`}
                   >
                     Soft Skills ({skills.filter((s) => s.category === 'soft').length})
@@ -2079,25 +2099,25 @@ export default function AdminPanel({ onNavigate }) {
                   .map((skill) => {
                     const ratingInfo = getSkillRatingLabel(skill.ratePoint);
                     return (
-                      <article key={skill.id} className="bg-[#111a2e] border border-slate-800 rounded-2xl p-4 space-y-2.5">
+                      <article key={skill.id} className="bg-[#181615] border border-[#302A26] rounded-2xl p-4 space-y-2.5">
                         <div className="flex items-start justify-between gap-2">
                           <div className="min-w-0">
                             <div className="flex flex-wrap items-center gap-1.5 mb-1">
                               <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${
                                 skill.category === 'hard'
-                                  ? 'bg-sky-500/15 text-sky-400 border-sky-500/30'
-                                  : 'bg-purple-500/15 text-purple-300 border-purple-500/30'
+                                  ? 'bg-[#DC2626]/15 text-[#EF4444] border-[#DC2626]/35'
+                                  : 'bg-[#DC2626]/15 text-[#FCA5A5] border-[#DC2626]/35'
                               }`}>
                                 {skill.category === 'hard' ? 'Hard Skill' : 'Soft Skill'}
                               </span>
-                              <span className="text-[11px] text-slate-400 bg-slate-900 border border-slate-800 px-2 py-0.5 rounded-full">
+                              <span className="text-[11px] text-[#C2B8A7] bg-[#1C1917] border border-[#302A26] px-2 py-0.5 rounded-full">
                                 {skill.groupName}
                               </span>
                               <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${ratingInfo.badgeClass}`}>
                                 {ratingInfo.label.split('/')[0].trim()}
                               </span>
                             </div>
-                            <h3 className="font-bold text-sm sm:text-base text-slate-100">{skill.name}</h3>
+                            <h3 className="font-bold text-sm sm:text-base text-[#EDE6D6]">{skill.name}</h3>
                           </div>
 
                           <div className="flex items-center gap-1.5 shrink-0">
@@ -2113,7 +2133,7 @@ export default function AdminPanel({ onNavigate }) {
                                   sortOrder: Number(skill.sortOrder) || 0,
                                 });
                               }}
-                              className="p-1.5 rounded-lg border border-slate-700 hover:border-sky-400 text-slate-300"
+                              className="p-1.5 rounded-lg border border-[#302A26] hover:border-[#DC2626] text-[#D6CEBF]"
                               title="Edit Keahlian"
                             >
                               <Edit3 className="w-3.5 h-3.5" />
@@ -2129,22 +2149,12 @@ export default function AdminPanel({ onNavigate }) {
                           </div>
                         </div>
 
-                        {/* Progress Rate Point Bar */}
-                        <div className="space-y-1">
-                          <div className="flex items-center justify-between text-xs">
-                            <span className="text-slate-400 text-[11px]">Tingkat Penguasaan</span>
-                            <span className="font-extrabold text-sky-400 text-xs">{skill.ratePoint}%</span>
-                          </div>
-                          <div className="w-full bg-slate-950 rounded-full h-2 overflow-hidden border border-slate-800/80 p-0.5">
-                            <div
-                              className={`h-full rounded-full ${
-                                skill.category === 'hard'
-                                  ? 'bg-gradient-to-r from-sky-500 via-cyan-400 to-emerald-400'
-                                  : 'bg-gradient-to-r from-purple-500 via-fuchsia-400 to-indigo-400'
-                              }`}
-                              style={{ width: `${skill.ratePoint}%` }}
-                            />
-                          </div>
+                        {/* Ringkasan Tingkat Penguasaan berbasis teks (selaras tampilan baru) */}
+                        <div className="pt-2 border-t border-[#302A26] flex items-center justify-between text-xs font-mono-code">
+                          <span className="text-[#C2B8A7]">Tingkat Penguasaan</span>
+                          <span className="font-semibold text-[#EDE6D6]">
+                            {ratingInfo.label.split('/')[0].trim()} (Skor {skill.ratePoint})
+                          </span>
                         </div>
                       </article>
                     );
@@ -2230,7 +2240,7 @@ export default function AdminPanel({ onNavigate }) {
       />
 
       {toast && (
-        <div className="fixed bottom-5 right-5 z-50 flex items-center gap-2 px-4 py-3 rounded-xl bg-slate-900 text-white text-sm font-medium shadow-xl border border-sky-500/40">
+        <div className="fixed bottom-5 right-5 z-50 flex items-center gap-2 px-4 py-3 rounded-xl bg-[#1C1917] text-white text-sm font-medium shadow-xl border border-[#DC2626]/45">
           <CheckCircle2 className="w-4 h-4 text-emerald-400" />
           <span>{toast}</span>
         </div>
