@@ -768,9 +768,33 @@ export default function AdminPanel({ onNavigate }) {
     );
   }
 
+  const adminBgImage =
+    activeTab === 'profile'
+      ? '/images/bg-dossier-hero.jpg'
+      : activeTab === 'projects' || activeTab === 'experiences'
+      ? '/images/bg-corridor-noir.jpg'
+      : '/images/bg-archive-crt.jpg';
+
   return (
-    <div className="min-h-screen bg-[#100F0E] text-[#EDE6D6]">
-      <header className="sticky top-0 z-30 bg-[#100F0E]/92 backdrop-blur border-b border-[#302A26]">
+    <div className="min-h-screen bg-[#100F0E] text-[#EDE6D6] relative overflow-x-hidden">
+      {/* Latar belakang atmosfer Noir Dossier dari public/images/ sesuai tab aktif */}
+      <div className="fixed inset-0 pointer-events-none select-none z-0" aria-hidden="true">
+        <div
+          className="absolute inset-0 bg-cover bg-center transition-all duration-500"
+          style={{
+            backgroundImage: `url('${adminBgImage}')`,
+            opacity: 0.16,
+            filter: 'contrast(1.08) saturate(0.72)',
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{ background: 'radial-gradient(ellipse at center, rgba(16,15,14,0.35) 0%, rgba(16,15,14,0.90) 88%)' }}
+        />
+        <div className="vhs-scanlines absolute inset-0 opacity-25" />
+      </div>
+
+      <header className="sticky top-0 z-30 bg-[#100F0E]/90 backdrop-blur border-b border-[#302A26]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <span className="w-9 h-9 rounded-lg bg-[#DC2626] text-white flex items-center justify-center font-mono-code font-extrabold text-sm shrink-0">
@@ -821,7 +845,7 @@ export default function AdminPanel({ onNavigate }) {
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-6 relative z-10">
         <div className="inline-flex flex-wrap p-1 rounded-xl bg-[#181615] border border-[#302A26] gap-1 font-mono-code">
           <button
             type="button"
